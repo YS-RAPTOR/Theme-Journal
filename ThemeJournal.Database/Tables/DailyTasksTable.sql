@@ -1,0 +1,10 @@
+CREATE TABLE DailyTasks (
+    Id UUID PRIMARY KEY,
+    UserId UUID REFERENCES Users(Id) ON DELETE CASCADE NOT NULL,
+    ObjectiveID UUID REFERENCES ThemeObjectives(Id),
+    Description VARCHAR(255) NOT NULL,
+    PartialCompletion VARCHAR(255) NOT NULL,
+    FullCompletion VARCHAR(255) NOT NULL,
+    StartDate TIMESTAMP NOT NULL Default CURRENT_TIMESTAMP,
+    EndDate TIMESTAMP NOT NULL
+);
