@@ -1,5 +1,6 @@
 import { ReactNode, useEffect } from "react";
 import { IMsalContext, useMsal } from "@azure/msal-react";
+import { loginRequest } from "../utils/authConfig";
 
 const AuthWrapper = ({ children }: { children: ReactNode }) => {
     const { instance, accounts }: IMsalContext = useMsal();
@@ -9,8 +10,9 @@ const AuthWrapper = ({ children }: { children: ReactNode }) => {
         if (accounts.length > 0) {
             // Sign in silently if we have an account
             instance
-                .acquireTokenSilent({
-                    scopes: [],
+                .acquireTokenSilent(loginRequest)
+                .then((response) => {
+                    console.log(response.accessToken);
                 })
                 .catch((error) => {
                     console.log(
@@ -20,7 +22,6 @@ const AuthWrapper = ({ children }: { children: ReactNode }) => {
                 });
         }
     }, []);
-
     return <>{children}</>;
 };
 export default AuthWrapper;

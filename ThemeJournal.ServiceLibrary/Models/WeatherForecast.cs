@@ -1,4 +1,4 @@
-namespace ThemeJournal.API
+namespace ThemeJournal.Api
 {
     public class WeatherForecast
     {

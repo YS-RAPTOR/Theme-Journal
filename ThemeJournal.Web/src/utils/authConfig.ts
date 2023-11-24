@@ -73,5 +73,5 @@ export const msalConfig = {
 };
 
 export const loginRequest = {
-    scopes: [],
+    scopes: [import.meta.env.VITE_AUTH_SCOPE as string],
 };

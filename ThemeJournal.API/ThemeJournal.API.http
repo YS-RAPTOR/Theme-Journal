@@ -1,6 +1,6 @@
-@ThemeJournal.API_HostAddress = http://localhost:5256
+@ThemeJournal.Api_HostAddress = http://localhost:5140
 
-GET {{ThemeJournal.API_HostAddress}}/weatherforecast/
+GET {{ThemeJournal.Api_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
