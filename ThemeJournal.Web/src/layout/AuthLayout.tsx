@@ -2,7 +2,7 @@ import { ReactNode, useEffect } from "react";
 import { IMsalContext, useMsal } from "@azure/msal-react";
 import { loginRequest } from "../utils/authConfig";
 
-const AuthWrapper = ({ children }: { children: ReactNode }) => {
+const Layout = ({ children }: { children: ReactNode }) => {
     const { instance, accounts }: IMsalContext = useMsal();
 
     // Runs on initial load
@@ -24,4 +24,4 @@ const AuthWrapper = ({ children }: { children: ReactNode }) => {
     }, []);
     return <>{children}</>;
 };
-export default AuthWrapper;
+export default Layout;

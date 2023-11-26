@@ -3,6 +3,7 @@ lockfileVersion: 5.4
 specifiers:
   '@azure/msal-browser': ^3.5.0
   '@azure/msal-react': ^2.0.7
+  '@formkit/auto-animate': ^0.8.1
   '@types/react': ^18.2.37
   '@types/react-dom': ^18.2.15
   '@typescript-eslint/eslint-plugin': ^6.10.0
@@ -17,6 +18,7 @@ specifiers:
   postcss: ^8.4.31
   react: ^18.2.0
   react-dom: ^18.2.0
+  react-icons: ^4.12.0
   react-router-dom: ^6.20.0
   sort-by: ^1.2.0
   tailwindcss: ^3.3.5
@@ -26,10 +28,12 @@ specifiers:
 dependencies:
   '@azure/msal-browser': 3.5.0
   '@azure/msal-react': 2.0.7_3eeop24xdhbze5e6qtjy2hdefy
+  '@formkit/auto-animate': 0.8.1
   localforage: 1.10.0
   match-sorter: 6.3.1
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
+  react-icons: 4.12.0_react@18.2.0
   react-router-dom: 6.20.0_biqbaboplfbrettd7655fr4n2y
   sort-by: 1.2.0
 
@@ -329,6 +333,10 @@ packages:
     resolution: {integrity: sha512-ut5V+D+fOoWPgGGNj83GGjnntO39xDy6DWxO0wb7Jp3DcMX0TfIqdzHF85VTQkerdyGmuuMD9AKAo5KiNlf/AQ==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dev: true
+
+  /@formkit/auto-animate/0.8.1:
+    resolution: {integrity: sha512-0/Z2cuNXWVVIG/l0SpcHAWFhGdvLJ8DRvEfRWvmojtmRWfEy+LWNwgDazbZqY0qQYtkHcoEK3jBLkhiZaB/4Ig==}
+    dev: false
 
   /@humanwhocodes/config-array/0.11.13:
     resolution: {integrity: sha512-JSBDMiDKSzQVngfRjOdFXgFfklaXI4K9nLF49Auh21lmBWRLIK3+xTErTWD4KU54pb6coM6ESE7Awz/FNU3zgQ==}
@@ -1776,6 +1784,14 @@ packages:
       loose-envify: 1.4.0
       react: 18.2.0
       scheduler: 0.23.0
+    dev: false
+
+  /react-icons/4.12.0_react@18.2.0:
+    resolution: {integrity: sha512-IBaDuHiShdZqmfc/TwHu6+d6k2ltNCf3AszxNmjJc1KUfXdEeRJOKyNvLmAHaarhzGmTSVygNdyu8/opXv2gaw==}
+    peerDependencies:
+      react: '*'
+    dependencies:
+      react: 18.2.0
     dev: false
 
   /react-router-dom/6.20.0_biqbaboplfbrettd7655fr4n2y:

@@ -8,15 +8,15 @@ import {
 } from "@azure/msal-browser";
 import { MsalProvider } from "@azure/msal-react";
 import { msalConfig } from "./utils/authConfig.ts";
-import AuthWrapper from "./components/AuthWrapper.tsx";
 
+import AuthLayout from "./layout/AuthLayout.tsx";
 import Root from "./pages/Root.tsx";
-import ViewTasks from "./pages/ViewTasks.tsx";
+import MainLayout from "./layout/MainLayout.tsx";
+import Journal from "./pages/Journal.tsx";
+import Theme from "./pages/Theme.tsx";
 
 import "./index.css";
-import CreateTasks from "./pages/CreateTask.tsx";
-import ThemeCreator from "./pages/ThemeCreator.tsx";
-import GratitudeAndThoughts from "./pages/GratitudeAndThoughts.tsx";
+import NotFound from "./pages/NotFound.tsx";
 
 // Create msal instance
 const msalInstance = new PublicClientApplication(msalConfig);
@@ -49,32 +49,31 @@ msalInstance.addEventCallback((event: EventMessage) => {
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <Root />,
-    },
-    {
-        path: "/see-tasks",
-        element: <ViewTasks />,
-    },
-    {
-        path: "/add-task",
-        element: <CreateTasks />,
-    },
-    {
-        path: "/create-theme",
-        element: <ThemeCreator />,
-    },
-    {
-        path: "/gratitudes-and-thoughts",
-        element: <GratitudeAndThoughts />,
+        element: <MainLayout />,
+        errorElement: <NotFound />,
+        children: [
+            {
+                index: true,
+                element: <Root />,
+            },
+            {
+                path: "/journal",
+                element: <Journal />,
+            },
+            {
+                path: "/theme",
+                element: <Theme />,
+            },
+        ],
     },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
         <MsalProvider instance={msalInstance}>
-            <AuthWrapper>
+            <AuthLayout>
                 <RouterProvider router={router} />
-            </AuthWrapper>
+            </AuthLayout>
         </MsalProvider>
     </React.StrictMode>,
 );
