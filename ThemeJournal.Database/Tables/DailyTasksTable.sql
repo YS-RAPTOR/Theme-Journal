@@ -1,7 +1,7 @@
-CREATE TABLE DailyTasks (
+CREATE TABLE Daily_Tasks (
     Id UUID PRIMARY KEY,
     UserId UUID REFERENCES Users(Id) ON DELETE CASCADE NOT NULL,
-    ObjectiveID UUID REFERENCES ThemeObjectives(Id),
+    ObjectiveID UUID REFERENCES Theme_Objectives(Id) ON DELETE SET NULL,
     Description VARCHAR(255) NOT NULL,
     PartialCompletion VARCHAR(255) NOT NULL,
     FullCompletion VARCHAR(255) NOT NULL,
