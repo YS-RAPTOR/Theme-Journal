@@ -84,32 +84,37 @@ const Profile = () => {
         <>
             <AuthenticatedTemplate>
                 <div ref={menuRef} className="flex flex-col items-end">
-                    <button
-                        onClick={() => setMenuOpen(!menuOpen)}
-                        key="ProfileButton"
-                        className={
-                            (menuOpen
-                                ? " bg-lime-100 text-primaryLight "
-                                : " text-primaryDark hover:bg-lime-50 ") +
-                            "inline-flex h-14 w-14 cursor-pointer items-center justify-center rounded-full "
-                        }
-                    >
-                        <div
+                    <div className="flex h-16 w-16 items-center justify-center">
+                        <button
+                            onClick={() => setMenuOpen(!menuOpen)}
+                            key="ProfileButton"
                             className={
                                 (menuOpen
-                                    ? " border-primaryLight "
-                                    : " border-primaryDark ") +
-                                "inline-flex h-12 w-12 items-center justify-center rounded-full border-2 bg-gray-300 bg-white text-4xl transition-colors hover:border-primaryLight  hover:text-primaryLight"
+                                    ? " bg-lime-100 text-primaryLight "
+                                    : " text-primaryDark hover:bg-lime-50 ") +
+                                "inline-flex h-14 w-14 cursor-pointer items-center justify-center rounded-full "
                             }
                         >
-                            <div className="h-fit w-fit select-none font-bold">
-                                {profileLetter}
+                            <div
+                                className={
+                                    (menuOpen
+                                        ? " border-primaryLight "
+                                        : " border-primaryDark ") +
+                                    "z-10 inline-flex h-12 w-12 items-center justify-center rounded-full border-2 bg-slate-200 text-4xl transition-colors hover:border-primaryLight  hover:text-primaryLight"
+                                }
+                            >
+                                <div className="h-fit w-fit select-none font-bold">
+                                    {profileLetter}
+                                </div>
                             </div>
-                        </div>
-                    </button>
+                        </button>
+                    </div>
                     <div ref={animationParent}>
                         {menuOpen && (
-                            <div className="pr-2 pt-2" key="ProfileDropDown">
+                            <div
+                                className="pr-2 pt-2 backdrop-blur-md"
+                                key="ProfileDropDown"
+                            >
                                 <div className="flex w-max flex-col gap-1 rounded-md border-2 border-primaryDark p-2 text-primaryDark transition-colors">
                                     <Link
                                         to="/settings"

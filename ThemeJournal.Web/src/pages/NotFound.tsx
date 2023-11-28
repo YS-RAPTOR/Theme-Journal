@@ -4,12 +4,12 @@ import NavBar from "../components/NavBar";
 const NotFound = () => {
     return (
         <div className="flex h-screen flex-col">
-            <header className="border-b-2">
+            <header className="border-b-2 border-primaryDark">
                 <nav className="h-16">
                     <NavBar />
                 </nav>
             </header>
-            <main className="h- flex w-full flex-auto flex-col items-center justify-center gap-2">
+            <main className="flex w-full flex-auto flex-col items-center justify-center gap-2">
                 <div className="text-8xl font-black text-primaryDark">404</div>
                 <div className="text-2xl font-black text-primaryLight">
                     Page Not Found
