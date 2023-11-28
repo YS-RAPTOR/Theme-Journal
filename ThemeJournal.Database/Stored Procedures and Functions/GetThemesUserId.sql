@@ -4,10 +4,10 @@ CREATE OR REPLACE FUNCTION Get_Themes_UserId
 )
 RETURNS TABLE
 (
-    Id UUID 
-    Title VARCHAR(255) 
-    StartDate TIMESTAMP 
-    EndDate TIMESTAMP 
+    Id UUID, 
+    Title VARCHAR(255), 
+    StartDate TIMESTAMP,
+    EndDate TIMESTAMP
 )
 LANGUAGE plpgsql
 AS $$

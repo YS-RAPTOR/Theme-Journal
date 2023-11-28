@@ -1,18 +1,18 @@
-CREATE OR REPLACE FUNCTION Get_Tasks_UserId 
+CREATE OR REPLACE FUNCTION Get_Tasks_Date
 (
-    UserId UUID
-    LowerDate TIMESTAMP
+    UserId UUID,
+    LowerDate TIMESTAMP,
     UpperDate TIMESTAMP
 )
 RETURNS TABLE
 (
-    TaskId UUID 
-    ObjectiveDescription VARCHAR(255) 
-    ObjectiveColor INTEGER 
-    Description VARCHAR(255) 
-    PartialCompletion VARCHAR(255) 
-    FullCompletion VARCHAR(255) 
-    StartDate TIMESTAMP
+    TaskId UUID, 
+    ObjectiveDescription VARCHAR(255), 
+    ObjectiveColor INTEGER, 
+    Description VARCHAR(255), 
+    PartialCompletion VARCHAR(255),
+    FullCompletion VARCHAR(255), 
+    StartDate TIMESTAMP,
     EndDate TIMESTAMP 
 )
 LANGUAGE plpgsql
@@ -23,8 +23,7 @@ BEGIN
     FROM Daily_Tasks
     LEFT JOIN Theme_Objectives ON Daily_Tasks.ObjectiveID = Theme_Objectives.Id
     WHERE Daily_Tasks.UserId = UserId AND
-    Daily_Tasks.StartDate >= LowerDate AND
-    Daily_Tasks.EndDate <= UpperDate;
+    Daily_Tasks.StartDate <= UpperDate;
 END;
 $$
 

@@ -1,9 +1,9 @@
-CREATE OR REPLACE PROCEDURE Create_Gratitude
+CREATE OR REPLACE PROCEDURE Upsert_Gratitude
 (
-    _Id UUID 
-    _UserId UUID 
+    _Id UUID,
+    _UserId UUID,
     _Description VARCHAR(1024),
-    _Sentiment NUMERIC(3, 2)
+    _Sentiment NUMERIC(3, 2),
     _CreatedAt TIMESTAMP
 )
 LANGUAGE plpgsql

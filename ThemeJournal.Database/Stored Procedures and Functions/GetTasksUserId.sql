@@ -4,13 +4,13 @@ CREATE OR REPLACE FUNCTION Get_Tasks_UserId
 )
 RETURNS TABLE
 (
-    TaskId UUID 
-    ObjectiveDescription VARCHAR(255) 
-    ObjectiveColor INTEGER 
-    Description VARCHAR(255) 
-    PartialCompletion VARCHAR(255) 
-    FullCompletion VARCHAR(255) 
-    StartDate TIMESTAMP
+    TaskId UUID, 
+    ObjectiveDescription VARCHAR(255), 
+    ObjectiveColor INTEGER, 
+    Description VARCHAR(255), 
+    PartialCompletion VARCHAR(255), 
+    FullCompletion VARCHAR(255), 
+    StartDate TIMESTAMP,
     EndDate TIMESTAMP 
 )
 LANGUAGE plpgsql

@@ -1,7 +1,7 @@
 CREATE OR REPLACE FUNCTION Get_Objective_ThemeId
 (
     _UserId UUID,
-    _ThemeId UUID,
+    _ThemeId UUID
 )
 RETURNS TABLE
 (

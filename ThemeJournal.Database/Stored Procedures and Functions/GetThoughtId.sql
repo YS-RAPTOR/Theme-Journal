@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION Get_Gratitude_Id
+CREATE OR REPLACE FUNCTION Get_Thought_Id
 (
     _Id UUID,
     _UserId UUID

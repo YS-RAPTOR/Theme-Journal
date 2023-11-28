@@ -1,7 +1,7 @@
-CREATE OR REPLACE PROCEDURE Update_Task
+CREATE OR REPLACE PROCEDURE Extend_Task
 (
-    _Id UUID  
-    _UserId UUID 
+    _Id UUID,
+    _UserId UUID, 
     _EndDate TIMESTAMP 
 )
 LANGUAGE plpgsql

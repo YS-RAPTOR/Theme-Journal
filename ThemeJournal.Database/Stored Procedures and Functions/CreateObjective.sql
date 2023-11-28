@@ -3,7 +3,7 @@ CREATE OR REPLACE PROCEDURE Create_Objective
     _Id UUID[],
     _UserId UUID,
     _ThemeId UUID,
-    _Description VARCHAR(255)[]
+    _Description VARCHAR(255)[],
     _ColorId INTEGER[]
 )
 LANGUAGE plpgsql

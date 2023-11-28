@@ -1,15 +1,15 @@
 CREATE OR REPLACE FUNCTION Get_Progress
 (
-    _UserId UUID
-    _TaskIds UUID[]
+    _UserId UUID,
+    _TaskIds UUID[],
     _LowerDate TIMESTAMP,
     _UpperDate TIMESTAMP
 )
 RETURNS TABLE
 (
-    Id UUID 
-    TaskID UUID 
-    CompletionDate TIMESTAMP 
+    Id UUID,
+    TaskID UUID,
+    CompletionDate TIMESTAMP,
     Progress BIT(2) 
 )
 LANGUAGE plpgsql

@@ -1,6 +1,6 @@
 CREATE OR REPLACE FUNCTION Get_Thoughts_Date
 (
-    _UserId UUID
+    _UserId UUID,
     _LowerDate TIMESTAMP,
     _UpperDate TIMESTAMP
 )

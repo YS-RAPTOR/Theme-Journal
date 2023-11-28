@@ -1,12 +1,12 @@
 CREATE OR REPLACE PROCEDURE Create_Task
 (
-    _Id UUID  
-    _UserId UUID 
-    _ObjectiveID UUID 
-    _Description VARCHAR(255) 
-    _PartialCompletion VARCHAR(255) 
-    _FullCompletion VARCHAR(255) 
-    _StartDate TIMESTAMP 
+    _Id UUID,  
+    _UserId UUID, 
+    _ObjectiveID UUID, 
+    _Description VARCHAR(255), 
+    _PartialCompletion VARCHAR(255), 
+    _FullCompletion VARCHAR(255), 
+    _StartDate TIMESTAMP, 
     _EndDate TIMESTAMP 
 )
 LANGUAGE plpgsql
