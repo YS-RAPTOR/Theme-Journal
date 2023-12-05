@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION Get_Thoughts_Date
+CREATE OR REPLACE FUNCTION Get_Thoughts
 (
     _UserId UUID,
     _LowerDate TIMESTAMP,
@@ -17,7 +17,7 @@ BEGIN
     SELECT (Id, CreatedAt, Thought)
     FROM Daily_Thoughts 
     WHERE UserId = _UserId AND 
-    CreatedAt >= _LowerDate AND 
-    CreatedAt <= _UpperDate;
+    (CreatedAt >= _LowerDate OR _LowerDate IS NOT NULL) AND 
+    (CreatedAt <= _UpperDate OR _UpperDate IS NOT NULL)
 END;
 $$

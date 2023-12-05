@@ -19,11 +19,11 @@ Put to update a thought
 Get based on Task id (Internal)
 Get Based on date range (Internal. Think about this a lot)
 Post to create a new progress (Internal)
-Put to update a progress
+
+- Put to update a progress
 
 # Tasks
 
-Get Based on user id (Normal without any params)
 Get Based on Date Range
 Post to create a new task
 Put to update a task (only date)
@@ -31,7 +31,9 @@ Put to update a task (only date)
 # Theme Objectives
 
 Get Based on Theme id (Internal)
-Post to create a new theme objective (Internal)
+
+- Post to create a new theme objective
+- Update Theme Objective
 
 # Themes
 

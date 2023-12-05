@@ -1,6 +1,7 @@
-CREATE OR REPLACE FUNCTION Get_Gratitude_Date
+CREATE OR REPLACE FUNCTION Get_Gratitude
 (
     _UserId UUID,
+    _Sentiment NUMERIC(3, 2)
     _LowerDate TIMESTAMP,
     _UpperDate TIMESTAMP
 )
@@ -18,7 +19,8 @@ BEGIN
     SELECT (Id, CreatedAt, Description, Sentiment)
     FROM Daily_Gratitudes 
     WHERE UserId = _UserID AND
-    CreatedAt >= _LowerDate AND
-    CreatedAt <= _UpperDate;
+    (CreatedAt >= _LowerDate OR _LowerDate IS NOT NULL) AND
+    (CreatedAt <= _UpperDate OR _UpperDate IS NOT NULL) AND
+    (Sentiment >= _Sentiment OR _Sentiment IS NOT NULL);
 END;
 $$
