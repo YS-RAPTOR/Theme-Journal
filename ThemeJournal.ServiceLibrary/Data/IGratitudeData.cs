@@ -4,12 +4,13 @@ namespace ThemeJournal.ServiceLibrary.Data;
 
 public interface IGratitudeData
 {
-    List<GratitudeModel> GetGratitudeById(Guid userId, Guid id);
-    List<GetGratitudeModel> GetGratitudes(
+    Task<List<GratitudeModel>> GetGratitudeById(Guid userId, Guid id);
+    Task<List<GetGratitudeModel>> GetGratitudes(
         Guid userId,
         float? sentiment,
         DateTime? upperDate,
-        DateTime? lowerDate
+        DateTime? lowerDate,
+        TimeOfDay? time
     );
-    void UpsertGratitude(Guid userId, Guid id, GratitudeModel gratitude);
+    Task UpsertGratitude(Guid userId, Guid id, GratitudeModel gratitude);
 }

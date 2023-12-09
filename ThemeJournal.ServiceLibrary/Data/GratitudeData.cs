@@ -13,40 +13,69 @@ public class GratitudeData : IGratitudeData
         _sql = sql;
     }
 
-    public void UpsertGratitude(Guid userId, Guid id, GratitudeModel gratitude)
+    public async Task UpsertGratitude(Guid userId, Guid id, GratitudeModel gratitude)
     {
         DynamicParameters parameters = new();
-        parameters.Add("_UserId", userId);
-        parameters.Add("_Id", id);
-        parameters.Add("_Description", gratitude.Description);
-        parameters.Add("_sentiment", gratitude.Sentiment);
-        parameters.Add("_CreatedAt", gratitude.CreatedAt);
+        parameters.Add("@userid", userId);
+        parameters.Add("@id", id);
+        parameters.Add("@description", gratitude.Description);
+        parameters.Add("@sentiment", gratitude.Sentiment);
+        parameters.Add("@createdat", gratitude.CreatedAt);
+        parameters.Add("@time", gratitude.Time.ToString());
 
-        _sql.SaveData("Upsert_Gratitude", parameters);
+        var sql =
+            @"
+                insert into daily_gratitudes (id, userid, description, sentiment, createdat, time)
+                values (@id, @userid, @description, @sentiment, @createdat, @time::timeofday)
+                on conflict (id)
+                do update set description = @description, sentiment = @sentiment;
+            ";
+
+        await _sql.SaveData(sql, parameters);
     }
 
-    public List<GetGratitudeModel> GetGratitudes(
+    public async Task<List<GetGratitudeModel>> GetGratitudes(
         Guid userId,
         float? sentiment,
         DateTime? upperDate,
-        DateTime? lowerDate
+        DateTime? lowerDate,
+        TimeOfDay? time
     )
     {
         DynamicParameters parameters = new();
-        parameters.Add("_UserId", userId);
-        parameters.Add("_Sentiment", sentiment);
-        parameters.Add("_UpperDate", upperDate);
-        parameters.Add("_LowerDate", lowerDate);
-        var output = _sql.LoadData<GetGratitudeModel, dynamic>("Get_Gratitude", parameters);
-        return output;
+        parameters.Add("@userId", userId);
+        parameters.Add("@sentiment", sentiment);
+        parameters.Add("@upperDate", upperDate);
+        parameters.Add("@lowerDate", lowerDate);
+        parameters.Add("@time", time.HasValue ? time.ToString() : null);
+
+        var sql =
+            @"
+                select id, createdat, description, sentiment, time
+                from daily_gratitudes 
+                where userid = @userid and
+                (createdat >= @lowerdate or @lowerdate is null) and
+                (createdat < @upperdate or @upperdate is null) and
+                (sentiment >= @sentiment or @sentiment is null) and
+                (time = @time::timeofday or @time is null);
+            ";
+
+        return await _sql.LoadData<GetGratitudeModel, dynamic>(sql, parameters);
     }
 
-    public List<GratitudeModel> GetGratitudeById(Guid userId, Guid id)
+    public async Task<List<GratitudeModel>> GetGratitudeById(Guid userId, Guid id)
     {
         DynamicParameters parameters = new();
-        parameters.Add("_UserId", userId);
-        parameters.Add("_Id", id);
-        var output = _sql.LoadData<GratitudeModel, dynamic>("Get_Gratitude_Id", parameters);
-        return output;
+        parameters.Add("@userid", userId);
+
+        var sql =
+            @"
+                select description, sentiment, createdat, time 
+                from daily_gratitudes
+                where userid = @userid and id = @id;
+            ";
+
+        parameters.Add("@id", id);
+        return await _sql.LoadData<GratitudeModel, dynamic>(sql, parameters);
     }
 }

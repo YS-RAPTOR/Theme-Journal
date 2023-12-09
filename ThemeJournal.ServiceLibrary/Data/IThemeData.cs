@@ -4,9 +4,9 @@ namespace ThemeJournal.ServiceLibrary.Data;
 
 public interface IThemeData
 {
-    void CreateTheme(Guid userId, PostThemeModel theme);
-    void ExtendTheme(Guid userId, Guid id, DateTime endDate);
-    List<ThemeModel> GetThemeByID(Guid userId, Guid themeId);
-    List<GetThemeModel> GetThemes(Guid userId);
-    void UpdateTheme(Guid userId, Guid id, ThemeModel theme);
+    Task CreateTheme(Guid userId, PostThemeModel theme);
+    Task ExtendTheme(Guid userId, Guid id, DateTime endDate);
+    Task<List<ThemeModel>> GetThemeByID(Guid userId, Guid id);
+    Task<List<GetThemeModel>> GetThemes(Guid userId, DateTime? lowerDate, DateTime? upperDate);
+    Task UpdateTheme(Guid userId, Guid id, ThemeModel theme);
 }

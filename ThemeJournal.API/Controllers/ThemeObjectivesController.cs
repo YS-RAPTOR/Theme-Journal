@@ -30,61 +30,63 @@ namespace ThemeJournal.Api.Controllers
 
         [HttpGet("{themeId}")]
         [ProducesResponseType(typeof(ObjectiveModel), 200)]
-        public IActionResult Get(Guid themeId)
+        public async Task<IActionResult> Get(Guid themeId)
         {
             var userId = _userService.GetUserId();
-            var objectives = _objectiveData.GetObjectiveByThemeId(userId, themeId);
+            var objectives = await _objectiveData.GetObjectiveByThemeId(userId, themeId);
             return Ok(objectives);
         }
 
         [HttpPost("{themeId}")]
-        public IActionResult Post(Guid themeId, List<ObjectiveModel> objectives)
+        public async Task<IActionResult> Post(Guid themeId, List<ObjectiveModel> objectives)
         {
             // Can create a theme objective only if the theme has not been completed
             var userId = _userService.GetUserId();
-            var theme = _themeData.GetThemeByID(userId, themeId);
+            var theme = await _themeData.GetThemeByID(userId, themeId);
 
             if (theme.Count == 0)
             {
                 return NotFound();
             }
 
-            if (theme[0].EndDate < _userService.TrasformDate(DateTime.UtcNow))
+            if (theme[0].EndDate <= _userService.TrasformDate(DateTime.UtcNow))
             {
                 return BadRequest("Theme has already been completed.");
             }
 
-            _objectiveData.CreateObjective(userId, themeId, objectives);
+            await _objectiveData.CreateObjective(userId, themeId, objectives);
             return Ok();
         }
 
         [HttpPut("{id}")]
-        public IActionResult Put(Guid id, int colorId)
+        public async Task<IActionResult> Put(Guid id, [FromBody] int colorId)
         {
             // Can update color any time
             var userId = _userService.GetUserId();
-            _objectiveData.UpdateObjective(userId, id, colorId);
+            await _objectiveData.UpdateObjective(userId, id, colorId);
             return Ok();
         }
 
         [HttpDelete("{themeId}/{id}")]
-        public IActionResult Delete(Guid themeId, Guid id)
+        public async Task<IActionResult> Delete(Guid themeId, Guid id)
         {
             // Can only delete a theme if it has not started yet
             var userId = _userService.GetUserId();
-            var theme = _themeData.GetThemeByID(userId, themeId);
+            var theme = await _themeData.GetThemeByID(userId, themeId);
 
             if (theme.Count == 0)
             {
                 return NotFound();
             }
 
-            if (theme[0].StartDate < _userService.TrasformDate(DateTime.UtcNow))
+            if (theme[0].StartDate <= _userService.TrasformDate(DateTime.UtcNow))
             {
-                return BadRequest("Theme has already started.");
+                return BadRequest(
+                    "Cannot update an objective of a theme that has/had already started"
+                );
             }
 
-            _objectiveData.DeleteObjective(userId, themeId, id);
+            await _objectiveData.DeleteObjective(userId, themeId, id);
             return Ok();
         }
     }

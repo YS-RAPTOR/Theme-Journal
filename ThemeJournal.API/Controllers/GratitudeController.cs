@@ -23,7 +23,7 @@ namespace ThemeJournal.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpsertGratitude(Guid id, GratitudeModel gratitude)
+        public async Task<IActionResult> UpsertGratitude(Guid id, GratitudeModel gratitude)
         {
             // Transform the Dates according to User Start time
             // Set sentiment to null since the user cannot set it
@@ -32,56 +32,61 @@ namespace ThemeJournal.Api.Controllers
 
             if (gratitude.CreatedAt != _userService.TrasformDate(DateTime.UtcNow))
             {
-                return BadRequest("Can only create gratitudes for today");
+                return BadRequest("Can only create/update gratitudes for today");
             }
-            // TODO: Fix everything about TimeOfDay Field introduced
 
+            // Has to be the only gratitude of a specific type for today
             var userId = _userService.GetUserId();
+            var gratitudes = await _gratitudeData.GetGratitudes(
+                userId,
+                null,
+                gratitude.CreatedAt.AddDays(1),
+                gratitude.CreatedAt,
+                gratitude.Time
+            );
 
-            _gratitudeData.UpsertGratitude(userId, id, gratitude);
+            if (gratitudes.Count == 1 && gratitudes[0].Id != id)
+            {
+                return BadRequest("Can only create one gratitude per day of specific type");
+            }
+            else if (gratitudes.Count > 1)
+            {
+                return BadRequest("Can only create one gratitude per day of specific type");
+            }
+
+            await _gratitudeData.UpsertGratitude(userId, id, gratitude);
             return Ok();
         }
 
         [HttpGet]
         [ProducesResponseType(typeof(List<GetGratitudeModel>), 200)]
-        public IActionResult GetGratitudes()
+        public async Task<IActionResult> GetGratitudes(
+            [FromQuery] DateTime? upperDate,
+            [FromQuery] DateTime? lowerDate,
+            [FromQuery] float? sentiment,
+            [FromQuery] TimeOfDay? time
+        )
         {
-            string? sentiment = HttpContext.Request.Query["sentiment"];
+            DateTime? upperDateCorrect = !upperDate.HasValue
+                ? null
+                : _userService.TrasformDate(upperDate.Value);
 
-            if (sentiment != null && !float.TryParse(sentiment, out float _))
-            {
-                return BadRequest("Sentiment must be a float");
-            }
+            DateTime? lowerDateCorrect = !lowerDate.HasValue
+                ? null
+                : _userService.TrasformDate(lowerDate.Value);
 
-            float? sentimentCorrect = sentiment == null ? null : float.Parse(sentiment);
+            float? sentimentCorrect = !sentiment.HasValue ? null : sentiment;
 
-            string? upperDate = HttpContext.Request.Query["upperDate"];
-
-            if (upperDate != null && !DateTime.TryParse(upperDate, out DateTime _))
-            {
-                return BadRequest("UpperDate must be a DateTime");
-            }
-
-            DateTime? upperDateCorrect =
-                upperDate == null ? null : _userService.TrasformDate(DateTime.Parse(upperDate));
-
-            string? lowerDate = HttpContext.Request.Query["lowerDate"];
-
-            if (lowerDate != null && !DateTime.TryParse(lowerDate, out DateTime _))
-            {
-                return BadRequest("LowerDate must be a DateTime");
-            }
-
-            DateTime? lowerDateCorrect =
-                lowerDate == null ? null : _userService.TrasformDate(DateTime.Parse(lowerDate));
+            TimeOfDay? timeCorrect = !time.HasValue ? null : time;
 
             var userId = _userService.GetUserId();
 
-            var output = _gratitudeData.GetGratitudes(
+            var output = await _gratitudeData.GetGratitudes(
                 userId,
                 sentimentCorrect,
                 upperDateCorrect,
-                lowerDateCorrect
+                lowerDateCorrect,
+                timeCorrect
             );
 
             return Ok(output);
@@ -89,10 +94,10 @@ namespace ThemeJournal.Api.Controllers
 
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(GratitudeModel), 200)]
-        public IActionResult GetGratitudeById(Guid id)
+        public async Task<IActionResult> GetGratitudeById(Guid id)
         {
             var userId = _userService.GetUserId();
-            var output = _gratitudeData.GetGratitudeById(userId, id);
+            var output = await _gratitudeData.GetGratitudeById(userId, id);
             return Ok(output[0]);
         }
     }

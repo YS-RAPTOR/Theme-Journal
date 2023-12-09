@@ -1,3 +1,4 @@
+using System.Data;
 using Dapper;
 using ThemeJournal.ServiceLibrary.DataAccess;
 using ThemeJournal.ServiceLibrary.Models;
@@ -13,52 +14,105 @@ public class ThemeData : IThemeData
         _sql = sql;
     }
 
-    public void CreateTheme(Guid userId, PostThemeModel theme)
+    public async Task CreateTheme(Guid userId, PostThemeModel theme)
     {
         DynamicParameters parameters = new();
-        parameters.Add("_UserId", userId);
-        parameters.Add("_Id", theme.Id);
-        parameters.Add("_Title", theme.Title);
-        parameters.Add("_StartDate", theme.StartDate);
-        parameters.Add("_EndDate", theme.EndDate);
+        parameters.Add("@userId", userId);
+        parameters.Add("@id", theme.Id);
+        parameters.Add("@title", theme.Title);
+        parameters.Add("@startDate", theme.StartDate);
+        parameters.Add("@endDate", theme.EndDate);
 
-        _sql.SaveData("Create_Theme", parameters);
+        var sql =
+            @"
+                insert into themes (id, userid, title, startdate, enddate)
+                values (@id, @userid, @title, @startdate, @enddate)
+            ";
+
+        await _sql.SaveData(sql, parameters);
     }
 
-    public void UpdateTheme(Guid userId, Guid id, ThemeModel theme)
+    public async Task UpdateTheme(Guid userId, Guid id, ThemeModel theme)
     {
         DynamicParameters parameters = new();
-        parameters.Add("_Id", id);
-        parameters.Add("_UserId", userId);
-        parameters.Add("_Title", theme.Title);
-        parameters.Add("_StartDate", theme.StartDate);
-        parameters.Add("_EndDate", theme.EndDate);
-        _sql.SaveData("Update_Theme", parameters);
+        parameters.Add("@id", id);
+        parameters.Add("@userid", userId);
+        parameters.Add("@title", theme.Title);
+        parameters.Add("@startdate", theme.StartDate);
+        parameters.Add("@enddate", theme.EndDate);
+
+        var sql =
+            @"
+                update themes
+                set title = @title, startdate = @startdate, enddate = @enddate
+                where id = @id and userid = @userid;
+            ";
+
+        await _sql.SaveData(sql, parameters);
     }
 
-    public void ExtendTheme(Guid userId, Guid id, DateTime endDate)
+    public async Task ExtendTheme(Guid userId, Guid id, DateTime endDate)
     {
         DynamicParameters parameters = new();
-        parameters.Add("_Id", id);
-        parameters.Add("_UserId", userId);
-        parameters.Add("_EndDate", endDate);
-        _sql.SaveData("Extend_Theme", parameters);
+        parameters.Add("@id", id);
+        parameters.Add("@userid", userId);
+        parameters.Add("@enddate", endDate);
+
+        var sql =
+            @"
+                update themes
+                set enddate = @enddate
+                where id = @id and userid = @userid;
+            ";
+
+        await _sql.SaveData(sql, parameters);
     }
 
-    public List<ThemeModel> GetThemeByID(Guid userId, Guid themeId)
+    public async Task<List<ThemeModel>> GetThemeByID(Guid userId, Guid id)
     {
         DynamicParameters parameters = new();
-        parameters.Add("_UserId", userId);
-        parameters.Add("_ThemeId", themeId);
-        var output = _sql.LoadData<ThemeModel, dynamic>("Get_Theme_Id", parameters);
-        return output;
+        parameters.Add("@userid", userId);
+        parameters.Add("@id", id);
+
+        var sql =
+            @"
+                select title, startdate, enddate
+                from themes
+                where userid = @userid and id = @id;
+            ";
+
+        return await _sql.LoadData<ThemeModel, dynamic>(sql, parameters);
     }
 
-    public List<GetThemeModel> GetThemes(Guid userId)
+    public async Task<List<GetThemeModel>> GetThemes(
+        Guid userId,
+        DateTime? lowerDate,
+        DateTime? upperDate
+    )
     {
         DynamicParameters parameters = new();
-        parameters.Add("_UserId", userId);
-        var output = _sql.LoadData<GetThemeModel, dynamic>("Get_Themes_UserId", parameters);
-        return output;
+        parameters.Add("@userid", userId);
+        parameters.Add("@lowerdate", lowerDate, DbType.DateTime);
+        parameters.Add("@upperdate", upperDate, DbType.DateTime);
+
+        var sql =
+            @"
+            select id, title, startdate, enddate
+            from themes
+            where userid = @userid and 
+            ((
+             (@lowerdate is null) 
+              or 
+             (startdate <= @lowerdate and @lowerdate < enddate)
+            )
+            or
+            (
+             (@upperdate is null) 
+             or
+            (startdate < @upperdate and @upperdate < enddate)
+            ))
+            ";
+
+        return await _sql.LoadData<GetThemeModel, dynamic>(sql, parameters);
     }
 }

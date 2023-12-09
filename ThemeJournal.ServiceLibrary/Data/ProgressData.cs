@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Data;
 using Dapper;
 using ThemeJournal.ServiceLibrary.DataAccess;
 using ThemeJournal.ServiceLibrary.Models;
@@ -14,50 +15,87 @@ public class ProgressData : IProgressData
         _sql = sql;
     }
 
-    public void CreateProgress(Guid userId, Guid taskId, List<PostProgressModel> progresses)
-    {
-        List<Guid> ids = new(progresses.Count);
-        List<DateTime> dates = new(progresses.Count);
-
-        foreach (var progress in progresses)
-        {
-            ids.Add(progress.Id);
-            dates.Add(progress.CompletionDate);
-        }
-
-        DynamicParameters parameters = new();
-        parameters.Add("_UserId", userId);
-        parameters.Add("_TaskId", taskId);
-        parameters.Add("_Id", ids);
-        parameters.Add("_CompletionDate ", dates);
-
-        _sql.SaveData("Create_Progress", parameters);
-    }
-
-    public void UpdateProgress(Guid userId, Guid id, BitArray progress)
-    {
-        DynamicParameters parameters = new();
-        parameters.Add("_Id", id);
-        parameters.Add("_UserId", userId);
-        parameters.Add("_Progress", progress);
-
-        _sql.SaveData("Update_Progress", parameters);
-    }
-
-    public List<ProgressModel> GetProgress(
+    public async Task UpsertProgress(
         Guid userId,
-        List<Guid> taskIds,
-        DateTime? lowerDate,
-        DateTime? upperDate
+        Guid id,
+        PostProgressModel progress,
+        BitArray bits
     )
     {
         DynamicParameters parameters = new();
-        parameters.Add("_UserId", userId);
-        parameters.Add("_TaskIds", taskIds);
-        parameters.Add("_LowerDate", lowerDate);
-        parameters.Add("_UpperDate", upperDate);
+        parameters.Add("@userid", userId);
+        parameters.Add("@id", id);
+        parameters.Add("@taskid", progress.TaskId);
+        parameters.Add("@completiondate", progress.CompletionDate);
+        parameters.Add("@progress", bits);
 
-        var output = _sql.LoadData<ProgressModel, dynamic>("Get_Progress", parameters);
-        return output;
+        var sql =
+            @"
+                insert into daily_progress (id, userid, taskid, completiondate, progress)
+                values (@id, @userid, @taskid, @completiondate, @progress)
+                on conflict (id) do update
+                set progress = @progress;
+            ";
+
+        await _sql.SaveData(sql, parameters);
+    }
+
+    public async Task UpdateProgress(Guid userId, Guid id, BitArray progress)
+    {
+        DynamicParameters parameters = new();
+        parameters.Add("@id", id);
+        parameters.Add("@userid", userId);
+        parameters.Add("@progress", progress);
+
+        var sql =
+            @"
+                update daily_progress
+                set progress = @progress
+                where id = @id and userid = @userid;
+            ";
+
+        await _sql.SaveData(sql, parameters);
+    }
+
+    public async Task<List<ProgressModel>> GetProgress(
+        Guid userId,
+        List<Guid> taskIds,
+        DateTime? upperDate,
+        DateTime? lowerDate
+    )
+    {
+        DynamicParameters parameters = new();
+        parameters.Add("@userid", userId);
+        parameters.Add("@taskids", taskIds);
+        parameters.Add("@lowerdate", lowerDate, DbType.Date);
+        parameters.Add("@upperdate", upperDate, DbType.Date);
+
+        var sql =
+            @"
+                select id, taskid, completiondate, progress
+                from daily_progress
+                where userid = @userid and
+                (@lowerdate is null or completiondate >= @lowerdate) and
+                (@upperdate is null or completiondate < @upperdate) and
+                taskid = any(@taskids);
+            ";
+
+        return await _sql.LoadData<ProgressModel, dynamic>(sql, parameters);
+    }
+
+    public async Task<List<ProgressModel>> GetProgressById(Guid userId, Guid id)
+    {
+        DynamicParameters parameters = new();
+        parameters.Add("@userid", userId);
+        parameters.Add("@id", id);
+
+        var sql =
+            @"
+                select id, taskid, completiondate, progress
+                from daily_progress
+                where userid = @userid and id = @id;
+            ";
+
+        return await _sql.LoadData<ProgressModel, dynamic>(sql, parameters);
     }
 }

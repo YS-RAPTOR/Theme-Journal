@@ -39,7 +39,8 @@ public class UserService : IUserService
             date.Day,
             userDayStartTime.Hour,
             userDayStartTime.Minute,
-            userDayStartTime.Second
+            userDayStartTime.Second,
+            DateTimeKind.Utc
         );
     }
 }

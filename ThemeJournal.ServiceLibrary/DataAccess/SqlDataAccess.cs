@@ -14,29 +14,32 @@ public class SqlDataAccess : IDataAccess
         _config = config;
     }
 
-    public Task SaveData(
-        string storedProcedure,
+    public async Task SaveData(
+        string sql,
         DynamicParameters data,
         string connectionStringName = "DatabaseConnection"
     )
     {
-        using NpgsqlConnection connection = new(_config.GetConnectionString(connectionStringName));
-        return connection.ExecuteAsync(
-            storedProcedure,
-            data,
-            commandType: CommandType.StoredProcedure
-        );
+        using (NpgsqlConnection connection = new(_config.GetConnectionString(connectionStringName)))
+        {
+            connection.Open();
+            await connection.ExecuteAsync(sql, data);
+        }
+        ;
     }
 
-    public List<T> LoadData<T, U>(
-        string storedProcedure,
+    public async Task<List<T>> LoadData<T, U>(
+        string sql,
         U parameters,
         string connectionStringName = "DatabaseConnection"
     )
     {
-        using NpgsqlConnection connection = new(_config.GetConnectionString(connectionStringName));
-        return connection
-            .Query<T>(storedProcedure, parameters, commandType: CommandType.StoredProcedure)
-            .ToList();
+        using (NpgsqlConnection connection = new(_config.GetConnectionString(connectionStringName)))
+        {
+            connection.Open();
+            var output = await connection.QueryAsync<T>(sql, parameters);
+            return output.ToList();
+        }
+        ;
     }
 }

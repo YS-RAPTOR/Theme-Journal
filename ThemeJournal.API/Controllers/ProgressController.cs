@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Web.Resource;
 using ThemeJournal.Api.Services;
 using ThemeJournal.ServiceLibrary.Data;
+using ThemeJournal.ServiceLibrary.Models;
 
 namespace ThemeJournal.Api.Controllers
 {
@@ -23,25 +24,21 @@ namespace ThemeJournal.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult Put(Guid id, int progress)
+        public async Task<IActionResult> UpsertProgress(Guid id, PostProgressModel progress)
         {
-            // Can only update progress for today
+            // Transform the Dates according to User Start time
+            progress.CompletionDate = _userService.TrasformDate(progress.CompletionDate);
+
             var userId = _userService.GetUserId();
-            var progressData = _progressData.GetProgress(userId, [id], null, null);
 
-            if (progressData.Count == 0)
+            if (progress.CompletionDate != _userService.TrasformDate(DateTime.UtcNow))
             {
-                return NotFound();
-            }
-
-            if (progressData[0].CompletionDate != _userService.TrasformDate(DateTime.UtcNow))
-            {
-                return BadRequest("Can only update today's progress.");
+                return BadRequest("Can only update/insert today's progress.");
             }
 
             BitArray bits = new(2);
 
-            switch (progress)
+            switch (progress.Progress)
             {
                 case 0:
                     bits[0] = false;
@@ -56,10 +53,28 @@ namespace ThemeJournal.Api.Controllers
                     bits[1] = true;
                     break;
                 default:
-                    return BadRequest();
+                    return BadRequest("Invalid Progress. Must be between 0-2.");
             }
-            _progressData.UpdateProgress(userId, id, bits);
-            return Ok(bits);
+
+            //Make sure the user has not already submitted progress for today under different Id for same task
+            var progresses = await _progressData.GetProgress(
+                userId,
+                [progress.TaskId],
+                progress.CompletionDate.AddDays(1),
+                progress.CompletionDate
+            );
+
+            if (progresses.Count == 1 && progresses[0].Id != id)
+            {
+                return BadRequest("Can only create one progress per day of specific task");
+            }
+            else if (progresses.Count > 1)
+            {
+                return BadRequest("Can only create one progress per day of specific task");
+            }
+
+            await _progressData.UpsertProgress(userId, id, progress, bits);
+            return Ok();
         }
     }
 }

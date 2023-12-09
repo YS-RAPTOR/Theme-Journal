@@ -24,55 +24,66 @@ namespace ThemeJournal.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpsertThought(Guid id, ThoughtModel thought)
+        public async Task<IActionResult> UpsertThought(Guid id, ThoughtModel thought)
         {
             // Transform the Dates according to User Start time
             thought.CreatedAt = _userService.TrasformDate(thought.CreatedAt);
             if (thought.CreatedAt != _userService.TrasformDate(DateTime.UtcNow))
             {
-                return BadRequest("Can only create thoughts for today");
+                return BadRequest("Can only create/update thoughts for today");
             }
 
+            // Has to be the only theme today
             var userId = _userService.GetUserId();
-            _thoughtData.UpsertThought(userId, id, thought);
+            var thoughts = await _thoughtData.GetThoughts(
+                userId,
+                thought.CreatedAt.AddDays(1),
+                thought.CreatedAt
+            );
+
+            Console.WriteLine("Thoughts");
+            Console.WriteLine(thoughts.Count);
+
+            if (thoughts.Count == 1 && thoughts[0].Id != id)
+            {
+                return BadRequest("Can only create one thought per day");
+            }
+            else if (thoughts.Count > 1)
+            {
+                return BadRequest("Can only create one thought per day");
+            }
+
+            await _thoughtData.UpsertThought(userId, id, thought);
             return Ok();
         }
 
         [HttpGet]
         [ProducesResponseType(typeof(List<GetThoughtModel>), 200)]
-        public IActionResult GetThoughts()
+        public async Task<IActionResult> GetThoughts(
+            [FromQuery] DateTime? upperDate,
+            [FromQuery] DateTime? lowerDate
+        )
         {
-            string? upperDate = HttpContext.Request.Query["upperDate"];
+            DateTime? upperDateCorrect = !upperDate.HasValue
+                ? null
+                : _userService.TrasformDate(upperDate.Value);
 
-            if (upperDate != null && !DateTime.TryParse(upperDate, out DateTime _))
-            {
-                return BadRequest("UpperDate must be a DateTime");
-            }
-
-            DateTime? upperDateCorrect =
-                upperDate == null ? null : _userService.TrasformDate(DateTime.Parse(upperDate));
-
-            string? lowerDate = HttpContext.Request.Query["lowerDate"];
-
-            if (lowerDate != null && !DateTime.TryParse(lowerDate, out DateTime _))
-            {
-                return BadRequest("LowerDate must be a DateTime");
-            }
-
-            DateTime? lowerDateCorrect =
-                lowerDate == null ? null : _userService.TrasformDate(DateTime.Parse(lowerDate));
+            DateTime? lowerDateCorrect = !lowerDate.HasValue
+                ? null
+                : _userService.TrasformDate(lowerDate.Value);
 
             var userId = _userService.GetUserId();
-            var output = _thoughtData.GetThoughts(userId, upperDateCorrect, lowerDateCorrect);
+            var output = await _thoughtData.GetThoughts(userId, upperDateCorrect, lowerDateCorrect);
             return Ok(output);
         }
 
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(ThoughtModel), 200)]
-        public IActionResult GetThoughtById(Guid id)
+        public async Task<IActionResult> GetThoughtById(Guid id)
         {
             var userId = _userService.GetUserId();
-            var output = _thoughtData.GetThoughtById(userId, id);
+            var output = await _thoughtData.GetThoughtById(userId, id);
+
             return Ok(output[0]);
         }
     }

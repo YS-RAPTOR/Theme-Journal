@@ -1,4 +1,3 @@
-using System.Collections;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Web.Resource;
@@ -17,36 +16,62 @@ namespace ThemeJournal.Api.Controllers
         private readonly IUserService _userService;
         private readonly ITaskData _taskData;
         private readonly IProgressData _progressData;
+        private readonly IThemeData _themeData;
 
         public TaskController(
             IUserService userService,
             ITaskData taskData,
-            IProgressData progressData
+            IProgressData progressData,
+            IThemeData themeData
         )
         {
             _userService = userService;
             _taskData = taskData;
             _progressData = progressData;
+            _themeData = themeData;
         }
 
         [HttpPost]
-        public IActionResult CreateTask(PostTaskModel task)
+        public async Task<IActionResult> CreateTask(PostTaskModel task)
         {
             // Transform the Dates according to User Start time
             task.StartDate = _userService.TrasformDate(task.StartDate);
             task.EndDate = _userService.TrasformDate(task.EndDate);
+            // Start Date must be today or in the future
+            if (task.StartDate < _userService.TrasformDate(DateTime.UtcNow))
+            {
+                return BadRequest("Start Date should be greater than or equal to today");
+            }
+            // End date should be greater than start date
+            if (task.EndDate <= task.StartDate)
+            {
+                return BadRequest("End Date should be greater than Start Date");
+            }
+            // Maximum End Date is the end date of the current theme
+            var currentTheme = await _themeData.GetThemes(
+                _userService.GetUserId(),
+                _userService.TrasformDate(DateTime.UtcNow),
+                _userService.TrasformDate(DateTime.UtcNow)
+            );
+
+            if (task.EndDate >= currentTheme[0].EndDate)
+            {
+                return BadRequest(
+                    "End Date of the task cannot be greater than or equal to the end date of the current theme"
+                );
+            }
 
             var userId = _userService.GetUserId();
-            _taskData.CreateTask(userId, task);
+            await _taskData.CreateTask(userId, task);
             return Ok();
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateTask(Guid id, PutTaskModel task)
+        public async Task<IActionResult> UpdateTask(Guid id, PutTaskModel task)
         {
             // Can only update Task if it has not started yet
             var userId = _userService.GetUserId();
-            var taskToUpdate = _taskData.GetTaskById(userId, id);
+            var taskToUpdate = await _taskData.GetTaskById(userId, id);
             if (taskToUpdate.Count == 0)
             {
                 return NotFound();
@@ -61,64 +86,85 @@ namespace ThemeJournal.Api.Controllers
             task.StartDate = _userService.TrasformDate(task.StartDate);
             task.EndDate = _userService.TrasformDate(task.EndDate);
 
-            _taskData.UpdateTask(userId, id, task);
+            // Start Date should be greater than or equal to today
+            if (task.StartDate < _userService.TrasformDate(DateTime.UtcNow))
+            {
+                return BadRequest("Start Date should be greater than or equal to today");
+            }
+            // End date should be greater than start date
+            if (task.EndDate <= task.StartDate)
+            {
+                return BadRequest("End Date should be greater than Start Date");
+            }
+
+            await _taskData.UpdateTask(userId, id, task);
             return Ok();
         }
 
         [HttpPut("{id}/extend")]
-        public IActionResult ExtendTask(Guid id, DateTime endDate)
+        public async Task<IActionResult> ExtendTask(Guid id, [FromBody] DateTime endDate)
         {
             // Can only extend Task if it has started
             // Cannot extend a task that has completed
             var userId = _userService.GetUserId();
-            var taskToExtend = _taskData.GetTaskById(userId, id);
+            var taskToExtend = await _taskData.GetTaskById(userId, id);
             if (taskToExtend.Count == 0)
             {
                 return NotFound();
             }
 
-            if (taskToExtend[0].StartDate >= _userService.TrasformDate(DateTime.UtcNow))
+            if (taskToExtend[0].StartDate > _userService.TrasformDate(DateTime.UtcNow))
             {
-                return BadRequest("Cannot extend a task that has not started");
+                return BadRequest("Cannot extend a task that hasn't started");
             }
 
-            if (taskToExtend[0].EndDate < _userService.TrasformDate(DateTime.UtcNow))
+            if (taskToExtend[0].EndDate <= _userService.TrasformDate(DateTime.UtcNow))
             {
-                return BadRequest("Cannot extend a task that has already completed");
+                return BadRequest("Cannot extend a task that has completed");
+            }
+
+            if (taskToExtend[0].EndDate >= endDate)
+            {
+                return BadRequest(
+                    "Cannot extend a task to a date that is before the current end date"
+                );
             }
 
             // Transform the Dates according to User Start time
             endDate = _userService.TrasformDate(endDate);
-            _taskData.ExtendTask(userId, id, endDate);
+            await _taskData.ExtendTask(userId, id, endDate);
             return Ok();
         }
 
         [HttpGet]
         [ProducesResponseType(typeof(List<TaskModel>), 200)]
-        public IActionResult GetTasks()
+        public async Task<IActionResult> GetTasks(
+            [FromQuery] DateTime? upperDate,
+            [FromQuery] DateTime? lowerDate
+        )
         {
-            string? upperDate = HttpContext.Request.Query["upperDate"];
+            DateTime? upperDateCorrect = !upperDate.HasValue
+                ? null
+                : _userService.TrasformDate(upperDate.Value);
 
-            if (upperDate != null && !DateTime.TryParse(upperDate, out DateTime _))
-            {
-                return BadRequest("UpperDate must be a DateTime");
-            }
-
-            DateTime? upperDateCorrect =
-                upperDate == null ? null : _userService.TrasformDate(DateTime.Parse(upperDate));
-
-            string? lowerDate = HttpContext.Request.Query["lowerDate"];
-
-            if (lowerDate != null && !DateTime.TryParse(lowerDate, out DateTime _))
-            {
-                return BadRequest("LowerDate must be a DateTime");
-            }
-
-            DateTime? lowerDateCorrect =
-                lowerDate == null ? null : _userService.TrasformDate(DateTime.Parse(lowerDate));
+            DateTime? lowerDateCorrect = !lowerDate.HasValue
+                ? null
+                : _userService.TrasformDate(lowerDate.Value);
 
             var userId = _userService.GetUserId();
-            List<TaskModel> tasks = _taskData.GetTasks(userId, upperDateCorrect);
+            List<TaskModel> tasks = await _taskData.GetTasks(
+                userId,
+                upperDateCorrect,
+                lowerDateCorrect
+            );
+
+            if (upperDateCorrect.HasValue && lowerDateCorrect.HasValue)
+            {
+                if (upperDateCorrect.Value <= lowerDateCorrect.Value)
+                {
+                    return BadRequest("Upper Date should be greater than Lower Date");
+                }
+            }
 
             var TaskMap = new Dictionary<Guid, TaskModel>(tasks.Count);
             var listOfTaskIds = new List<Guid>(tasks.Count);
@@ -129,15 +175,19 @@ namespace ThemeJournal.Api.Controllers
                 listOfTaskIds.Add(task.Id);
             }
 
-            var progresses = _progressData.GetProgress(
+            var progresses = await _progressData.GetProgress(
                 userId,
                 listOfTaskIds,
-                lowerDateCorrect,
-                upperDateCorrect
+                upperDateCorrect,
+                lowerDateCorrect
             );
 
             foreach (var progress in progresses)
             {
+                if (TaskMap[progress.TaskId].Progress == null)
+                {
+                    TaskMap[progress.TaskId].Progress = [];
+                }
                 TaskMap[progress.TaskId]
                     .Progress
                     .Add(new TaskProgress(progress.Id, progress.CompletionDate, progress.Progress));

@@ -5,8 +5,8 @@ namespace ThemeJournal.ServiceLibrary.Models;
 public class TaskModel
 {
     public Guid Id { get; set; }
-    public string ObjectiveDescription { get; set; } = string.Empty;
-    public int ObjectiveColor { get; set; }
+    public string? ObjectiveDescription { get; set; }
+    public int? ObjectiveColor { get; set; }
     public string Description { get; set; } = string.Empty;
     public string PartialCompletion { get; set; } = string.Empty;
     public string FullCompletion { get; set; } = string.Empty;

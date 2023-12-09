@@ -13,7 +13,7 @@ public class ObjectiveData : IObjectiveData
         _sql = sql;
     }
 
-    public void CreateObjective(Guid userId, Guid themeId, List<ObjectiveModel> objectives)
+    public async Task CreateObjective(Guid userId, Guid themeId, List<ObjectiveModel> objectives)
     {
         List<Guid> ids = new(objectives.Count);
         List<string> descriptions = new(objectives.Count);
@@ -27,41 +27,69 @@ public class ObjectiveData : IObjectiveData
         }
 
         DynamicParameters parameters = new();
-        parameters.Add("_UserId", userId);
-        parameters.Add("_ThemeId", themeId);
-        parameters.Add("_Id", ids);
-        parameters.Add("_Description", descriptions);
-        parameters.Add("_ColorId", colorIds);
+        parameters.Add("@userid", userId);
+        parameters.Add("@themeid", themeId);
+        parameters.Add("@id", ids);
+        parameters.Add("@description", descriptions);
+        parameters.Add("@colorid", colorIds);
 
-        _sql.SaveData("Create_Objective", parameters);
+        var sql =
+            @"
+                insert into theme_objectives (id, userid, themeid, description, colorid)
+                select unnest(@id), @userid, @themeid, unnest(@description), unnest(@colorid)
+            ";
+
+        await _sql.SaveData(sql, parameters);
     }
 
-    public List<ObjectiveModel> GetObjectiveByThemeId(Guid userId, Guid themeId)
+    public async Task<List<ObjectiveModel>> GetObjectiveByThemeId(Guid userId, Guid themeId)
     {
         DynamicParameters parameters = new();
-        parameters.Add("_UserId", userId);
-        parameters.Add("_ThemeId", themeId);
+        parameters.Add("@userid", userId);
+        parameters.Add("@themeid", themeId);
 
-        var output = _sql.LoadData<ObjectiveModel, dynamic>("Get_Objective_ThemeId", parameters);
-        return output;
+        var sql =
+            @"
+                select id, description, colorid
+                from theme_objectives
+                where userid = @userid and themeid = @themeid
+            ";
+
+        return await _sql.LoadData<ObjectiveModel, dynamic>(sql, parameters);
     }
 
-    public void UpdateObjective(Guid userId, Guid id, int colorId)
+    //YYY
+    public async Task UpdateObjective(Guid userId, Guid id, int colorId)
     {
         DynamicParameters parameters = new();
-        parameters.Add("_Id", id);
-        parameters.Add("_UserId", userId);
-        parameters.Add("_ColorId", colorId);
+        parameters.Add("@id", id);
+        parameters.Add("@userid", userId);
+        parameters.Add("@colorid", colorId);
 
-        _sql.SaveData("Update_Objective", parameters);
+        var sql =
+            @"
+                update theme_objectives
+                set colorid = @colorid
+                where id = @id and userid = @userid
+            ";
+
+        await _sql.SaveData(sql, parameters);
     }
 
-    public void DeleteObjective(Guid userId, Guid themeId, Guid id)
+    // NNY
+    public async Task DeleteObjective(Guid userId, Guid themeId, Guid id)
     {
         DynamicParameters parameters = new();
-        parameters.Add("_Id", id);
-        parameters.Add("_UserId", userId);
-        parameters.Add("_ThemeId", themeId);
-        _sql.SaveData("Delete_Objective", parameters);
+        parameters.Add("@id", id);
+        parameters.Add("@userid", userId);
+        parameters.Add("@themeid", themeId);
+
+        var sql =
+            @"
+                delete from theme_objectives
+                where id = @id and userid = @userid and themeid = @themeid
+            ";
+
+        await _sql.SaveData(sql, parameters);
     }
 }

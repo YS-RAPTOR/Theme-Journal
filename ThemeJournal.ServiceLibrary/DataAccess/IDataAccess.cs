@@ -5,12 +5,12 @@ namespace ThemeJournal.ServiceLibrary.DataAccess;
 public interface IDataAccess
 {
     Task SaveData(
-        string storedProcedure,
+        string sql,
         DynamicParameters data,
         string connectionStringName = "DatabaseConnection"
     );
-    List<T> LoadData<T, U>(
-        string storedProcedure,
+    Task<List<T>> LoadData<T, U>(
+        string sql,
         U parameters,
         string connectionStringName = "DatabaseConnection"
     );

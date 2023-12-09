@@ -5,12 +5,12 @@ namespace ThemeJournal.ServiceLibrary.Data;
 
 public interface IProgressData
 {
-    void CreateProgress(Guid userId, Guid taskId, List<PostProgressModel> progresses);
-    List<ProgressModel> GetProgress(
+    Task UpsertProgress(Guid userId, Guid id, PostProgressModel progress, BitArray bits);
+    Task<List<ProgressModel>> GetProgress(
         Guid userId,
         List<Guid> taskIds,
-        DateTime? lowerDate,
-        DateTime? upperDate
+        DateTime? upperDate,
+        DateTime? lowerDate
     );
-    void UpdateProgress(Guid userId, Guid id, BitArray progress);
+    Task<List<ProgressModel>> GetProgressById(Guid userId, Guid id);
 }
