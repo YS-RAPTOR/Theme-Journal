@@ -1,55 +1,23 @@
-import TaskList from "../components/TaskList";
-import { TaskType } from "../components/TaskList";
-
-const tasks: Array<TaskType> = [
-    {
-        id: "1",
-        objective: "Objective 1",
-        Description: "Task 1",
-        PartialDescription: "Task 1 Partial",
-        FullDescription: "Task 1 Full",
-        progress: 0,
-        startDate: new Date("2023-11-01"),
-        endDate: new Date("2023-12-01"),
-    },
-    {
-        id: "2",
-        objective: "Objective 2",
-        Description: "Task 2",
-        PartialDescription: "Task 2 Partial",
-        FullDescription: "Task 2 Full",
-        progress: 0,
-        startDate: new Date("2023-11-01"),
-        endDate: new Date("2023-12-01"),
-    },
-    {
-        id: "3",
-        objective: "Objective 1",
-        Description: "Task 1",
-        PartialDescription: "Task 1 Partial",
-        FullDescription: "Task 1 Full",
-        progress: 0,
-        startDate: new Date("2023-11-01"),
-        endDate: new Date("2023-12-01"),
-    },
-    {
-        id: "4",
-        objective: "Objective 2",
-        Description: "Task 2",
-        PartialDescription: "Task 2 Partial",
-        FullDescription: "Task 2 Full",
-        progress: 0,
-        startDate: new Date("2023-11-01"),
-        endDate: new Date("2023-12-01"),
-    },
-];
+import { useMsal } from "@azure/msal-react";
+import { loginRequest } from "../utils/authConfig";
 
 const Root = () => {
+    const { instance } = useMsal();
+    const HandleLogin = () => {
+        instance.loginRedirect(loginRequest).catch((error) => {
+            console.log(error);
+        });
+    };
+
     return (
         <>
             <div className="h-16"></div>
-            <main className="flex justify-center">
-                <TaskList props={tasks} />
+            <main className="flex justify-center bg-yellow-800 h-screen">
+                <button onClick={HandleLogin}>
+                    <div className="bg-yellow-500 p-4 rounded-lg text-white">
+                        <h1 className="text-2xl">Login</h1>
+                    </div>
+                </button>
             </main>
         </>
     );

@@ -1,27 +1,45 @@
 import { ReactNode, useEffect } from "react";
-import { IMsalContext, useMsal } from "@azure/msal-react";
+import {
+    IMsalContext,
+    useMsal,
+    AuthenticatedTemplate,
+    UnauthenticatedTemplate,
+} from "@azure/msal-react";
+
 import { loginRequest } from "../utils/authConfig";
+import Root from "../pages/Root";
+import { axiosInstance } from "../utils/api";
 
 const Layout = ({ children }: { children: ReactNode }) => {
-    const { instance, accounts }: IMsalContext = useMsal();
+    const { instance }: IMsalContext = useMsal();
 
-    // Runs on initial load
     useEffect(() => {
-        if (accounts.length > 0) {
-            // Sign in silently if we have an account
-            instance
-                .acquireTokenSilent(loginRequest)
-                .then((response) => {
-                    console.log(response.accessToken);
-                })
-                .catch((error) => {
-                    console.log(
-                        "Could not login automatically. Error: ",
-                        error,
-                    );
-                });
-        }
+        // Sets up interceptor to add bearer token to requests
+        const inceptor = axiosInstance.interceptors.request.use(
+            async (config) => {
+                try {
+                    const response =
+                        await instance.acquireTokenSilent(loginRequest);
+                    config.headers.Authorization = `Bearer ${response.accessToken}`;
+                } catch (e) {
+                    instance.loginRedirect(loginRequest);
+                }
+                return config;
+            },
+        );
+
+        return () => {
+            axiosInstance.interceptors.request.eject(inceptor);
+        };
     }, []);
-    return <>{children}</>;
+
+    return (
+        <>
+            <AuthenticatedTemplate>{children}</AuthenticatedTemplate>
+            <UnauthenticatedTemplate>
+                <Root />
+            </UnauthenticatedTemplate>
+        </>
+    );
 };
 export default Layout;

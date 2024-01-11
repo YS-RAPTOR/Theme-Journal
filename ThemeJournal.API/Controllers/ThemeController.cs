@@ -147,6 +147,14 @@ namespace ThemeJournal.Api.Controllers
             }
             else if (themesWithIntersection.Count > 1)
             {
+                foreach (var theme in themesWithIntersection)
+                {
+                    Console.WriteLine(theme.Id);
+                    Console.WriteLine(theme.Title);
+                    Console.WriteLine(theme.StartDate);
+                    Console.WriteLine(theme.EndDate);
+                    Console.WriteLine("--------");
+                }
                 return BadRequest("Cannot update a theme that intersects with another theme");
             }
 

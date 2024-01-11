@@ -14,6 +14,21 @@ builder
     .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
 builder.Services.AddControllers();
 
+// Add Cors
+var allowedOrigins = "*";
+builder
+    .Services
+    .AddCors(options =>
+    {
+        options.AddPolicy(
+            name: "CorsPolicy",
+            policy =>
+            {
+                policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod();
+            }
+        );
+    });
+
 // Register services
 
 // User service
@@ -28,6 +43,10 @@ builder.Services.AddTransient<ITaskData, TaskData>();
 builder.Services.AddTransient<IThemeData, ThemeData>();
 builder.Services.AddTransient<IGratitudeData, GratitudeData>();
 builder.Services.AddTransient<IThoughtData, ThoughtData>();
+
+// Add date time converter
+var DateTimeConverter = new UTCDateTimeHandler();
+UTCDateTimeHandler.Register(DateTimeConverter);
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -65,6 +84,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("CorsPolicy");
 
 app.UseHttpsRedirection();
 

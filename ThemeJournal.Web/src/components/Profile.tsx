@@ -100,7 +100,7 @@ const Profile = () => {
                                     (menuOpen
                                         ? " border-primaryLight "
                                         : " border-primaryDark ") +
-                                    "z-10 inline-flex h-12 w-12 items-center justify-center rounded-full border-2 bg-slate-200 text-4xl transition-colors hover:border-primaryLight  hover:text-primaryLight"
+                                    "z-10 inline-flex h-12 w-12 items-center justify-center rounded-full border-2 bg-primarySuperLight text-4xl transition-colors hover:border-primaryLight  hover:text-primaryLight"
                                 }
                             >
                                 <div className="h-fit w-fit select-none font-bold">
@@ -111,11 +111,8 @@ const Profile = () => {
                     </div>
                     <div ref={animationParent}>
                         {menuOpen && (
-                            <div
-                                className="pr-2 pt-2 backdrop-blur-md"
-                                key="ProfileDropDown"
-                            >
-                                <div className="flex w-max flex-col gap-1 rounded-md border-2 border-primaryDark p-2 text-primaryDark transition-colors">
+                            <div className="pr-2 pt-2  " key="ProfileDropDown">
+                                <div className="flex backdrop-blur-md w-max flex-col shadow-md shadow-primarySuperLight gap-1 rounded-md border-2 border-primaryDark p-2 text-primaryDark transition-colors">
                                     <Link
                                         to="/settings"
                                         className="flex cursor-pointer items-center justify-between gap-3  hover:text-primaryLight"

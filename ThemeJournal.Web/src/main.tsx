@@ -7,10 +7,13 @@ import {
     EventMessage,
 } from "@azure/msal-browser";
 import { MsalProvider } from "@azure/msal-react";
+import { QueryClientProvider } from "react-query";
+import { Provider } from "jotai";
 import { msalConfig } from "./utils/authConfig.ts";
+import { queryClient } from "./utils/api.ts";
 
 import AuthLayout from "./layout/AuthLayout.tsx";
-import Root from "./pages/Root.tsx";
+import Home from "./pages/Home.tsx";
 import MainLayout from "./layout/MainLayout.tsx";
 import Journal from "./pages/Journal.tsx";
 import Theme from "./pages/Theme.tsx";
@@ -54,7 +57,7 @@ const router = createBrowserRouter([
         children: [
             {
                 index: true,
-                element: <Root />,
+                element: <Home />,
             },
             {
                 path: "/journal",
@@ -70,10 +73,14 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
-        <MsalProvider instance={msalInstance}>
-            <AuthLayout>
-                <RouterProvider router={router} />
-            </AuthLayout>
-        </MsalProvider>
+        <Provider>
+            <MsalProvider instance={msalInstance}>
+                <QueryClientProvider client={queryClient}>
+                    <AuthLayout>
+                        <RouterProvider router={router} />
+                    </AuthLayout>
+                </QueryClientProvider>
+            </MsalProvider>
+        </Provider>
     </React.StrictMode>,
 );
