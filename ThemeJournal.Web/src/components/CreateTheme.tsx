@@ -19,7 +19,6 @@ import { Control, useFieldArray, useForm } from "react-hook-form";
 import {
     Dialog,
     DialogContent,
-    DialogContentScroll,
     DialogFooter,
     DialogTitle,
     DialogTrigger,
@@ -39,7 +38,6 @@ import { Separator } from "./ui/separator";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { ScrollArea } from "./ui/scroll-area";
-import { DialogPortal } from "@radix-ui/react-dialog";
 
 const CreateThemeView = (props: { endDate: Date }) => {
     const queryClient = useQueryClient();
@@ -330,10 +328,13 @@ const CreateThemeView = (props: { endDate: Date }) => {
                             <DialogTitle className="text-xl font-black">
                                 Objectives
                             </DialogTitle>
-                            <div className="px-4 flex flex-col gap-2">
+                            <div
+                                ref={animationRef}
+                                className="px-4 flex flex-col gap-2"
+                            >
                                 {objectiveFields.map((field, index) => (
                                     <ObjectiveView
-                                        key={field.keyId}
+                                        key={field.id}
                                         canEdit={0 !== index}
                                         index={index}
                                         control={form.control}
@@ -342,9 +343,9 @@ const CreateThemeView = (props: { endDate: Date }) => {
                                     ></ObjectiveView>
                                 ))}
                                 <Button
+                                    type="button"
                                     variant="secondary"
                                     size="wide"
-                                    type="button"
                                     onClick={() =>
                                         objectiveAppend({
                                             id: uuidv7(),
@@ -403,6 +404,7 @@ const ObjectiveView = (props: {
                                 />
                             </FormControl>
                             <Button
+                                type="button"
                                 variant="ghost"
                                 size="icon"
                                 className="h-fit w-fit"
