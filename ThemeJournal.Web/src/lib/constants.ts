@@ -19,3 +19,5 @@ export const colors = [
     "slate-400",
     "stone-400",
 ];
+
+export const NumberOfColors = colors.length;

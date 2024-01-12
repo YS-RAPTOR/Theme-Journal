@@ -3,7 +3,7 @@ import {
     AuthenticatedTemplate,
     UnauthenticatedTemplate,
 } from "@azure/msal-react";
-import { loginRequest } from "../utils/authConfig";
+import { loginRequest } from "../lib/authConfig";
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { PiGearDuotone, PiSignOutDuotone } from "react-icons/pi";

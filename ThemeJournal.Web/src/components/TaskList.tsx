@@ -15,7 +15,7 @@ export type TaskType = {
 // Add the new task button. Allows to add a new task.
 // Add task History button. Allows to see the history of the task.
 
-const TaskList = ({ props }: { props: Array<TaskType> }) => {
+const TaskList = (props: { tasks: Array<TaskType> }) => {
     const scrollRef = useRef(null as null | Map<string, HTMLElement>);
 
     const getMap = () => {

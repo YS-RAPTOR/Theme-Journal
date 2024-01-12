@@ -49,7 +49,7 @@ const Home = () => {
         <>
             <div className="h-16"></div>
             <main className="flex justify-center">
-                <TaskList props={tasks} />
+                <TaskList tasks={tasks} />
             </main>
         </>
     );

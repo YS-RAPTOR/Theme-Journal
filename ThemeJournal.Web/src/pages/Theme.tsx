@@ -1,8 +1,8 @@
 import { useRef } from "react";
 import Loading from "../components/Loading";
 import ThemeView from "../components/ThemeView";
-import { ThemeType } from "../utils/types";
-import { GetTheme } from "../utils/api";
+import { ThemeType } from "../lib/types";
+import { GetTheme } from "../lib/api";
 import { useQuery } from "react-query";
 import WideButton from "../components/WideButton";
 import FetchError from "../components/FetchError";
@@ -10,7 +10,6 @@ import CreateTheme from "../components/CreateTheme";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 const Theme = () => {
-    const CreateThemeDialog = useRef<HTMLDialogElement>(null);
     const [animationRef, _animate] = useAutoAnimate<HTMLDivElement>();
 
     const ThemesQuery = useQuery({
@@ -59,26 +58,15 @@ const Theme = () => {
                         );
                     })}
                     {ThemesQuery.data!.length <= 1 && (
-                        <WideButton
-                            onClick={() => {
-                                CreateThemeDialog.current!.showModal();
-                            }}
+                        <CreateTheme
+                            endDate={
+                                ThemesQuery.data!.length > 0
+                                    ? ThemesQuery.data![0].endDate
+                                    : new Date()
+                            }
                         />
                     )}
                 </div>
-                <dialog
-                    ref={CreateThemeDialog}
-                    className="w-11/12 max-w-[1054px] rounded shadow-md shadow-primarySuperLight"
-                >
-                    <CreateTheme
-                        dialogRef={CreateThemeDialog}
-                        endDate={
-                            ThemesQuery.data!.length > 0
-                                ? ThemesQuery.data![0].endDate
-                                : new Date()
-                        }
-                    />
-                </dialog>
             </main>
         </>
     );

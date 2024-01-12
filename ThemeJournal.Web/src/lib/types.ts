@@ -1,13 +1,13 @@
 import { UUID } from "uuidv7";
 
 export type ObjectiveType = {
-    id: UUID;
+    id: string;
     description: string;
     colorId: number;
 };
 
 export type ThemeType = {
-    id: UUID;
+    id: string;
     title: string;
     startDate: Date;
     endDate: Date;

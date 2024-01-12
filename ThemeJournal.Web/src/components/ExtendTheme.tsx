@@ -1,9 +1,9 @@
 import { RefObject } from "react";
-import { ThemeType } from "../utils/types";
+import { ThemeType } from "../lib/types";
 import { PiXBold } from "react-icons/pi";
 import { useState } from "react";
 import { useMutation, useQueryClient } from "react-query";
-import { ExtendTheme } from "../utils/api";
+import { ExtendTheme } from "../lib/api";
 
 const ExtendThemeView = ({
     props,

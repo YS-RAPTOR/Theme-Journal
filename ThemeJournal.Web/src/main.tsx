@@ -1,25 +1,35 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+
+// Router
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
+// Auth
 import {
     PublicClientApplication,
     EventType,
     EventMessage,
 } from "@azure/msal-browser";
 import { MsalProvider } from "@azure/msal-react";
-import { QueryClientProvider } from "react-query";
-import { Provider } from "jotai";
-import { msalConfig } from "./utils/authConfig.ts";
-import { queryClient } from "./utils/api.ts";
+import { msalConfig } from "./lib/authConfig.ts";
+import AuthLayout from "./layouts/AuthLayout.tsx";
 
-import AuthLayout from "./layout/AuthLayout.tsx";
+// Query
+import { QueryClientProvider } from "react-query";
+import { queryClient } from "./lib/api.ts";
+
+// State
+import { Provider } from "jotai";
+
+// Pages
 import Home from "./pages/Home.tsx";
-import MainLayout from "./layout/MainLayout.tsx";
+import MainLayout from "./layouts/MainLayout.tsx";
 import Journal from "./pages/Journal.tsx";
 import Theme from "./pages/Theme.tsx";
-
-import "./index.css";
 import NotFound from "./pages/NotFound.tsx";
+
+// CSS
+import "./index.css";
 
 // Create msal instance
 const msalInstance = new PublicClientApplication(msalConfig);
@@ -78,6 +88,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                 <QueryClientProvider client={queryClient}>
                     <AuthLayout>
                         <RouterProvider router={router} />
+                        <div className="font-virgil"></div>
                     </AuthLayout>
                 </QueryClientProvider>
             </MsalProvider>

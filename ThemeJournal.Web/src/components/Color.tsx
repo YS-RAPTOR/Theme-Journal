@@ -1,5 +1,5 @@
-import { colors } from "../utils/constants";
-import { ObjectiveType } from "../utils/types";
+import { colors } from "../lib/constants";
+import { ObjectiveType } from "../lib/types";
 
 const Color = ({
     objectives,

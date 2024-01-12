@@ -1,45 +1,50 @@
 import { useMutation, useQueryClient } from "react-query";
-import { CreateObjectives, CreateTheme } from "../utils/api";
-import { UUID, uuidv7obj } from "uuidv7";
-import { ThemeType, ObjectiveType } from "../utils/types";
-import { RefObject, useRef } from "react";
-import { PiXBold, PiPlusBold } from "react-icons/pi";
-import { useState } from "react";
-import { colors } from "../utils/constants";
+import { CreateObjectives, CreateTheme } from "../lib/api";
+import { ThemeType, ObjectiveType } from "../lib/types";
+import { uuidv7 } from "uuidv7";
+import { PiPlusBold } from "react-icons/pi";
+import { NumberOfColors, colors } from "../lib/constants";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import Color from "./Color";
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "./ui/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Control, useFieldArray, useForm } from "react-hook-form";
 
-type NullableThemeType = {
-    id: UUID;
-    title: string;
-    startDate: Date | null;
-    endDate: Date | null;
-};
+import {
+    Dialog,
+    DialogContent,
+    DialogContentScroll,
+    DialogFooter,
+    DialogTitle,
+    DialogTrigger,
+} from "./ui/dialog";
 
-const CreateThemeView = ({
-    dialogRef,
-    endDate,
-}: {
-    dialogRef: RefObject<HTMLDialogElement>;
-    endDate: Date;
-}) => {
+import * as z from "zod";
+import { Input } from "./ui/input";
+import { Button } from "./ui/button";
+
+import { Popover, PopoverTrigger, PopoverContent } from "./ui/popover";
+import { cn } from "@/lib/utils";
+import { Calendar } from "./ui/calendar";
+import { format } from "date-fns";
+import { PiCalendarDuotone } from "react-icons/pi";
+import { useState } from "react";
+import { Separator } from "./ui/separator";
+import { Cross2Icon } from "@radix-ui/react-icons";
+import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
+import { ScrollArea } from "./ui/scroll-area";
+import { DialogPortal } from "@radix-ui/react-dialog";
+
+const CreateThemeView = (props: { endDate: Date }) => {
     const queryClient = useQueryClient();
     const [animationRef, _] = useAutoAnimate();
-    const endDateRef = useRef<HTMLInputElement>(null);
-    const [theme, setTheme] = useState<NullableThemeType>({
-        id: uuidv7obj(),
-        title: "",
-        startDate: null,
-        endDate: null,
-    });
-
-    const [objectives, setObjectives] = useState<ObjectiveType[]>([
-        {
-            id: uuidv7obj(),
-            description: "Critical",
-            colorId: 0,
-        },
-    ]);
+    const [modalOpen, setModalOpen] = useState(false);
 
     const CreateThemeMutation = useMutation({
         // @ts-ignore
@@ -77,7 +82,7 @@ const CreateThemeView = ({
         // @ts-ignore
         mutationFn: CreateObjectives,
         onMutate: async (newObjectives: {
-            themeId: UUID;
+            themeId: string;
             objectives: Array<ObjectiveType>;
         }) => {
             await queryClient.cancelQueries({
@@ -98,7 +103,7 @@ const CreateThemeView = ({
         onError: (
             _err: Error,
             newObjectives: {
-                themeId: UUID;
+                themeId: string;
                 objectives: Array<ObjectiveType>;
             },
             context: { previousObjectives: ObjectiveType[] },
@@ -111,7 +116,10 @@ const CreateThemeView = ({
         onSettled: (
             _data: any,
             _err: Error,
-            newObjectives: { themeId: UUID; objectives: Array<ObjectiveType> },
+            newObjectives: {
+                themeId: string;
+                objectives: Array<ObjectiveType>;
+            },
         ) => {
             queryClient.invalidateQueries({
                 queryKey: ["objectives", newObjectives.themeId],
@@ -120,198 +128,333 @@ const CreateThemeView = ({
     });
 
     const today = new Date();
-    const minDate = today < endDate ? endDate : today;
-    const minDateStr = minDate.toISOString().split("T")[0];
+    let minDate = today < props.endDate ? props.endDate : today;
+    minDate.setHours(0, 0, 0, 0);
+
+    const ObjectiveSchema = z.object({
+        id: z.string().uuid().default(uuidv7()),
+        description: z
+            .string()
+            .min(1, { message: "Description cannot be empty" })
+            .max(255, {
+                message: "Description cannot be longer than 255 chars",
+            }),
+        colorId: z.coerce.number().min(0).max(NumberOfColors),
+    });
+
+    const ThemeSchema = z
+        .object({
+            id: z.string().uuid().default(uuidv7()),
+            title: z
+                .string()
+                .min(1, { message: "Title cannot be empty" })
+                .max(255, { message: "Title cannot be longer than 255 chars" }),
+            startDate: z.coerce
+                .date({ required_error: "Start date is required" })
+                .refine((d) => d >= minDate, {
+                    message: "Start date must be in the future",
+                }),
+            endDate: z.coerce.date({ required_error: "End date is required" }),
+            objectives: z.array(ObjectiveSchema),
+        })
+        .refine((data) => data.endDate >= data.startDate, {
+            message: "End date must be after start date",
+            path: ["endDate"],
+        });
+
+    const form = useForm<z.infer<typeof ThemeSchema>>({
+        resolver: zodResolver(ThemeSchema),
+        defaultValues: {
+            title: "",
+            objectives: [{ description: "Critical", colorId: 0 }],
+        },
+    });
+
+    const {
+        fields: objectiveFields,
+        append: objectiveAppend,
+        remove: objectiveRemove,
+    } = useFieldArray({
+        control: form.control,
+        name: "objectives",
+        keyName: "keyId",
+    });
+
+    const onModalOpenChange = (open: boolean) => {
+        form.reset();
+        setModalOpen(open);
+    };
+
+    const onSubmit = async (theme: z.infer<typeof ThemeSchema>) => {
+        // @ts-ignore
+        await CreateThemeMutation.mutateAsync(theme as ThemeType);
+        await CreateObjectivesMutation.mutateAsync({
+            themeId: theme.id,
+            objectives: theme.objectives as ObjectiveType[],
+        });
+
+        onModalOpenChange(false);
+    };
 
     return (
-        <form
-            method="POST"
-            className="flex flex-col gap-3 rounded border-2 border-primaryDark p-5"
-            onSubmit={(e) => {
-                e.preventDefault();
-                //@ts-ignore
-                e.target.reset();
-                CreateThemeMutation.mutateAsync(theme as ThemeType).then(() => {
-                    CreateObjectivesMutation.mutate({
-                        themeId: theme.id,
-                        objectives: objectives,
-                    });
-                });
-
-                setTheme({
-                    id: uuidv7obj(),
-                    title: "",
-                    startDate: null,
-                    endDate: null,
-                });
-                setObjectives([
-                    { id: uuidv7obj(), description: "Critical", colorId: 0 },
-                ]);
-                dialogRef.current!.close();
-            }}
-        >
-            <div className="flex items-center justify-between text-xl">
-                <div className=" font-black">Create Theme</div>
-                <PiXBold
-                    className="cursor-pointer"
-                    onClick={() => {
-                        dialogRef.current!.close();
-                    }}
-                />
-            </div>
-            <div className="flex h-2 w-full border-t-2 border-primaryLight"></div>
-            <div className="flex flex-col gap-1">
-                <label>Theme Title</label>
-                <input
-                    name="title"
-                    placeholder="Enter theme title"
-                    type="text"
-                    autoFocus={true}
-                    required={true}
-                    value={theme.title}
-                    maxLength={255}
-                    onChange={(e) => {
-                        setTheme({ ...theme, title: e.target.value });
-                    }}
-                    className="rounded border-none bg-primaryLightBackground px-2 py-1 shadow focus:ring-2 focus:ring-primaryLight"
-                />
-            </div>
-            <div className="flex flex-col gap-1">
-                <label>Theme Duration</label>
-                <div className="flex items-center gap-1">
-                    <input
-                        name="startDate"
-                        type="date"
-                        className="rounded border-none bg-primaryLightBackground px-2 py-1 text-xs shadow focus:ring-2 focus:ring-primaryLight sm:text-base"
-                        min={minDateStr}
-                        required={true}
-                        onChange={(e) => {
-                            theme.startDate = new Date(
-                                e.target.value +
-                                    "T" +
-                                    minDate.toISOString().split("T")[1],
-                            );
-                            endDateRef.current!.min = e.target.value;
-                            setTheme({ ...theme });
-                        }}
-                    />
-                    <div className="text-lg">-</div>
-                    <input
-                        ref={endDateRef}
-                        name="endDate"
-                        type="date"
-                        className="rounded border-none bg-primaryLightBackground px-2 py-1 text-xs shadow focus:ring-2 focus:ring-primaryLight sm:text-base"
-                        required={true}
-                        onChange={(e) => {
-                            theme.endDate = new Date(
-                                e.target.value +
-                                    "T" +
-                                    minDate.toISOString().split("T")[1],
-                            );
-                            setTheme({ ...theme });
-                        }}
-                    />
-                </div>
-            </div>
-            <div className="flex items-center justify-between ">
-                <div>Theme Objectives</div>
-                <PiPlusBold
-                    className="cursor-pointer"
-                    onClick={() => {
-                        setObjectives([
-                            ...objectives,
-                            { id: uuidv7obj(), description: "", colorId: 1 },
-                        ]);
-                    }}
-                />
-            </div>
-            <div className="flex w-full border-b-2 border-primaryLight"></div>
-            <div ref={animationRef} className="flex flex-col gap-3 p-2">
-                {objectives.map((_, index) => {
-                    return (
-                        <ObjectiveView
-                            key={index}
-                            canEdit={index != 0}
-                            index={index}
-                            setObjectives={setObjectives}
-                            objectives={objectives}
-                        />
-                    );
-                })}
-            </div>
-            <div className="flex w-full border-b-2 border-primaryLight"></div>
-            <div className="w-full flex items-center justify-center">
-                <button className="text-xl rounded-md w-fit cursor-pointer border-2 border-primaryDark px-2 py-1 text-primaryDark transition-all hover:border-primaryLight hover:bg-primaryDark hover:text-primaryLight hover:text-primaryWhite">
-                    Create Theme
-                </button>
-            </div>
-        </form>
+        <Dialog onOpenChange={onModalOpenChange} open={modalOpen}>
+            <DialogTrigger>
+                <Button variant="default" size="wide">
+                    <PiPlusBold className="text-5xl" />
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="max-h-[99vh] sm:max-w-2xl">
+                <DialogTitle className=" text-xl font-black">
+                    Create New Theme
+                </DialogTitle>
+                <ScrollArea className="p-3 max-h-[50vh] ">
+                    <Form {...form}>
+                        <form className="px-1 flex flex-col gap-3">
+                            <FormField
+                                control={form.control}
+                                name="title"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-col gap-1 space-y-0">
+                                        <FormLabel>Title</FormLabel>
+                                        <FormControl>
+                                            <Input {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            ></FormField>
+                            <FormField
+                                control={form.control}
+                                name="startDate"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-col gap-1 space-y-0">
+                                        <FormLabel>Start Date</FormLabel>
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <FormControl>
+                                                    <Button
+                                                        variant={"outline"}
+                                                        className={cn(
+                                                            "w-[240px] pl-3 text-left font-normal",
+                                                            !field.value &&
+                                                                "text-muted-foreground",
+                                                        )}
+                                                    >
+                                                        {field.value ? (
+                                                            format(
+                                                                field.value,
+                                                                "P",
+                                                            )
+                                                        ) : (
+                                                            <span>
+                                                                Pick a date
+                                                            </span>
+                                                        )}
+                                                        <PiCalendarDuotone className="ml-auto h-4 w-4 opacity-50" />
+                                                    </Button>
+                                                </FormControl>
+                                            </PopoverTrigger>
+                                            <PopoverContent
+                                                className="w-auto p-0"
+                                                align="start"
+                                            >
+                                                <Calendar
+                                                    mode="single"
+                                                    selected={field.value}
+                                                    onSelect={field.onChange}
+                                                    disabled={(date) =>
+                                                        date < minDate
+                                                    }
+                                                    initialFocus
+                                                />
+                                            </PopoverContent>
+                                        </Popover>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="endDate"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-col gap-1 space-y-0">
+                                        <FormLabel>End Date</FormLabel>
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <FormControl>
+                                                    <Button
+                                                        variant={"outline"}
+                                                        className={cn(
+                                                            "w-[240px] pl-3 text-left font-normal",
+                                                            !field.value &&
+                                                                "text-muted-foreground",
+                                                        )}
+                                                    >
+                                                        {field.value ? (
+                                                            format(
+                                                                field.value,
+                                                                "P",
+                                                            )
+                                                        ) : (
+                                                            <span>
+                                                                Pick a date
+                                                            </span>
+                                                        )}
+                                                        <PiCalendarDuotone className="ml-auto h-4 w-4 opacity-50" />
+                                                    </Button>
+                                                </FormControl>
+                                            </PopoverTrigger>
+                                            <PopoverContent
+                                                className="w-auto p-0"
+                                                align="start"
+                                            >
+                                                <Calendar
+                                                    mode="single"
+                                                    selected={field.value}
+                                                    onSelect={field.onChange}
+                                                    disabled={(date) =>
+                                                        date <
+                                                            form.getValues(
+                                                                "startDate",
+                                                            ) || date < minDate
+                                                    }
+                                                    initialFocus
+                                                />
+                                            </PopoverContent>
+                                        </Popover>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <Separator />
+                            <DialogTitle className="text-xl font-black">
+                                Objectives
+                            </DialogTitle>
+                            <div className="px-4 flex flex-col gap-2">
+                                {objectiveFields.map((field, index) => (
+                                    <ObjectiveView
+                                        key={field.keyId}
+                                        canEdit={0 !== index}
+                                        index={index}
+                                        control={form.control}
+                                        objective={field}
+                                        deleteObjective={objectiveRemove}
+                                    ></ObjectiveView>
+                                ))}
+                                <Button
+                                    variant="secondary"
+                                    size="wide"
+                                    type="button"
+                                    onClick={() =>
+                                        objectiveAppend({
+                                            id: uuidv7(),
+                                            description: "",
+                                            colorId: 1,
+                                        })
+                                    }
+                                >
+                                    <PiPlusBold className="text-2xl" />
+                                </Button>
+                            </div>
+                        </form>
+                    </Form>
+                </ScrollArea>
+                <DialogFooter>
+                    <Button
+                        type="submit"
+                        onClick={form.handleSubmit(onSubmit, (e) =>
+                            console.log(e),
+                        )}
+                        className="w-fit"
+                    >
+                        Create Theme
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     );
 };
 
-const ObjectiveView = ({
-    canEdit,
-    index,
-    objectives,
-    setObjectives,
-}: {
+const ObjectiveView = (props: {
     canEdit: boolean;
+    control?: Control<any>;
+    deleteObjective: (index: number) => void;
     index: number;
-    objectives: ObjectiveType[];
-    setObjectives: React.Dispatch<React.SetStateAction<ObjectiveType[]>>;
+    objective: any;
 }) => {
-    const canEditStyles = canEdit ? "gap-2" : "";
+    const [state, setState] = useState(1);
+    if (!props.canEdit)
+        return <ObjectiveViewConst objective={props.objective} />;
+
     return (
         <div
-            className={`flex w-full justify-center flex-col items-start rounded-lg bg-${
-                colors[objectives[index].colorId]
-            } ${canEditStyles} py-2 px-4 text-xl font-black `}
+            className={`bg-${colors[state]} rounded-md p-2 flex flex-col gap-2`}
         >
-            {canEdit ? (
-                <div className="flex gap-3 w-full max-w-full justify-between items-center">
-                    <input
-                        name={`objective-${index}`}
-                        placeholder="Enter objective"
-                        type="text"
-                        required={true}
-                        value={objectives[index].description}
-                        maxLength={255}
-                        onChange={(e) => {
-                            const newObjectives = [...objectives];
-                            newObjectives[index].description = e.target.value;
-                            setObjectives(newObjectives);
-                        }}
-                        className="border-b-2 border-0 border-primaryWhite placeholder-primaryWhite bg-inherit pt-1 p-0 focus:ring-0 flex flex-auto min-w-0 focus:border-primaryLight"
-                    ></input>
-                    <PiXBold
-                        className="cursor-pointer min-w-fit"
-                        onClick={() => {
-                            // remove objective
-                            const newObjectives = [...objectives];
-                            newObjectives.splice(index, 1);
-                            setObjectives(newObjectives);
-                        }}
-                    />
-                </div>
-            ) : (
-                objectives[index].description
-            )}
-            <div className="flex w-full gap-2 items-center justify-center flex-wrap">
-                {canEdit &&
-                    colors.map((_, colorIndex) => {
-                        return (
-                            <Color
-                                key={colorIndex}
-                                objectives={objectives}
-                                objectiveIndex={index}
-                                colorIndex={colorIndex}
-                                onClick={() => {
-                                    objectives[index].colorId = colorIndex;
-                                    setObjectives([...objectives]);
+            <FormField
+                control={props.control}
+                name={`objectives[${props.index}].description`}
+                render={({ field }) => (
+                    <FormItem className="flex flex-col gap-1 space-y-0">
+                        <div className="flex items-center justify-between">
+                            <FormControl>
+                                <Input
+                                    className="h-fit rounded-none border-l-0 border-r-0 border-t-0 shadow-none outline-none focus-visible:border-slate-950 focus-visible:ring-0"
+                                    {...field}
+                                />
+                            </FormControl>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-fit w-fit"
+                                onClick={() =>
+                                    props.deleteObjective(props.index)
+                                }
+                            >
+                                <Cross2Icon />
+                            </Button>
+                        </div>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+            <FormField
+                control={props.control}
+                name={`objectives[${props.index}].colorId`}
+                render={({ field }) => (
+                    <FormItem className="space-y-0">
+                        <FormControl>
+                            <RadioGroup
+                                onValueChange={(e) => {
+                                    setState(parseInt(e));
+                                    field.onChange(e);
                                 }}
-                            />
-                        );
-                    })}
+                                defaultValue={field.value.toString()}
+                                className="flex gap-2 flex-wrap justify-center"
+                            >
+                                {colors.map((color, index) => (
+                                    <FormItem className="space-y-0" key={index}>
+                                        <FormControl className="space-y-0 flex">
+                                            <RadioGroupItem
+                                                className={`bg-${color}`}
+                                                value={index.toString()}
+                                            />
+                                        </FormControl>
+                                    </FormItem>
+                                ))}
+                            </RadioGroup>
+                        </FormControl>
+                    </FormItem>
+                )}
+            />
+        </div>
+    );
+};
+
+const ObjectiveViewConst = (props: { objective: any }) => {
+    return (
+        <div className={`bg-${colors[props.objective.colorId]} rounded-md p-2`}>
+            <div className="flex w-full rounded-md bg-transparent px-3 py-1 text-sm ">
+                {props.objective.description}
             </div>
         </div>
     );

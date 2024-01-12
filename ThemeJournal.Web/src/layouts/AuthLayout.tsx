@@ -6,9 +6,9 @@ import {
     UnauthenticatedTemplate,
 } from "@azure/msal-react";
 
-import { loginRequest } from "../utils/authConfig";
+import { loginRequest } from "../lib/authConfig";
+import { axiosInstance } from "../lib/api";
 import Root from "../pages/Root";
-import { axiosInstance } from "../utils/api";
 
 const Layout = ({ children }: { children: ReactNode }) => {
     const { instance }: IMsalContext = useMsal();

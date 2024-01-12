@@ -1,7 +1,6 @@
 import axios from "axios";
 import { QueryClient } from "react-query";
 import * as Types from "./types";
-import { UUID } from "uuidv7";
 
 // Create axios instance
 export const axiosInstance = axios.create({
@@ -69,12 +68,7 @@ export const EditTheme = async ({
     });
 };
 
-export const ExtendTheme = async ({
-    id,
-    title,
-    startDate,
-    endDate,
-}: Types.ThemeType) => {
+export const ExtendTheme = async ({ id, endDate }: Types.ThemeType) => {
     return axiosInstance
         .put(`theme/${id}/extend`, endDate.toISOString(), {
             headers: { "Content-Type": "application/json" },
@@ -88,7 +82,7 @@ export const CreateObjectives = async ({
     themeId,
     objectives,
 }: {
-    themeId: UUID;
+    themeId: string;
     objectives: Array<Types.ObjectiveType>;
 }) => {
     return axiosInstance
@@ -98,7 +92,7 @@ export const CreateObjectives = async ({
         });
 };
 
-export const GetObjectives = async (id: UUID) => {
+export const GetObjectives = async (id: string) => {
     return axiosInstance.get(`/ThemeObjective/${id}`).then((res) => {
         return res.data as Array<Types.ObjectiveType>;
     });
@@ -120,8 +114,8 @@ export const DeleteObjective = async ({
     //@ts-ignore
     index,
 }: {
-    id: UUID;
-    themeId: UUID;
+    id: string;
+    themeId: string;
     index: number;
 }) => {
     return axiosInstance

@@ -1,13 +1,13 @@
 import { PiClockClockwiseBold, PiNotePencilDuotone } from "react-icons/pi";
-import { ObjectiveType, ThemeType } from "../utils/types";
 import { useQuery, useMutation, useQueryClient } from "react-query";
-import { GetObjectives, CreateObjectives, EditTheme } from "../utils/api";
+import { ObjectiveType, ThemeType } from "../lib/types";
+import { GetObjectives, CreateObjectives, EditTheme } from "../lib/api";
+import { colors } from "../lib/constants";
 import ObjectiveView from "./ObjectiveView";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import WideButton from "./WideButton";
 import { useRef, RefObject } from "react";
 import { UUID, uuidv7obj } from "uuidv7";
-import { colors } from "../utils/constants";
 import { PiXBold } from "react-icons/pi";
 import Color from "./Color";
 import { useState } from "react";
@@ -285,7 +285,7 @@ const AddObjectiveView = ({
     themeId,
 }: {
     dialogRef: RefObject<HTMLDialogElement>;
-    themeId: UUID;
+    themeId: string;
 }) => {
     const [objective, setObjective] = useState<ObjectiveType>({
         id: uuidv7obj(),
@@ -298,7 +298,7 @@ const AddObjectiveView = ({
         // @ts-ignore
         mutationFn: CreateObjectives,
         onMutate: async (newObjectives: {
-            themeId: UUID;
+            themeId: string;
             objectives: Array<ObjectiveType>;
         }) => {
             await queryClient.cancelQueries({
@@ -320,7 +320,7 @@ const AddObjectiveView = ({
         onError: (
             _err: Error,
             newObjectives: {
-                themeId: UUID;
+                themeId: string;
                 objectives: Array<ObjectiveType>;
             },
             context: { previousObjectives: ObjectiveType[] },

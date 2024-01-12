@@ -1,11 +1,11 @@
-import { ObjectiveType } from "../utils/types";
-import { colors } from "../utils/constants";
+import { ObjectiveType } from "../lib/types";
+import { colors } from "../lib/constants";
 import { PiNotePencilDuotone, PiTrashDuotone, PiXBold } from "react-icons/pi";
 import { RefObject, useRef } from "react";
 import { useMutation, useQueryClient } from "react-query";
 import Color from "./Color";
 import { UUID } from "uuidv7";
-import { EditObjective, DeleteObjective } from "../utils/api";
+import { EditObjective, DeleteObjective } from "../lib/api";
 
 const ObjectiveView = ({
     objectives,

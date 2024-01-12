@@ -6,8 +6,8 @@ import {
     GetThought,
     UpsertGratitude,
     UpsertThought,
-} from "../utils/api";
-import { GratitudesType, ThoughtsType, TimeOfDay } from "../utils/types";
+} from "../lib/api";
+import { GratitudesType, ThoughtsType, TimeOfDay } from "../lib/types";
 import Loading from "../components/Loading";
 import FetchError from "../components/FetchError";
 import { uuidv7obj } from "uuidv7";
