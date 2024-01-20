@@ -22,6 +22,17 @@ import { uuidv7 } from "uuidv7";
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "./ui/alert-dialog";
 
 const ObjectiveView = (props: {
     objectives: ObjectiveType[];
@@ -96,19 +107,42 @@ const ObjectiveView = (props: {
                         />
                     )}
                     {props.canDelete && (
-                        <Button
-                            onClick={() => {
-                                DeleteObjectiveMutation.mutate({
-                                    id: props.objectives[props.index].id,
-                                    themeId: props.themeId,
-                                    index: props.index,
-                                });
-                            }}
-                            size="icon"
-                            variant="ghost"
-                        >
-                            <PiTrashDuotone className="text-2xl" />
-                        </Button>
+                        <AlertDialog>
+                            <AlertDialogTrigger>
+                                <Button size="icon" variant="ghost">
+                                    <PiTrashDuotone className="text-2xl" />
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                        Are you absolutely sure?
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        This action cannot be undone. This will
+                                        permanently delete this Objective.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>
+                                        Cancel
+                                    </AlertDialogCancel>
+                                    <AlertDialogAction
+                                        onClick={() => {
+                                            DeleteObjectiveMutation.mutate({
+                                                id: props.objectives[
+                                                    props.index
+                                                ].id,
+                                                themeId: props.themeId,
+                                                index: props.index,
+                                            });
+                                        }}
+                                    >
+                                        Delete
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
                     )}
                 </div>
             </div>

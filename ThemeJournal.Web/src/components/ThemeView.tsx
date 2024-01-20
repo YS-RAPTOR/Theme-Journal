@@ -8,6 +8,18 @@ import {
     FixDate,
 } from "../lib/api";
 
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "./ui/alert-dialog";
+
 import { NumberOfColors, colors } from "../lib/constants";
 import ObjectiveView from "./ObjectiveView";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
