@@ -1,6 +1,7 @@
 import axios from "axios";
 import { QueryClient } from "react-query";
 import * as Types from "./types";
+import { format } from "date-fns";
 
 // Create axios instance
 export const axiosInstance = axios.create({
@@ -10,16 +11,25 @@ export const axiosInstance = axios.create({
 // Create query client
 export const queryClient = new QueryClient();
 
+export const FixDate = (date: Date) => {
+    date.setHours(0, 0, 0, 0);
+    return date;
+};
+
+const DateToISOString = (date: Date) => {
+    return format(date, "yyyy-MM-dd") + "T00:00:00.000Z";
+};
+
 // All dates have to be local time zone. The functions will comvert to UTC before sending to the server.
 type date = Date | null;
 
 export const GetTheme = async (upperDate: date, lowerDate: date) => {
     let params: any = {};
     if (upperDate !== null) {
-        params.upperDate = upperDate.toISOString();
+        params.upperDate = DateToISOString(upperDate);
     }
     if (lowerDate !== null) {
-        params.lowerDate = lowerDate.toISOString();
+        params.lowerDate = DateToISOString(lowerDate);
     }
 
     return axiosInstance
@@ -31,6 +41,11 @@ export const GetTheme = async (upperDate: date, lowerDate: date) => {
                 res.data[i].startDate = new Date(res.data[i].startDate);
                 res.data[i].endDate = new Date(res.data[i].endDate);
             }
+
+            res.data.sort((a: Types.ThemeType, b: Types.ThemeType) => {
+                return a.startDate.getTime() - b.startDate.getTime();
+            });
+
             return res.data as Array<Types.ThemeType>;
         });
 };
@@ -44,9 +59,11 @@ export const CreateTheme = async ({
     const data = {
         id: id,
         title: title,
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString(),
+        startDate: DateToISOString(startDate),
+        endDate: DateToISOString(endDate),
     };
+    console.log(data);
+
     return axiosInstance.post("/theme", data).then((res) => {
         return res.data;
     });
@@ -60,8 +77,8 @@ export const EditTheme = async ({
 }: Types.ThemeType) => {
     const data = {
         title: title,
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString(),
+        startDate: DateToISOString(startDate),
+        endDate: DateToISOString(endDate),
     };
     return axiosInstance.put(`theme/${id}`, data).then((res) => {
         return res.data;
@@ -70,7 +87,7 @@ export const EditTheme = async ({
 
 export const ExtendTheme = async ({ id, endDate }: Types.ThemeType) => {
     return axiosInstance
-        .put(`theme/${id}/extend`, endDate.toISOString(), {
+        .put(`theme/${id}/extend`, DateToISOString(endDate), {
             headers: { "Content-Type": "application/json" },
         })
         .then((res) => {
@@ -133,10 +150,10 @@ export const GetGratitude = async (
 ) => {
     let data: any = {};
     if (upperDate !== null) {
-        data.upperDate = upperDate.toISOString();
+        data.upperDate = DateToISOString(upperDate);
     }
     if (lowerDate !== null) {
-        data.lowerDate = lowerDate.toISOString();
+        data.lowerDate = DateToISOString(lowerDate);
     }
     if (time !== null) {
         data.time = time;
@@ -162,7 +179,7 @@ export const UpsertGratitude = async ({
 }: Types.GratitudesType) => {
     const data = {
         description: description,
-        createdAt: createdAt.toISOString(),
+        createdAt: DateToISOString(createdAt),
         sentiment: sentiment,
         time: time,
     };
@@ -175,10 +192,10 @@ export const UpsertGratitude = async ({
 export const GetThought = async (upperDate: date, lowerDate: date) => {
     let data: any = {};
     if (upperDate !== null) {
-        data.upperDate = upperDate.toISOString();
+        data.upperDate = DateToISOString(upperDate);
     }
     if (lowerDate !== null) {
-        data.lowerDate = lowerDate.toISOString();
+        data.lowerDate = DateToISOString(lowerDate);
     }
     return axiosInstance.get("/thoughts", { params: data }).then((res) => {
         for (let i = 0; i < res.data.length; i++) {
@@ -195,7 +212,7 @@ export const UpsertThought = async ({
 }: Types.ThoughtsType) => {
     const data = {
         thought: thought,
-        createdAt: createdAt.toISOString(),
+        createdAt: DateToISOString(createdAt),
     };
 
     return axiosInstance.put(`/thoughts/${id}`, data).then((res) => {

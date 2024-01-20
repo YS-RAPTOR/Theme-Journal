@@ -4,7 +4,6 @@ import ThemeView from "../components/ThemeView";
 import { ThemeType } from "../lib/types";
 import { GetTheme } from "../lib/api";
 import { useQuery } from "react-query";
-import WideButton from "../components/WideButton";
 import FetchError from "../components/FetchError";
 import CreateTheme from "../components/CreateTheme";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
@@ -47,13 +46,11 @@ const Theme = () => {
                     ref={animationRef}
                     className="flex w-full max-w-[1054px] flex-auto flex-col gap-2 p-2 "
                 >
-                    {ThemesQuery.data!.sort((a, b) => {
-                        return a.startDate.getTime() - b.startDate.getTime();
-                    }).map((theme: ThemeType) => {
+                    {ThemesQuery.data!.map((theme: ThemeType) => {
                         return (
                             <ThemeView
                                 key={theme.id.toString()}
-                                props={theme}
+                                theme={theme}
                             />
                         );
                     })}

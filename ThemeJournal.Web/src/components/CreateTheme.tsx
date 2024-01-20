@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "react-query";
-import { CreateObjectives, CreateTheme } from "../lib/api";
+import { CreateObjectives, CreateTheme, FixDate } from "../lib/api";
 import { ThemeType, ObjectiveType } from "../lib/types";
 import { uuidv7 } from "uuidv7";
 import { PiPlusBold } from "react-icons/pi";
@@ -20,6 +20,7 @@ import {
     Dialog,
     DialogContent,
     DialogFooter,
+    DialogHeader,
     DialogTitle,
     DialogTrigger,
 } from "./ui/dialog";
@@ -127,7 +128,7 @@ const CreateThemeView = (props: { endDate: Date }) => {
 
     const today = new Date();
     let minDate = today < props.endDate ? props.endDate : today;
-    minDate.setHours(0, 0, 0, 0);
+    minDate = FixDate(minDate);
 
     const ObjectiveSchema = z.object({
         id: z.string().uuid().default(uuidv7()),
@@ -202,9 +203,11 @@ const CreateThemeView = (props: { endDate: Date }) => {
                 </Button>
             </DialogTrigger>
             <DialogContent className="max-h-[99vh] sm:max-w-2xl">
-                <DialogTitle className=" text-xl font-black">
-                    Create New Theme
-                </DialogTitle>
+                <DialogHeader>
+                    <DialogTitle className=" text-xl font-black">
+                        Create New Theme
+                    </DialogTitle>
+                </DialogHeader>
                 <ScrollArea className="p-3 max-h-[50vh] ">
                     <Form {...form}>
                         <form className="px-1 flex flex-col gap-3">

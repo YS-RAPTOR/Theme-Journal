@@ -1,35 +1,37 @@
-import { PiClockClockwiseBold, PiNotePencilDuotone } from "react-icons/pi";
+import { PiNotePencilDuotone } from "react-icons/pi";
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import { ObjectiveType, ThemeType } from "../lib/types";
 import { GetObjectives, CreateObjectives, EditTheme } from "../lib/api";
 import { colors } from "../lib/constants";
 import ObjectiveView from "./ObjectiveView";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import WideButton from "./WideButton";
 import { useRef, RefObject } from "react";
-import { UUID, uuidv7obj } from "uuidv7";
+import { uuidv7 } from "uuidv7";
 import { PiXBold } from "react-icons/pi";
 import Color from "./Color";
 import { useState } from "react";
 import ExtendTheme from "./ExtendTheme";
 import FetchError from "./FetchError";
 import Loading from "./Loading";
+import {
+    Card,
+    CardHeader,
+    CardContent,
+    CardDescription,
+    CardTitle,
+} from "./ui/card";
 
-const ThemeView = ({ props }: { props: ThemeType }) => {
+const ThemeView = (props: { theme: ThemeType }) => {
     const isThemeActive = () => {
         const today = new Date();
-        return today >= props.startDate && today < props.endDate;
+        return today >= props.theme.startDate && today < props.theme.endDate;
     };
     const objectivesQuery = useQuery({
-        queryKey: ["objectives", props.id],
-        queryFn: () => GetObjectives(props.id),
+        queryKey: ["objectives", props.theme.id],
+        queryFn: () => GetObjectives(props.theme.id),
     });
 
-    const CreateObjectiveDialog = useRef<HTMLDialogElement>(null);
-    const EditThemeDialog = useRef<HTMLDialogElement>(null);
-    const ExtendThemeDialog = useRef<HTMLDialogElement>(null);
-
-    const [animationRef, animate] = useAutoAnimate<HTMLDivElement>();
+    const [animationRef, _] = useAutoAnimate<HTMLDivElement>();
 
     if (objectivesQuery.isLoading) {
         return <Loading />;
@@ -40,87 +42,56 @@ const ThemeView = ({ props }: { props: ThemeType }) => {
     }
 
     return (
-        <>
-            <div className="border-2 flex flex-col flex-auto gap-2 border-primaryDark p-1 rounded-md">
-                <div className="flex justify-between">
-                    <div>
-                        <div className="text-3xl">{props.title}</div>
-                        <div className="text-sm">
-                            {props.startDate.toLocaleDateString()} -{" "}
-                            {props.endDate.toLocaleDateString()}
-                        </div>
-                    </div>
-                    {isThemeActive() ? (
-                        <PiClockClockwiseBold
-                            className="text-primaryDark text-2xl cursor-pointer"
-                            onClick={() => {
-                                ExtendThemeDialog.current!.showModal();
-                            }}
-                        />
-                    ) : (
-                        <PiNotePencilDuotone
-                            className="text-primaryDark text-2xl cursor-pointer"
-                            onClick={() => {
-                                EditThemeDialog.current!.showModal();
-                            }}
-                        />
-                    )}
+        <Card>
+            <CardHeader className="relative">
+                <CardTitle className="text-2xl">{props.theme.title}</CardTitle>
+                <CardDescription>
+                    {" "}
+                    {props.theme.startDate.toLocaleDateString()} -{" "}
+                    {props.theme.endDate.toLocaleDateString()}
+                </CardDescription>
+                {/* If Active can only extend else can edit*/}
+                <div className="top-4 right-4 absolute">
+                    {
+                        // @ts-ignore
+                        isThemeActive() ? (
+                            <ExtendTheme theme={props.theme} />
+                        ) : (
+                            <PiNotePencilDuotone
+                                className="text-primaryDark text-2xl cursor-pointer"
+                                onClick={() => {
+                                    EditThemeDialog.current!.showModal();
+                                }}
+                            />
+                        )
+                    }
                 </div>
-                <div className="flex flex-col gap-2" ref={animationRef}>
-                    {objectivesQuery.data
-                        ?.sort((a, b) => {
-                            if (a.id < b.id) return -1;
-                            if (a.id > b.id) return 1;
-                            return 0;
-                        })
-                        .map((objective, index) => {
-                            return (
-                                <ObjectiveView
-                                    themeId={props.id}
-                                    objectives={objectivesQuery.data!}
-                                    index={index}
-                                    canDelete={
-                                        !isThemeActive() &&
-                                        objective.description != "Critical"
-                                    }
-                                    canEdit={
-                                        objective.description != "Critical"
-                                    }
-                                    key={index}
-                                />
-                            );
-                        })}
-                    {!isThemeActive() && (
-                        <WideButton
-                            onClick={() => {
-                                CreateObjectiveDialog.current!.showModal();
-                            }}
-                        />
-                    )}
-                </div>
-            </div>
-            <dialog
-                ref={CreateObjectiveDialog}
-                className="w-11/12 max-w-[1054px] rounded shadow-md shadow-primarySuperLight"
-            >
-                <AddObjectiveView
-                    dialogRef={CreateObjectiveDialog}
-                    themeId={props.id}
-                />
-            </dialog>
-            <dialog
-                ref={EditThemeDialog}
-                className="w-11/12 max-w-[1054px] rounded shadow-md shadow-primarySuperLight"
-            >
-                <EditThemeView props={props} dialogRef={EditThemeDialog} />
-            </dialog>
-            <dialog
-                ref={ExtendThemeDialog}
-                className="w-11/12 max-w-[1054px] rounded shadow-md shadow-primarySuperLight"
-            >
-                <ExtendTheme props={props} dialogRef={ExtendThemeDialog} />
-            </dialog>
-        </>
+            </CardHeader>
+            <CardContent ref={animationRef} className="flex flex-col gap-2">
+                {objectivesQuery.data
+                    ?.sort((a, b) => {
+                        if (a.id < b.id) return -1;
+                        if (a.id > b.id) return 1;
+                        return 0;
+                    })
+                    .map((objective, index) => {
+                        return (
+                            <ObjectiveView
+                                themeId={props.theme.id}
+                                objectives={objectivesQuery.data!}
+                                index={index}
+                                canDelete={
+                                    !isThemeActive() &&
+                                    objective.description != "Critical"
+                                }
+                                canEdit={objective.description != "Critical"}
+                                key={index}
+                            />
+                        );
+                    })}
+                {!isThemeActive() && <div></div>}
+            </CardContent>
+        </Card>
     );
 };
 
@@ -131,7 +102,7 @@ const EditThemeView = ({
     props: ThemeType;
     dialogRef: RefObject<HTMLDialogElement>;
 }) => {
-    const [theme, setTheme] = useState<NullableThemeType>(props);
+    const [theme, setTheme] = useState<ThemeType>(props);
     const [isError, setError] = useState(false);
     const queryClient = useQueryClient();
 
@@ -288,7 +259,7 @@ const AddObjectiveView = ({
     themeId: string;
 }) => {
     const [objective, setObjective] = useState<ObjectiveType>({
-        id: uuidv7obj(),
+        id: uuidv7(),
         description: "",
         colorId: 0,
     });
@@ -333,7 +304,10 @@ const AddObjectiveView = ({
         onSettled: (
             _data: any,
             _err: Error,
-            newObjectives: { themeId: UUID; objectives: Array<ObjectiveType> },
+            newObjectives: {
+                themeId: string;
+                objectives: Array<ObjectiveType>;
+            },
         ) => {
             queryClient.invalidateQueries({
                 queryKey: ["objectives", newObjectives.themeId],
@@ -355,7 +329,7 @@ const AddObjectiveView = ({
                 });
 
                 setObjective({
-                    id: uuidv7obj(),
+                    id: uuidv7(),
                     description: "",
                     colorId: 0,
                 });
@@ -368,7 +342,7 @@ const AddObjectiveView = ({
                     onClick={() => {
                         dialogRef.current!.close();
                         setObjective({
-                            id: uuidv7obj(),
+                            id: uuidv7(),
                             description: "",
                             colorId: 0,
                         });

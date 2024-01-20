@@ -29,6 +29,7 @@ namespace ThemeJournal.Api.Controllers
             theme.StartDate = _userService.TrasformDate(theme.StartDate);
             theme.EndDate = _userService.TrasformDate(theme.EndDate);
 
+
             // Start Date should be greater than or equal to today
             if (theme.StartDate < _userService.TrasformDate(DateTime.UtcNow))
             {
@@ -147,14 +148,6 @@ namespace ThemeJournal.Api.Controllers
             }
             else if (themesWithIntersection.Count > 1)
             {
-                foreach (var theme in themesWithIntersection)
-                {
-                    Console.WriteLine(theme.Id);
-                    Console.WriteLine(theme.Title);
-                    Console.WriteLine(theme.StartDate);
-                    Console.WriteLine(theme.EndDate);
-                    Console.WriteLine("--------");
-                }
                 return BadRequest("Cannot update a theme that intersects with another theme");
             }
 

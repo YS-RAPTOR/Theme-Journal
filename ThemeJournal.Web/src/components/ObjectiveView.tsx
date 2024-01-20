@@ -4,7 +4,6 @@ import { PiNotePencilDuotone, PiTrashDuotone, PiXBold } from "react-icons/pi";
 import { RefObject, useRef } from "react";
 import { useMutation, useQueryClient } from "react-query";
 import Color from "./Color";
-import { UUID } from "uuidv7";
 import { EditObjective, DeleteObjective } from "../lib/api";
 
 const ObjectiveView = ({
@@ -15,7 +14,7 @@ const ObjectiveView = ({
     canEdit,
 }: {
     objectives: ObjectiveType[];
-    themeId: UUID;
+    themeId: string;
     index: number;
     canDelete: boolean;
     canEdit: boolean;
@@ -31,8 +30,8 @@ const ObjectiveView = ({
             themeId,
             index,
         }: {
-            id: UUID;
-            themeId: UUID;
+            id: string;
+            themeId: string;
             index: number;
         }) => {
             await queryClient.cancelQueries({
@@ -55,7 +54,7 @@ const ObjectiveView = ({
         },
         onError: (
             _err: Error,
-            _objectiveToDelete: { id: UUID; themeId: UUID; index: number },
+            _objectiveToDelete: { id: string; themeId: string; index: number },
             context: { previousObjectives: ObjectiveType[] },
         ) => {
             queryClient.setQueryData(
@@ -125,7 +124,7 @@ const EditObjectiveView = ({
     dialogRef: RefObject<HTMLDialogElement>;
     objectives: ObjectiveType[];
     index: number;
-    themeId: UUID;
+    themeId: string;
 }) => {
     const queryClient = useQueryClient();
     const EditObjectiveMutation = useMutation({

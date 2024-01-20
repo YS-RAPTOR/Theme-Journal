@@ -1,27 +1,38 @@
-import { RefObject } from "react";
 import { ThemeType } from "../lib/types";
-import { PiXBold } from "react-icons/pi";
+import { PiClockClockwiseBold } from "react-icons/pi";
 import { useState } from "react";
 import { useMutation, useQueryClient } from "react-query";
-import { ExtendTheme } from "../lib/api";
+import { ExtendTheme, FixDate } from "../lib/api";
+import * as z from "zod";
+import {
+    Dialog,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "./ui/dialog";
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "./ui/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Popover, PopoverTrigger, PopoverContent } from "./ui/popover";
+import { cn } from "@/lib/utils";
+import { Calendar } from "./ui/calendar";
+import { format } from "date-fns";
+import { PiCalendarDuotone } from "react-icons/pi";
+import { Button } from "./ui/button";
+import { ScrollArea } from "./ui/scroll-area";
 
-const ExtendThemeView = ({
-    props,
-    dialogRef,
-}: {
-    props: ThemeType;
-    dialogRef: RefObject<HTMLDialogElement>;
-}) => {
-    const minDateStr = props.endDate.toISOString().split("T")[0];
-    const [endDate, setEndDate] = useState<Date>(props.endDate);
+const ExtendThemeView = (props: { theme: ThemeType; maxDate?: Date }) => {
     const queryClient = useQueryClient();
-    const currentThemes = queryClient.getQueryData<Array<ThemeType>>([
-        "currentThemes",
-    ]);
-    const maxDateStr =
-        currentThemes!.length > 1
-            ? currentThemes![1].startDate.toISOString().split("T")[0]
-            : "";
+    const [modalOpen, setModalOpen] = useState(false);
 
     const ExtendThemeMutation = useMutation({
         // @ts-ignore
@@ -59,60 +70,155 @@ const ExtendThemeView = ({
         },
     });
 
+    const minDate = FixDate(
+        new Date(
+            props.theme.endDate.getFullYear(),
+            props.theme.endDate.getMonth(),
+            props.theme.endDate.getDate() + 1,
+        ),
+    );
+
+    const currentThemes = queryClient.getQueryData<Array<ThemeType>>([
+        "currentThemes",
+    ]);
+
+    const maxDate =
+        currentThemes!.length > 1
+            ? FixDate(currentThemes![1].startDate)
+            : undefined;
+
+    const ExtendSchema = z.object({
+        endDate: z
+            .date()
+            .min(minDate, {
+                message: "End Date must be after the current end date",
+            })
+            .refine(
+                (d) => {
+                    if (!maxDate) return true;
+                    return d < maxDate;
+                },
+                {
+                    params: ["endDate"],
+                    message:
+                        "End Date must be before the start of the next theme",
+                },
+            ),
+    });
+
+    const form = useForm<z.infer<typeof ExtendSchema>>({
+        resolver: zodResolver(ExtendSchema),
+    });
+
+    const onModalOpenChange = (open: boolean) => {
+        form.reset();
+        setModalOpen(open);
+    };
+
+    const onSubmit = async (data: z.infer<typeof ExtendSchema>) => {
+        // @ts-ignore
+        await ExtendThemeMutation.mutateAsync({
+            id: props.theme.id,
+            title: props.theme.title,
+            startDate: props.theme.startDate,
+            endDate: data.endDate,
+        });
+
+        onModalOpenChange(false);
+    };
+
     return (
-        <form
-            method="POST"
-            className="flex flex-col gap-3 rounded border-2 border-primaryDark p-5"
-            onSubmit={(e) => {
-                e.preventDefault();
-                //@ts-ignore
-                ExtendThemeMutation.mutate({
-                    ...props,
-                    endDate: endDate,
-                });
-                dialogRef.current!.close();
-            }}
-        >
-            <div className="flex items-center justify-between text-xl">
-                <div className=" font-black">Extend Theme: {props.title}</div>
-                <PiXBold
-                    className="cursor-pointer"
-                    onClick={() => {
-                        dialogRef.current!.close();
-                    }}
-                />
-            </div>
-            <div className="flex flex-col gap-1">
-                <label>Theme End Date</label>
-                <div className="flex items-center gap-1">
-                    <input
-                        name="startDate"
-                        type="date"
-                        className="rounded border-none bg-primaryLightBackground px-2 py-1 shadow focus:ring-2 focus:ring-primaryLight text-base"
-                        min={minDateStr}
-                        max={maxDateStr}
-                        value={endDate.toISOString().split("T")[0]}
-                        required={true}
-                        onChange={(e) => {
-                            setEndDate(
-                                new Date(
-                                    e.target.value +
-                                        "T" +
-                                        props.endDate
-                                            .toISOString()
-                                            .split("T")[1],
-                                ),
-                            );
-                        }}
-                    />
-                </div>
-            </div>
-            <div className="w-full flex items-center justify-center">
-                <button className="text-xl rounded-md w-fit cursor-pointer border-2 border-primaryDark px-2 py-1 text-primaryDark transition-all hover:border-primaryLight hover:bg-primaryDark hover:text-primaryLight hover:text-primaryWhite">
-                    Extend Theme
-                </button>
-            </div>
-        </form>
+        <Dialog onOpenChange={onModalOpenChange} open={modalOpen}>
+            <DialogTrigger>
+                <Button size="icon" variant="ghost">
+                    <PiClockClockwiseBold className="text-2xl" />
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="max-h-[99vh] sm:max-w-2xl">
+                <DialogHeader>
+                    <DialogTitle className=" text-xl font-black">
+                        Extend Theme: {props.theme.title}
+                    </DialogTitle>
+                </DialogHeader>
+                <ScrollArea className="p-3 max-h-[50vh] ">
+                    <Form {...form}>
+                        <form className="px-1 flex flex-col gap-3">
+                            <FormField
+                                control={form.control}
+                                name="endDate"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-col gap-1 space-y-0">
+                                        <FormLabel>End Date</FormLabel>
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <FormControl>
+                                                    <Button
+                                                        variant={"outline"}
+                                                        className={cn(
+                                                            "w-[240px] pl-3 text-left font-normal",
+                                                            !field.value &&
+                                                                "text-muted-foreground",
+                                                        )}
+                                                    >
+                                                        {field.value ? (
+                                                            format(
+                                                                field.value,
+                                                                "P",
+                                                            )
+                                                        ) : (
+                                                            <span>
+                                                                Pick a date
+                                                            </span>
+                                                        )}
+                                                        <PiCalendarDuotone className="ml-auto h-4 w-4 opacity-50" />
+                                                    </Button>
+                                                </FormControl>
+                                            </PopoverTrigger>
+                                            <PopoverContent
+                                                className="w-auto p-0"
+                                                align="start"
+                                            >
+                                                <Calendar
+                                                    mode="single"
+                                                    selected={field.value}
+                                                    onSelect={field.onChange}
+                                                    disabled={(date) => {
+                                                        if (!maxDate) {
+                                                            return (
+                                                                date < minDate
+                                                            );
+                                                        } else {
+                                                            return (
+                                                                date <
+                                                                    minDate ||
+                                                                date > maxDate
+                                                            );
+                                                        }
+                                                    }}
+                                                    initialFocus
+                                                />
+                                            </PopoverContent>
+                                        </Popover>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </form>
+                    </Form>
+                </ScrollArea>
+                <DialogFooter>
+                    <Button
+                        type="submit"
+                        onClick={form.handleSubmit(onSubmit, (e) =>
+                            console.log(e),
+                        )}
+                        className="w-fit"
+                    >
+                        Extend Theme
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     );
 };
 
