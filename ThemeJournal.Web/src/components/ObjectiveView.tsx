@@ -1,25 +1,35 @@
 import { ObjectiveType } from "../lib/types";
-import { colors } from "../lib/constants";
-import { PiNotePencilDuotone, PiTrashDuotone, PiXBold } from "react-icons/pi";
-import { RefObject, useRef } from "react";
+import { NumberOfColors, colors } from "../lib/constants";
+import { PiNotePencilDuotone, PiTrashDuotone } from "react-icons/pi";
 import { useMutation, useQueryClient } from "react-query";
-import Color from "./Color";
 import { EditObjective, DeleteObjective } from "../lib/api";
+import * as z from "zod";
+import {
+    Dialog,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "./ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "./ui/form";
 
-const ObjectiveView = ({
-    objectives,
-    themeId,
-    index,
-    canDelete,
-    canEdit,
-}: {
+import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { uuidv7 } from "uuidv7";
+import { useState } from "react";
+import { Button } from "./ui/button";
+import { ScrollArea } from "./ui/scroll-area";
+
+const ObjectiveView = (props: {
     objectives: ObjectiveType[];
     themeId: string;
     index: number;
     canDelete: boolean;
     canEdit: boolean;
 }) => {
-    const EditObjectiveDialog = useRef<HTMLDialogElement>(null);
     const queryClient = useQueryClient();
 
     const DeleteObjectiveMutation = useMutation({
@@ -58,13 +68,13 @@ const ObjectiveView = ({
             context: { previousObjectives: ObjectiveType[] },
         ) => {
             queryClient.setQueryData(
-                ["objectives", themeId],
+                ["objectives", props.themeId],
                 context!.previousObjectives,
             );
         },
         onSettled: () => {
             queryClient.invalidateQueries({
-                queryKey: ["objectives", themeId],
+                queryKey: ["objectives", props.themeId],
             });
         },
     });
@@ -73,77 +83,69 @@ const ObjectiveView = ({
         <>
             <div
                 className={`flex w-full justify-between items-center rounded-lg bg-${
-                    colors[objectives[index].colorId]
+                    colors[props.objectives[props.index].colorId]
                 } py-2 px-4 text-xl font-black `}
             >
-                {objectives[index].description}
+                {props.objectives[props.index].description}
                 <div className="flex gap-2">
-                    {canEdit && (
-                        <PiNotePencilDuotone
-                            className="text-primaryDark text-2xl cursor-pointer"
-                            onClick={() => {
-                                EditObjectiveDialog.current!.showModal();
-                            }}
+                    {props.canEdit && (
+                        <EditObjectiveView
+                            objectives={props.objectives}
+                            index={props.index}
+                            themeId={props.themeId}
                         />
                     )}
-                    {canDelete && (
-                        <PiTrashDuotone
-                            className="cursor-pointer text-primaryDark text-2xl"
+                    {props.canDelete && (
+                        <Button
                             onClick={() => {
                                 DeleteObjectiveMutation.mutate({
-                                    id: objectives[index].id,
-                                    themeId: themeId,
-                                    index: index,
+                                    id: props.objectives[props.index].id,
+                                    themeId: props.themeId,
+                                    index: props.index,
                                 });
                             }}
-                        />
+                            size="icon"
+                            variant="ghost"
+                        >
+                            <PiTrashDuotone className="text-2xl" />
+                        </Button>
                     )}
                 </div>
             </div>
-            <dialog
-                ref={EditObjectiveDialog}
-                className="w-11/12 max-w-[1054px] rounded shadow-md shadow-primarySuperLight"
-            >
-                <EditObjectiveView
-                    dialogRef={EditObjectiveDialog}
-                    objectives={objectives}
-                    index={index}
-                    themeId={themeId}
-                />
-            </dialog>
         </>
     );
 };
 
-const EditObjectiveView = ({
-    dialogRef,
-    objectives,
-    index,
-    themeId,
-}: {
-    dialogRef: RefObject<HTMLDialogElement>;
+const EditObjectiveView = (props: {
     objectives: ObjectiveType[];
     index: number;
     themeId: string;
 }) => {
     const queryClient = useQueryClient();
+    const [modalOpen, setModalOpen] = useState(false);
+
+    const onModalOpenChange = (open: boolean) => {
+        form.reset();
+        setModalOpen(open);
+    };
+
     const EditObjectiveMutation = useMutation({
         // @ts-ignore
         mutationFn: EditObjective,
         onMutate: async (newObjective: ObjectiveType) => {
             await queryClient.cancelQueries({
-                queryKey: ["objectives", themeId],
+                queryKey: ["objectives", props.themeId],
             });
 
             const previousObjectives = queryClient.getQueryData<
                 ObjectiveType[]
-            >(["objectives", themeId]);
+            >(["objectives", props.themeId]);
 
             const newObjectives = [...previousObjectives!];
-            newObjectives[index] = newObjective;
+            newObjectives[props.index] = newObjective;
 
             queryClient.setQueryData<ObjectiveType[]>(
-                ["objectives", themeId],
+                ["objectives", props.themeId],
                 newObjectives,
             );
 
@@ -155,58 +157,105 @@ const EditObjectiveView = ({
             context: { previousObjectives: ObjectiveType[] },
         ) => {
             queryClient.setQueryData(
-                ["objectives", themeId],
+                ["objectives", props.themeId],
                 context!.previousObjectives,
             );
         },
         onSettled: () => {
             queryClient.invalidateQueries({
-                queryKey: ["objectives", themeId],
+                queryKey: ["objectives", props.themeId],
             });
         },
     });
 
+    const ObjectiveSchema = z.object({
+        id: z.string().uuid().default(uuidv7()),
+        colorId: z.coerce.number().min(0).max(NumberOfColors),
+    });
+
+    const form = useForm<z.infer<typeof ObjectiveSchema>>({
+        resolver: zodResolver(ObjectiveSchema),
+        values: {
+            id: props.objectives[props.index].id,
+            colorId: props.objectives[props.index].colorId,
+        },
+    });
+
+    const onSubmit = async (objective: z.infer<typeof ObjectiveSchema>) => {
+        // @ts-ignore
+        await EditObjectiveMutation.mutateAsync({
+            id: objective.id,
+            description: props.objectives[props.index].description,
+            colorId: objective.colorId,
+        });
+        onModalOpenChange(false);
+    };
+
     return (
-        <form
-            method="POST"
-            className="flex flex-col gap-3 rounded border-2 border-primaryDark p-5"
-            onSubmit={(e) => {
-                e.preventDefault();
-                //@ts-ignore
-                dialogRef.current!.close();
-            }}
-        >
-            <div className="flex items-center justify-between text-xl">
-                <div className=" font-black">
-                    Edit Objective: {objectives[index].description}
-                </div>
-                <PiXBold
-                    className="cursor-pointer"
-                    onClick={() => {
-                        dialogRef.current!.close();
-                    }}
-                />
-            </div>
-            <div className="flex w-full gap-2 items-center justify-center flex-wrap">
-                {colors.map((_, i) => {
-                    return (
-                        <Color
-                            key={i}
-                            objectiveIndex={index}
-                            objectives={objectives}
-                            colorIndex={i}
-                            onClick={() => {
-                                dialogRef.current!.close();
-                                EditObjectiveMutation.mutate({
-                                    ...objectives[index],
-                                    colorId: i,
-                                });
-                            }}
-                        />
-                    );
-                })}
-            </div>
-        </form>
+        <Dialog onOpenChange={onModalOpenChange} open={modalOpen}>
+            <DialogTrigger>
+                <Button size="icon" variant="ghost">
+                    <PiNotePencilDuotone className="text-2xl" />
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="max-h-[99vh] sm:max-w-2xl">
+                <DialogHeader>
+                    <DialogTitle className=" text-xl font-black">
+                        Edit Objective:{" "}
+                        {props.objectives[props.index].description}
+                    </DialogTitle>
+                </DialogHeader>
+                <ScrollArea className="p-3 max-h-[50vh] ">
+                    <Form {...form}>
+                        <form className="px-1 flex flex-col gap-3">
+                            <FormField
+                                control={form.control}
+                                name="colorId"
+                                render={({ field }) => (
+                                    <FormItem className="space-y-0">
+                                        <FormLabel>Color</FormLabel>
+                                        <FormControl>
+                                            <RadioGroup
+                                                onValueChange={(e) => {
+                                                    field.onChange(e);
+                                                }}
+                                                defaultValue={field.value.toString()}
+                                                className="flex gap-2 flex-wrap justify-center"
+                                            >
+                                                {colors.map((color, index) => (
+                                                    <FormItem
+                                                        className="space-y-0"
+                                                        key={index}
+                                                    >
+                                                        <FormControl className="space-y-0 flex">
+                                                            <RadioGroupItem
+                                                                className={`bg-${color}`}
+                                                                value={index.toString()}
+                                                            />
+                                                        </FormControl>
+                                                    </FormItem>
+                                                ))}
+                                            </RadioGroup>
+                                        </FormControl>
+                                    </FormItem>
+                                )}
+                            />
+                        </form>
+                    </Form>
+                </ScrollArea>
+                <DialogFooter>
+                    <Button
+                        type="submit"
+                        onClick={form.handleSubmit(onSubmit, (e) =>
+                            console.log(e),
+                        )}
+                        className="w-fit"
+                    >
+                        Edit Objective
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     );
 };
 
