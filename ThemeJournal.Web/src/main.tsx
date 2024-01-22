@@ -12,7 +12,6 @@ import {
 } from "@azure/msal-browser";
 import { MsalProvider } from "@azure/msal-react";
 import { msalConfig } from "./lib/authConfig.ts";
-import AuthLayout from "./layouts/AuthLayout.tsx";
 
 // Query
 import { QueryClientProvider } from "react-query";
@@ -86,10 +85,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <Provider>
             <MsalProvider instance={msalInstance}>
                 <QueryClientProvider client={queryClient}>
-                    <AuthLayout>
-                        <RouterProvider router={router} />
-                        <div className="font-virgil"></div>
-                    </AuthLayout>
+                    <RouterProvider router={router} />
+                    <div className="font-virgil"></div>
                 </QueryClientProvider>
             </MsalProvider>
         </Provider>

@@ -7,6 +7,12 @@ import {
 } from "react-icons/pi";
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
+import {
+    NavigationMenu,
+    NavigationMenuItem,
+    NavigationMenuLink,
+    NavigationMenuList,
+} from "./ui/navigation-menu";
 
 const Navigatons = [
     {
@@ -14,7 +20,7 @@ const Navigatons = [
         Path: "/",
         Icon: PiHouseDuotone,
         color: "bg-lime-100",
-        hover: "hover:bg-lime-200",
+        hover: "bg-lime-200",
         selected: "bg-lime-200",
     },
     {
@@ -22,7 +28,7 @@ const Navigatons = [
         Path: "/journal",
         Icon: PiBookOpenTextDuotone,
         color: "bg-teal-100",
-        hover: "hover:bg-teal-200",
+        hover: "bg-teal-200",
         selected: "bg-teal-200",
     },
     {
@@ -30,12 +36,12 @@ const Navigatons = [
         Path: "/theme",
         Icon: PiCompassDuotone,
         color: "bg-yellow-100",
-        hover: "hover:bg-yellow-200",
+        hover: "bg-yellow-200",
         selected: "bg-yellow-200",
     },
 ];
 
-const NavBar = () => {
+const NavBar = (props: { className: string }) => {
     const location = useLocation();
 
     const InitialSelected = () => {
@@ -50,74 +56,29 @@ const NavBar = () => {
     const [selected, setSelected] = useState(InitialSelected());
 
     return (
-        <div className="flex h-full items-end gap-2">
-            {Navigatons.map((nav, index) => {
-                return (
-                    <NavIcon
-                        key={index}
-                        name={nav.Name}
-                        link={nav.Path}
-                        Icon={nav.Icon}
-                        selected={selected === index}
-                        normalClasses={nav.color}
-                        hoverClasses={nav.hover}
-                        selectedClasses={nav.selected}
-                        onClick={() => setSelected(index)}
-                    />
-                );
-            })}
-        </div>
-    );
-};
-
-const NavIcon = ({
-    name,
-    link,
-    selected,
-    normalClasses,
-    selectedClasses,
-    hoverClasses,
-    onClick,
-    Icon,
-}: {
-    name: string;
-    link: string;
-    selected: boolean;
-    normalClasses?: string;
-    selectedClasses?: string;
-    hoverClasses?: string;
-    onClick?: () => void;
-    Icon: IconType;
-}) => {
-    return (
-        <Link
-            to={link}
-            onClick={onClick}
-            className={
-                (selected
-                    ? "border-primaryLight py-2 text-primaryLight" +
-                      " " +
-                      selectedClasses +
-                      " "
-                    : "border-primaryDark py-1 text-primaryDark " +
-                      " " +
-                      normalClasses +
-                      " ") +
-                "flex flex-col items-center gap-0 rounded-tr-md border-r-2 border-t-2 px-2 transition-all hover:border-primaryLight hover:py-2 hover:text-primaryLight sm:flex-row sm:gap-4" +
-                " " +
-                hoverClasses
-            }
-        >
-            <Icon></Icon>
-            <div
-                className={
-                    // (selected ? "opacity-100" : "hidden opacity-0") +
-                    " transition-all sm:block sm:opacity-100"
-                }
-            >
-                {name}
-            </div>
-        </Link>
+        <NavigationMenu className={props.className}>
+            <NavigationMenuList className="flex gap-2 h-12 items-end">
+                {Navigatons.map((nav, index) => (
+                    <NavigationMenuItem>
+                        <Link to={nav.Path}>
+                            <NavigationMenuLink
+                                className={`sm:gap-2 border-t-2 border-r-2  sm:hover:h-12 hover:h-14 items-center justify-center flex-col sm:flex-row group inline-flex w-max rounded-tr-md ${
+                                    selected == index
+                                        ? `${nav.selected} h-14 sm:h-12`
+                                        : `${nav.color} h-12 sm:h-10`
+                                } px-4 py-2 text-sm font-medium transition-all hover:${
+                                    nav.hover
+                                } hover:text-slate-900 focus:bg-slate-100 focus:text-slate-900 focus:outline-none disabled:pointer-events-none disabled:opacity-50`}
+                                onClick={() => setSelected(index)}
+                            >
+                                <nav.Icon />
+                                {nav.Name}
+                            </NavigationMenuLink>
+                        </Link>
+                    </NavigationMenuItem>
+                ))}
+            </NavigationMenuList>
+        </NavigationMenu>
     );
 };
 
