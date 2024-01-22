@@ -11,6 +11,8 @@ import { GratitudesType, ThoughtsType, TimeOfDay } from "../lib/types";
 import Loading from "../components/Loading";
 import FetchError from "../components/FetchError";
 import { uuidv7obj } from "uuidv7";
+import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
 
 const syncCharacters = 1;
 
@@ -95,6 +97,16 @@ const JournalInner = ({
         GetGratitudeByTime(gratitudeQuery.data, TimeOfDay.Night),
     );
 
+    const [thoughts, setThoughts] = useState(
+        thoughtQuery.data.length === 0
+            ? {
+                  id: uuidv7obj(),
+                  thought: "",
+                  createdAt: new Date(),
+              }
+            : thoughtQuery.data[0],
+    );
+
     const GratitudeMutation = useMutation({
         //@ts-ignore
         mutationFn: UpsertGratitude,
@@ -135,16 +147,6 @@ const JournalInner = ({
             queryClient.invalidateQueries(["todaysGratitudes"]);
         },
     });
-
-    const [thoughts, setThoughts] = useState(
-        thoughtQuery.data.length === 0
-            ? {
-                  id: uuidv7obj(),
-                  thought: "",
-                  createdAt: new Date(),
-              }
-            : thoughtQuery.data[0],
-    );
 
     const ThoughtMutation = useMutation({
         //@ts-ignore
@@ -196,22 +198,21 @@ const JournalInner = ({
             description: value,
         };
         setValue(updated);
-
-        if (Math.abs(value.length - queryValue.length) >= syncCharacters) {
-            GratitudeMutation.mutate(updated);
-        }
+        GratitudeMutation.mutate(updated);
     };
 
     return (
         <>
             <div className="h-16"></div>
             <main className="flex justify-center">
-                <div className="flex w-full max-w-[1054px] flex-auto flex-col gap-4 p-2 ">
-                    <div>
-                        <label>
-                            What are you feeling grateful for this morning?
-                        </label>
-                        <TextArea
+                <div className="flex w-full max-w-[1054px] flex-auto flex-col gap-3 p-2 ">
+                    <Card className="p-2">
+                        <CardHeader>
+                            <CardTitle>
+                                What are you feeling grateful for this morning?
+                            </CardTitle>
+                        </CardHeader>
+                        <Textarea
                             value={day1Gratitude.description}
                             rows={4}
                             onChange={(e: any) => {
@@ -225,14 +226,16 @@ const JournalInner = ({
                                     ).description,
                                 );
                             }}
-                            className="bg-yellow-300"
-                        />
-                    </div>
-                    <div>
-                        <label>
-                            What is something else you are grateful for?
-                        </label>
-                        <TextArea
+                            className="bg-yellow-200"
+                        ></Textarea>
+                    </Card>
+                    <Card className="p-2">
+                        <CardHeader>
+                            <CardTitle>
+                                What is something else you are grateful for?
+                            </CardTitle>
+                        </CardHeader>
+                        <Textarea
                             value={day2Gratitude.description}
                             rows={4}
                             onChange={(e: any) => {
@@ -246,14 +249,16 @@ const JournalInner = ({
                                     ).description,
                                 );
                             }}
-                            className="bg-amber-300"
-                        />
-                    </div>
-                    <div>
-                        <label>What is on your mind?</label>
-                        <TextArea
+                            className="bg-amber-200"
+                        ></Textarea>
+                    </Card>
+                    <Card className="p-2">
+                        <CardHeader>
+                            <CardTitle>What is on your mind?</CardTitle>
+                        </CardHeader>
+                        <Textarea
                             value={thoughts.thought}
-                            rows={13}
+                            rows={8}
                             onChange={(e: any) => {
                                 const updated = {
                                     ...thoughts,
@@ -266,23 +271,18 @@ const JournalInner = ({
                                         ? ""
                                         : thoughtQuery.data[0].thought;
 
-                                if (
-                                    Math.abs(
-                                        e.target.value.length -
-                                            queryValue.length,
-                                    ) >= syncCharacters
-                                ) {
-                                    ThoughtMutation.mutate(updated);
-                                }
+                                ThoughtMutation.mutate(updated);
                             }}
-                            className="bg-lime-300"
-                        />
-                    </div>
-                    <div>
-                        <label>
-                            What are you feeling grateful for this evening?
-                        </label>
-                        <TextArea
+                            className="bg-lime-200"
+                        ></Textarea>
+                    </Card>
+                    <Card className="p-2">
+                        <CardHeader>
+                            <CardTitle>
+                                What are you feeling grateful for this evening?
+                            </CardTitle>
+                        </CardHeader>
+                        <Textarea
                             value={nightGratitude.description}
                             rows={4}
                             onChange={(e: any) => {
@@ -297,8 +297,8 @@ const JournalInner = ({
                                 );
                             }}
                             className="bg-blue-300"
-                        />
-                    </div>
+                        ></Textarea>
+                    </Card>
                 </div>
             </main>
         </>

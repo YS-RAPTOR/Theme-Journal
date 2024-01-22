@@ -26,7 +26,7 @@ public class UserService : IUserService
 
     public TimeOnly GetUserDayStartTime()
     {
-        return new TimeOnly(3, 0, 0);
+        return new TimeOnly(17, 0, 0);
     }
 
     public DateTime TrasformDate(DateTime date)
