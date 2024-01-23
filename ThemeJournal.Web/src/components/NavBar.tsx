@@ -58,7 +58,7 @@ const NavBar = (props: { className: string }) => {
         <NavigationMenu className={props.className}>
             <NavigationMenuList className="flex gap-2 h-12 items-end">
                 {Navigatons.map((nav, index) => (
-                    <NavigationMenuItem>
+                    <NavigationMenuItem key={index}>
                         <Link to={nav.Path}>
                             <NavigationMenuLink
                                 className={`sm:gap-2 border-t-2 border-r-2  sm:hover:h-12 hover:h-14 items-center justify-center flex-col sm:flex-row group inline-flex w-max rounded-tr-md ${

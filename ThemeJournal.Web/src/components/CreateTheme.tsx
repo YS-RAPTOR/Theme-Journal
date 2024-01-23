@@ -165,7 +165,7 @@ const CreateThemeView = (props: { endDate: Date }) => {
         resolver: zodResolver(ThemeSchema),
         defaultValues: {
             title: "",
-            objectives: [{ description: "Critical", colorId: 0 }],
+            objectives: [{ id: uuidv7(), description: "Critical", colorId: 0 }],
         },
     });
 

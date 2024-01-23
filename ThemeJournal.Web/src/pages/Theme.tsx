@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import Loading from "../components/Loading";
 import ThemeView from "../components/ThemeView";
 import { ThemeType } from "../lib/types";
@@ -39,33 +38,25 @@ const Theme = () => {
     }
 
     return (
-        <>
-            <div className="h-16"></div>
-            <main className="flex justify-center">
-                <div
-                    ref={animationRef}
-                    className="flex w-full max-w-[1054px] flex-auto flex-col gap-2 p-2 "
-                >
-                    {ThemesQuery.data!.map((theme: ThemeType) => {
-                        return (
-                            <ThemeView
-                                key={theme.id.toString()}
-                                theme={theme}
-                            />
-                        );
-                    })}
-                    {ThemesQuery.data!.length <= 1 && (
-                        <CreateTheme
-                            endDate={
-                                ThemesQuery.data!.length > 0
-                                    ? ThemesQuery.data![0].endDate
-                                    : new Date()
-                            }
-                        />
-                    )}
-                </div>
-            </main>
-        </>
+        <main className="flex justify-center">
+            <div
+                ref={animationRef}
+                className="flex w-full max-w-[1054px] flex-auto flex-col gap-2 p-2 "
+            >
+                {ThemesQuery.data!.map((theme: ThemeType) => (
+                    <ThemeView key={theme.id.toString()} theme={theme} />
+                ))}
+                {ThemesQuery.data!.length <= 1 && (
+                    <CreateTheme
+                        endDate={
+                            ThemesQuery.data!.length > 0
+                                ? ThemesQuery.data![0].endDate
+                                : new Date()
+                        }
+                    />
+                )}
+            </div>
+        </main>
     );
 };
 

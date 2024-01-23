@@ -33,7 +33,7 @@ public class UserService : IUserService
     {
         var userDayStartTime = GetUserDayStartTime();
 
-        return new DateTime(
+        var transformedDate = new DateTime(
             date.Year,
             date.Month,
             date.Day,
@@ -42,5 +42,12 @@ public class UserService : IUserService
             userDayStartTime.Second,
             DateTimeKind.Utc
         );
+
+        if (transformedDate > date)
+        {
+            transformedDate = transformedDate.AddDays(-1);
+        }
+
+        return transformedDate;
     }
 }

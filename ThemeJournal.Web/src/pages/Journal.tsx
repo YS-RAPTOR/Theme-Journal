@@ -14,8 +14,6 @@ import { uuidv7obj } from "uuidv7";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 
-const syncCharacters = 1;
-
 const GetGratitudeByTime = (
     array: GratitudesType[],
     time: TimeOfDay,
@@ -191,7 +189,6 @@ const JournalInner = ({
         value: string,
         current: GratitudesType,
         setValue: (vals: GratitudesType) => void,
-        queryValue: string,
     ) => {
         const updated = {
             ...current,
@@ -202,16 +199,15 @@ const JournalInner = ({
     };
 
     return (
-        <>
-            <div className="h-16"></div>
-            <main className="flex justify-center">
-                <div className="flex w-full max-w-[1054px] flex-auto flex-col gap-3 p-2 ">
-                    <Card className="p-2">
-                        <CardHeader>
-                            <CardTitle>
-                                What are you feeling grateful for this morning?
-                            </CardTitle>
-                        </CardHeader>
+        <main className="flex justify-center">
+            <div className="flex w-full max-w-[1054px] flex-auto flex-col gap-3 p-2 ">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>
+                            What are you feeling grateful for this morning?
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
                         <Textarea
                             value={day1Gratitude.description}
                             rows={4}
@@ -220,21 +216,19 @@ const JournalInner = ({
                                     e.target.value,
                                     day1Gratitude,
                                     setDay1Gratitude,
-                                    GetGratitudeByTime(
-                                        gratitudeQuery.data,
-                                        TimeOfDay.Day1,
-                                    ).description,
                                 );
                             }}
                             className="bg-yellow-200"
                         ></Textarea>
-                    </Card>
-                    <Card className="p-2">
-                        <CardHeader>
-                            <CardTitle>
-                                What is something else you are grateful for?
-                            </CardTitle>
-                        </CardHeader>
+                    </CardContent>
+                </Card>
+                <Card className="p-2">
+                    <CardHeader>
+                        <CardTitle>
+                            What is something else you are grateful for?
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
                         <Textarea
                             value={day2Gratitude.description}
                             rows={4}
@@ -243,19 +237,17 @@ const JournalInner = ({
                                     e.target.value,
                                     day2Gratitude,
                                     setDay2Gratitude,
-                                    GetGratitudeByTime(
-                                        gratitudeQuery.data,
-                                        TimeOfDay.Day2,
-                                    ).description,
                                 );
                             }}
                             className="bg-amber-200"
                         ></Textarea>
-                    </Card>
-                    <Card className="p-2">
-                        <CardHeader>
-                            <CardTitle>What is on your mind?</CardTitle>
-                        </CardHeader>
+                    </CardContent>
+                </Card>
+                <Card className="p-2">
+                    <CardHeader>
+                        <CardTitle>What is on your mind?</CardTitle>
+                    </CardHeader>
+                    <CardContent>
                         <Textarea
                             value={thoughts.thought}
                             rows={8}
@@ -265,23 +257,19 @@ const JournalInner = ({
                                     thought: e.target.value,
                                 };
                                 setThoughts(updated);
-
-                                const queryValue =
-                                    thoughtQuery.data.length === 0
-                                        ? ""
-                                        : thoughtQuery.data[0].thought;
-
                                 ThoughtMutation.mutate(updated);
                             }}
                             className="bg-lime-200"
                         ></Textarea>
-                    </Card>
-                    <Card className="p-2">
-                        <CardHeader>
-                            <CardTitle>
-                                What are you feeling grateful for this evening?
-                            </CardTitle>
-                        </CardHeader>
+                    </CardContent>
+                </Card>
+                <Card className="p-2">
+                    <CardHeader>
+                        <CardTitle>
+                            What are you feeling grateful for this evening?
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
                         <Textarea
                             value={nightGratitude.description}
                             rows={4}
@@ -290,18 +278,14 @@ const JournalInner = ({
                                     e.target.value,
                                     nightGratitude,
                                     setNightGratitude,
-                                    GetGratitudeByTime(
-                                        gratitudeQuery.data,
-                                        TimeOfDay.Night,
-                                    ).description,
                                 );
                             }}
                             className="bg-blue-300"
                         ></Textarea>
-                    </Card>
-                </div>
-            </main>
-        </>
+                    </CardContent>
+                </Card>
+            </div>
+        </main>
     );
 };
 

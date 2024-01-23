@@ -32,3 +32,10 @@ export type ThoughtsType = {
     thought: string;
     createdAt: Date;
 };
+
+export type ProgressType = {
+    id: string;
+    taskId: string;
+    completionDate: Date;
+    progress: number;
+};
