@@ -268,8 +268,8 @@ export const GetTask = async (upperDate: date, lowerDate: date) => {
                 const map = new Map();
                 if (res.data[i].progress !== null) {
                     for (const item of res.data[i].progress) {
-                        item.CompletionDate = new Date(item.CompletionDate);
-                        map.set(item.CompletionDate, item);
+                        item.completionDate = new Date(item.completionDate);
+                        map.set(item.completionDate.getTime(), item);
                     }
                 }
                 res.data[i].progress = map;
@@ -314,6 +314,12 @@ export const ExtendTask = async ({ id, endDate }: Types.TaskTypeGet) => {
 
 export const EditTask = async ({ id, ...data }: Types.ThemeType) => {
     return axiosInstance.put(`Task/${id}`, data).then((res) => {
+        return res.data;
+    });
+};
+
+export const UpsertProgress = async ({ id, ...data }: Types.ProgressType) => {
+    return axiosInstance.put(`progress/${id}`, data).then((res) => {
         return res.data;
     });
 };

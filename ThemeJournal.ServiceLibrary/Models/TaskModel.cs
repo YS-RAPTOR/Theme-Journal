@@ -15,9 +15,31 @@ public class TaskModel
     public List<TaskProgress>? Progress { get; set; }
 }
 
+
 public class TaskProgress(Guid id, DateTime completionDate, BitArray progress)
 {
+    public static int BitArray2Int(BitArray bits)
+    {
+        if (bits.Length != 2){
+            return -1;
+        }
+
+        if(!bits[0] && !bits[1]){
+            return 0;
+        }
+        else if(bits[0] && !bits[1]){
+            return 1;
+        }
+        else if(bits[0] && bits[1]){
+            return 2;
+        }
+        else{
+            return -1;
+        }
+    }
     public Guid Id { get; set; } = id;
     public DateTime CompletionDate { get; set; } = completionDate;
-    public BitArray Progress { get; set; } = progress;
+    public int Progress { get; set; } = BitArray2Int(progress);
+
 }
+

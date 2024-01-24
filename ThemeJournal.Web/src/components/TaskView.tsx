@@ -45,7 +45,12 @@ import {
 } from "./ui/form";
 
 import { Popover, PopoverTrigger, PopoverContent } from "./ui/popover";
-import { TaskTypePost, TaskTypeGet, ThemeType } from "@/lib/types";
+import {
+    TaskTypePost,
+    TaskTypeGet,
+    ThemeType,
+    ProgressType,
+} from "@/lib/types";
 import Indented from "./IndentedText";
 import { cn } from "@/lib/utils";
 import { Calendar } from "./ui/calendar";
@@ -56,12 +61,14 @@ import {
     ExtendTask,
     TransformDate,
     EditTask,
+    UpsertProgress,
 } from "@/lib/api";
 import { useQuery } from "react-query";
 import TaskProgress from "./TaskProgress";
 import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 import { Badge } from "./ui/badge";
 import { colors } from "@/lib/constants";
+import { uuidv7 } from "uuidv7";
 
 const TaskView = (props: {
     task: TaskTypeGet;
@@ -73,8 +80,44 @@ const TaskView = (props: {
         queryKey: ["objectives", props.currentTheme.id],
         queryFn: () => GetObjectives(props.currentTheme.id),
     });
+    const queryClient = useQueryClient();
 
-    // Update Progress
+    const UpsertTaskProgress = useMutation({
+        // @ts-ignore
+        mutationFn: UpsertProgress,
+        onMutate: async (progress: ProgressType) => {
+            await queryClient.cancelQueries({
+                queryKey: ["currentTasks"],
+            });
+
+            const previousTasks = queryClient.getQueryData<TaskTypeGet[]>([
+                "currentTasks",
+            ]);
+
+            const newTasks: TaskTypeGet[] = [...previousTasks!];
+            const index = newTasks.findIndex(
+                (task) => progress.taskId == task.id,
+            );
+
+            newTasks[index].progress?.set(progress.completionDate, progress);
+
+            queryClient.setQueryData<TaskTypeGet[]>(["currentTasks"], newTasks);
+
+            return { previousTasks };
+        },
+        onError: (
+            _err: Error,
+            _progress: any,
+            context: { previousTasks: TaskTypeGet[] },
+        ) => {
+            queryClient.setQueryData(["currentTasks"], context!.previousTasks);
+        },
+        onSettled: () => {
+            queryClient.invalidateQueries({
+                queryKey: ["currentTasks"],
+            });
+        },
+    });
 
     const objectiveId =
         objectivesQuery.data?.find(
@@ -125,7 +168,27 @@ const TaskView = (props: {
                         <TaskProgress
                             key={index}
                             date={date}
-                            progress={props.task.progress?.get(date)}
+                            onClick={() => {
+                                const progress = props.task.progress?.get(
+                                    date.getTime(),
+                                );
+                                if (progress) {
+                                    UpsertTaskProgress.mutate({
+                                        id: progress.id,
+                                        taskId: props.task.id,
+                                        progress: (progress.progress + 1) % 3,
+                                        completionDate: progress.completionDate,
+                                    });
+                                } else {
+                                    UpsertTaskProgress.mutate({
+                                        id: uuidv7(),
+                                        taskId: props.task.id,
+                                        progress: 1,
+                                        completionDate: date,
+                                    });
+                                }
+                            }}
+                            progress={props.task.progress?.get(date.getTime())}
                             disabled={date !== today}
                             none={
                                 !(

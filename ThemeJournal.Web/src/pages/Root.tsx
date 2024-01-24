@@ -22,5 +22,12 @@ const Root = () => {
         </>
     );
 };
+// TODO: Fix Progress
+// TODO: Make Login Page Better
+// TODO: Fix Root Page
+// TODO: Add Skeletons for nicer loading
+// TODO: Convert Popover to Drawer for better mobile support
+// TODO: Add User Settings (Time)
+// TODO: Sorting Tasks
 
 export default Root;

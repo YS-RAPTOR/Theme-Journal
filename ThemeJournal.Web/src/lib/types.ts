@@ -57,6 +57,7 @@ export type ThoughtsType = {
 
 export type ProgressType = {
     id: string;
+    taskId: string;
     completionDate: Date;
     progress: number;
 };
