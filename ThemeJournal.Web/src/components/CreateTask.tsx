@@ -35,7 +35,13 @@ import { Input } from "./ui/input";
 import { ScrollArea } from "./ui/scroll-area";
 import * as z from "zod";
 import { uuidv7 } from "uuidv7";
-import { CreateTask, FixDate, GetObjectives } from "@/lib/api";
+import {
+    CreateTask,
+    FixDate,
+    GetActiveTheme,
+    GetObjectives,
+    GetTheme,
+} from "@/lib/api";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "react-query";
@@ -52,6 +58,13 @@ const CreateTaskView = (props: { currentTheme: string }) => {
         queryKey: ["objectives", props.currentTheme],
         queryFn: () => GetObjectives(props.currentTheme),
     });
+
+    const ThemesQuery = useQuery({
+        queryKey: ["currentThemes"],
+        queryFn: () => GetTheme(null, new Date()),
+    });
+
+    const activeTheme = GetActiveTheme(ThemesQuery.data);
 
     let CurrentObjectives = ObjectivesQuery.data?.filter(
         (obj) => obj.description != "Critical",
@@ -126,9 +139,13 @@ const CreateTaskView = (props: { currentTheme: string }) => {
                 .refine((d) => d >= minDate, {
                     message: "Start date must be in the future",
                 }),
-            endDate: z.coerce.date({ required_error: "End date is required" }),
+            endDate: z.coerce
+                .date({ required_error: "End date is required" })
+                .refine((d) => d <= activeTheme!.endDate, {
+                    message: "End date must be before the end of the theme",
+                }),
         })
-        .refine((data) => data.endDate >= data.startDate, {
+        .refine((data) => data.endDate > data.startDate, {
             message: "End date must be after start date",
             path: ["endDate"],
         });
@@ -150,6 +167,7 @@ const CreateTaskView = (props: { currentTheme: string }) => {
 
     const onSubmit = async (task: z.infer<typeof TaskSchema>) => {
         await CreateTaskMutation.mutateAsync(task as TaskTypePost);
+        onModalOpenChange(false);
     };
 
     return (
@@ -374,10 +392,13 @@ const CreateTaskView = (props: { currentTheme: string }) => {
                                                     selected={field.value}
                                                     onSelect={field.onChange}
                                                     disabled={(date) =>
-                                                        date <
+                                                        date <=
                                                             form.getValues(
                                                                 "startDate",
-                                                            ) || date < minDate
+                                                            ) ||
+                                                        date < minDate ||
+                                                        date >
+                                                            activeTheme!.endDate
                                                     }
                                                     initialFocus
                                                 />

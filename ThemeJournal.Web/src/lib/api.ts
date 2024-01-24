@@ -38,6 +38,16 @@ export const GetDates = () => {
     return dates;
 };
 
+export const GetActiveTheme = (data: undefined | Types.ThemeType[]) => {
+    if (data === undefined) {
+        return null;
+    }
+    const today = new Date();
+    return data.filter(
+        (theme) => theme.startDate <= today && today < theme.endDate,
+    )[0];
+};
+
 // All dates have to be local time zone. The functions will comvert to UTC before sending to the server.
 type date = Date | null;
 
@@ -264,8 +274,6 @@ export const GetTask = async (upperDate: date, lowerDate: date) => {
                 }
                 res.data[i].progress = map;
             }
-
-            console.log(res.data);
             return res.data as Array<Types.TaskTypeGet>;
         });
 };
@@ -292,4 +300,14 @@ export const CreateTask = async ({
     return axiosInstance.post("/Task", data).then((res) => {
         return res.data;
     });
+};
+
+export const ExtendTask = async ({ id, endDate }: Types.TaskTypeGet) => {
+    return axiosInstance
+        .put(`Task/${id}/extend`, FixTime(endDate).toISOString(), {
+            headers: { "Content-Type": "application/json" },
+        })
+        .then((res) => {
+            return res.data;
+        });
 };

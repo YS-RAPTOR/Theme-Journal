@@ -99,6 +99,7 @@ const ThemeView = (props: { theme: ThemeType }) => {
             <CardContent ref={animationRef} className="flex flex-col gap-2">
                 {objectivesQuery.data
                     ?.sort((a, b) => {
+                        if (a.id == null || b.id == null) return 0;
                         if (a.id < b.id) return -1;
                         if (a.id > b.id) return 1;
                         return 0;
@@ -186,7 +187,7 @@ const EditThemeView = (props: { theme: ThemeType }) => {
                 }),
             endDate: z.coerce.date({ required_error: "End date is required" }),
         })
-        .refine((data) => data.endDate >= data.startDate, {
+        .refine((data) => data.endDate > data.startDate, {
             message: "End date must be after start date",
             path: ["endDate"],
         });
@@ -331,7 +332,7 @@ const EditThemeView = (props: { theme: ThemeType }) => {
                                                     selected={field.value}
                                                     onSelect={field.onChange}
                                                     disabled={(date) =>
-                                                        date <
+                                                        date <=
                                                             form.getValues(
                                                                 "startDate",
                                                             ) || date < minDate

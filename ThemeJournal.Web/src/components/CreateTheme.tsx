@@ -156,7 +156,7 @@ const CreateThemeView = (props: { endDate: Date }) => {
             endDate: z.coerce.date({ required_error: "End date is required" }),
             objectives: z.array(ObjectiveSchema),
         })
-        .refine((data) => data.endDate >= data.startDate, {
+        .refine((data) => data.endDate > data.startDate, {
             message: "End date must be after start date",
             path: ["endDate"],
         });
@@ -314,7 +314,7 @@ const CreateThemeView = (props: { endDate: Date }) => {
                                                     selected={field.value}
                                                     onSelect={field.onChange}
                                                     disabled={(date) =>
-                                                        date <
+                                                        date <=
                                                             form.getValues(
                                                                 "startDate",
                                                             ) || date < minDate

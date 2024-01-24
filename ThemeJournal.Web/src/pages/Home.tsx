@@ -1,20 +1,10 @@
 import TaskView from "@/components/TaskView";
-import { GetDates, GetTask } from "@/lib/api";
-import { TaskTypePost, ThemeType } from "@/lib/types";
+import { GetActiveTheme, GetDates, GetTask } from "@/lib/api";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { GetTheme } from "../lib/api";
 import { useQuery } from "react-query";
 import CreateTask from "@/components/CreateTask";
-
-const GetActiveThemes = (data: undefined | ThemeType[]) => {
-    if (data === undefined) {
-        return null;
-    }
-    const today = new Date();
-    return data.filter(
-        (theme) => theme.startDate <= today && today < theme.endDate,
-    )[0];
-};
+import FetchError from "@/components/FetchError";
 
 // Add the new task button. Allows to add a new task.
 const Home = () => {
@@ -32,10 +22,30 @@ const Home = () => {
         queryFn: () => GetTask(dates[6], dates[0]),
     });
 
-    const activeTheme = GetActiveThemes(ThemesQuery.data);
+    if (ThemesQuery.isLoading || TasksQuery.isLoading) {
+        // Show a loading screen if the themes are loading
+        return <div>loading...</div>;
+    }
+
+    if (
+        ThemesQuery.isError ||
+        TasksQuery.isError ||
+        TasksQuery.data === undefined
+    ) {
+        return (
+            <div className="flex h-screen">
+                <main className="flex w-full flex-auto flex-col ">
+                    <FetchError />
+                </main>
+            </div>
+        );
+    }
+
+    const activeTheme = GetActiveTheme(ThemesQuery.data);
 
     if (activeTheme === null) {
-        return <div></div>;
+        // Redirect to the theme page if no theme is active
+        return <div>loading...</div>;
     }
 
     return (
@@ -45,7 +55,12 @@ const Home = () => {
                 className="flex w-full max-w-[1054px] flex-auto flex-col gap-3 p-2"
             >
                 {TasksQuery.data.map((task) => (
-                    <TaskView task={task} dates={dates} key={task.id} />
+                    <TaskView
+                        task={task}
+                        dates={dates}
+                        currentTheme={activeTheme}
+                        key={task.id}
+                    />
                 ))}
                 <CreateTask currentTheme={activeTheme.id} />
             </div>

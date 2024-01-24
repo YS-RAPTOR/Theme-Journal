@@ -18,7 +18,6 @@ const Theme = () => {
     if (ThemesQuery.isLoading) {
         return (
             <div className="flex h-screen">
-                <div className="h-16"></div>
                 <main className="flex w-full flex-auto flex-col">
                     <Loading />
                 </main>
@@ -29,7 +28,6 @@ const Theme = () => {
     if (ThemesQuery.isError) {
         return (
             <div className="flex h-screen">
-                <div className="h-16"></div>
                 <main className="flex w-full flex-auto flex-col ">
                     <FetchError />
                 </main>

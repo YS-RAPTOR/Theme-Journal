@@ -20,7 +20,7 @@ export enum TimeOfDay {
 }
 export type TaskTypePost = {
     id: string;
-    objectiveId: string;
+    objectiveId: string | null;
     description: string;
     partialCompletion: string;
     fullCompletion: string;
@@ -36,8 +36,8 @@ export type TaskTypeGet = {
     fullCompletion: string;
     progress?: Map<Date, ProgressType>;
     startDate: Date;
-    objectiveColor: int;
-    objectiveDescription: string;
+    objectiveColor: number | null;
+    objectiveDescription: string | null;
     endDate: Date;
 };
 

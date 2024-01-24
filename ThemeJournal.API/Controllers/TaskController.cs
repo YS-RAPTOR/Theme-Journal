@@ -49,10 +49,11 @@ namespace ThemeJournal.Api.Controllers
                 return BadRequest("End Date should be greater than Start Date");
             }
             // Maximum End Date is the end date of the current theme
+            var today = _userService.TrasformDate(DateTime.UtcNow);
             var currentTheme = await _themeData.GetThemes(
                 _userService.GetUserId(),
-                _userService.TrasformDate(DateTime.UtcNow),
-                _userService.TrasformDate(DateTime.UtcNow)
+                today,
+                today.AddDays(1)
             );
 
 
