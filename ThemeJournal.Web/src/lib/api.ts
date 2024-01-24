@@ -15,6 +15,29 @@ export const FixDate = (date: Date) => {
     return date;
 };
 
+const FixTime = (date: Date) => {
+    const today = new Date();
+    date.setHours(today.getHours(), today.getMinutes(), 0, 0);
+    return date;
+};
+
+export const TransformDate = (date: Date) => {
+    date.setHours(4, 0, 0, 0);
+    return date;
+};
+
+export const GetDates = () => {
+    // Get Dates from range -3 days to +3 days
+    const dates = [];
+    const DATERANGE = 3;
+    const today = TransformDate(new Date());
+
+    for (let i = -DATERANGE; i <= DATERANGE; i++) {
+        dates.push(new Date(today.getTime() + i * 86400000));
+    }
+    return dates;
+};
+
 // All dates have to be local time zone. The functions will comvert to UTC before sending to the server.
 type date = Date | null;
 
@@ -54,8 +77,8 @@ export const CreateTheme = async ({
     const data = {
         id: id,
         title: title,
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString(),
+        startDate: FixTime(startDate).toISOString(),
+        endDate: FixTime(endDate).toISOString(),
     };
 
     return axiosInstance.post("/theme", data).then((res) => {
@@ -71,8 +94,8 @@ export const EditTheme = async ({
 }: Types.ThemeType) => {
     const data = {
         title: title,
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString(),
+        startDate: FixTime(startDate).toISOString(),
+        endDate: FixTime(endDate).toISOString(),
     };
     return axiosInstance.put(`theme/${id}`, data).then((res) => {
         return res.data;
@@ -81,7 +104,7 @@ export const EditTheme = async ({
 
 export const ExtendTheme = async ({ id, endDate }: Types.ThemeType) => {
     return axiosInstance
-        .put(`theme/${id}/extend`, endDate.toISOString(), {
+        .put(`theme/${id}/extend`, FixTime(endDate).toISOString(), {
             headers: { "Content-Type": "application/json" },
         })
         .then((res) => {
@@ -174,7 +197,7 @@ export const UpsertGratitude = async ({
 }: Types.GratitudesType) => {
     const data = {
         description: description,
-        createdAt: createdAt.toISOString(),
+        createdAt: FixTime(createdAt).toISOString(),
         sentiment: sentiment,
         time: time,
     };
@@ -207,10 +230,66 @@ export const UpsertThought = async ({
 }: Types.ThoughtsType) => {
     const data = {
         thought: thought,
-        createdAt: createdAt.toISOString(),
+        createdAt: FixTime(createdAt).toISOString(),
     };
 
     return axiosInstance.put(`/thoughts/${id}`, data).then((res) => {
+        return res.data;
+    });
+};
+
+export const GetTask = async (upperDate: date, lowerDate: date) => {
+    let params: any = {};
+    if (upperDate !== null) {
+        params.upperDate = upperDate.toISOString();
+    }
+    if (lowerDate !== null) {
+        params.lowerDate = lowerDate.toISOString();
+    }
+
+    return axiosInstance
+        .get("/Task", {
+            params: params,
+        })
+        .then((res) => {
+            for (let i = 0; i < res.data.length; i++) {
+                res.data[i].startDate = new Date(res.data[i].startDate);
+                res.data[i].endDate = new Date(res.data[i].endDate);
+                const map = new Map();
+                if (res.data[i].progress !== null) {
+                    for (const item of res.data[i].progress) {
+                        item.CompletionDate = new Date(item.CompletionDate);
+                        map.set(item.CompletionDate, item);
+                    }
+                }
+                res.data[i].progress = map;
+            }
+
+            console.log(res.data);
+            return res.data as Array<Types.TaskTypeGet>;
+        });
+};
+
+export const CreateTask = async ({
+    id,
+    objectiveId,
+    description,
+    partialCompletion,
+    fullCompletion,
+    startDate,
+    endDate,
+}: Types.TaskTypePost) => {
+    const data = {
+        id: id,
+        objectiveId: objectiveId,
+        description: description,
+        partialCompletion: partialCompletion,
+        fullCompletion: fullCompletion,
+        startDate: FixTime(startDate).toISOString(),
+        endDate: FixTime(endDate).toISOString(),
+    };
+    console.log(data);
+    return axiosInstance.post("/Task", data).then((res) => {
         return res.data;
     });
 };

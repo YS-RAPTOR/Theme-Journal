@@ -124,17 +124,11 @@ public class TaskData : ITaskData
                 from daily_tasks
                 left join theme_objectives on daily_tasks.objectiveid = theme_objectives.id
                 where daily_tasks.userid = @userid and 
-                ((
-                (@lowerdate is null) 
-                or 
-                (startdate <= @lowerdate and @lowerdate < enddate)
-                )
-                or
                 (
-                (@upperdate is null) 
-                or
-                (startdate < @upperdate and @upperdate < enddate)
-                ));
+                    (@lowerdate is null or @lowerdate <= startdate or @lowerdate < enddate)
+                and
+                    (@upperdate is null or @upperdate > startdate or @upperdate > enddate)
+                );
             ";
 
         return await _sql.LoadData<TaskModel, dynamic>(sql, parameters);

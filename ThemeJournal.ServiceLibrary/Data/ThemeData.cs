@@ -97,11 +97,14 @@ public class ThemeData : IThemeData
 
         var sql =
             @"
-            select id, title, startdate, enddate
-            from themes
-            where userid = @userid and 
-            (@lowerdate is null or @lowerdate < enddate) and 
-            (@upperdate is null or startdate < @upperdate);
+                select id, title, startdate, enddate
+                from themes
+                where userid = @userid and 
+                (
+                    (@lowerdate is null or @lowerdate <= startdate or @lowerdate < enddate)
+                and
+                    (@upperdate is null or @upperdate > startdate or @upperdate > enddate)
+                );
             ";
 
         return await _sql.LoadData<GetThemeModel, dynamic>(sql, parameters);

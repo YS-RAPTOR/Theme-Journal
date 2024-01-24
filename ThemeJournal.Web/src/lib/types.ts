@@ -1,7 +1,7 @@
 import { UUID } from "uuidv7";
 
 export type ObjectiveType = {
-    id: string;
+    id: string | null;
     description: string;
     colorId: number;
 };
@@ -18,6 +18,28 @@ export enum TimeOfDay {
     Day2,
     Night,
 }
+export type TaskTypePost = {
+    id: string;
+    objectiveId: string;
+    description: string;
+    partialCompletion: string;
+    fullCompletion: string;
+    progress?: Map<Date, ProgressType>;
+    startDate: Date;
+    endDate: Date;
+};
+
+export type TaskTypeGet = {
+    id: string;
+    description: string;
+    partialCompletion: string;
+    fullCompletion: string;
+    progress?: Map<Date, ProgressType>;
+    startDate: Date;
+    objectiveColor: int;
+    objectiveDescription: string;
+    endDate: Date;
+};
 
 export type GratitudesType = {
     id: UUID;
@@ -35,7 +57,6 @@ export type ThoughtsType = {
 
 export type ProgressType = {
     id: string;
-    taskId: string;
     completionDate: Date;
     progress: number;
 };

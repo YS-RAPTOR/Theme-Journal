@@ -1,27 +1,38 @@
 import { ProgressType } from "@/lib/types";
-import { useState } from "react";
+import { format } from "date-fns";
 
 const dataProgress = ["e", "p", "f"];
 
 const TaskProgress = (props: {
-    progress: ProgressType;
-    disabled?: boolean;
-    none?: boolean;
+    progress?: ProgressType;
+    disabled: boolean;
+    none: boolean;
+    date: Date;
+    onClick?: () => void;
 }) => {
     const disabled = props.disabled || false;
 
     if (props.none) {
         return (
-            <div className="h-20 w-20 rounded-full border-2 border-transparent" />
+            <div className="h-20 w-20 rounded-full bg-slate-50 border-2 border-transparent" />
         );
     }
 
+    const dateString = format(props.date, "E dd MMM");
+
     return (
         <button
-            data-progress={dataProgress[props.progress.progress]}
+            onClick={props.onClick}
+            data-progress={
+                dataProgress[
+                    props.progress != undefined ? props.progress.progress : 0
+                ]
+            }
             aria-disabled={disabled}
-            className="h-20 w-20 rounded-full border-2 border-slate-900 bg-gradient-to-tl from-slate-950 to-transparent shadow transition-all hover:border-slate-200 aria-disabled:cursor-default aria-disabled:border-slate-700 aria-disabled:from-slate-700 data-[progress=e]:from-[0%] data-[progress=f]:from-[100%] data-[progress=p]:from-[49.5%] data-[progress=e]:to-[0%] data-[progress=f]:to-[100%] data-[progress=p]:to-[50.5%]"
-        />
+            className="h-20 w-20 rounded-full border-2 border-slate-900 bg-gradient-to-tl from-slate-950 to-transparent shadow transition-all hover:border-slate-200 aria-disabled:cursor-default aria-disabled:border-slate-500 aria-disabled:from-slate-500 data-[progress=e]:from-[0%] data-[progress=f]:from-[100%] data-[progress=p]:from-[49.5%] data-[progress=e]:to-[0%] data-[progress=f]:to-[100%] data-[progress=p]:to-[50.5%]"
+        >
+            {dateString}
+        </button>
     );
 };
 

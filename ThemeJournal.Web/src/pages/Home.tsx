@@ -1,76 +1,54 @@
-import { ProgressType } from "@/lib/types";
-import TaskList from "../components/TaskList";
-import { TaskType } from "../components/TaskList";
-import TaskProgress from "@/components/TaskProgress";
-import { Button } from "@/components/ui/button";
+import TaskView from "@/components/TaskView";
+import { GetDates, GetTask } from "@/lib/api";
+import { TaskTypePost, ThemeType } from "@/lib/types";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { GetTheme } from "../lib/api";
+import { useQuery } from "react-query";
+import CreateTask from "@/components/CreateTask";
 
-const tasks: Array<TaskType> = [
-    {
-        id: "1",
-        objective: "Objective 1",
-        Description: "Task 1",
-        PartialDescription: "Task 1 Partial",
-        FullDescription: "Task 1 Full",
-        progress: 0,
-        startDate: new Date("2024-01-01"),
-        endDate: new Date("2024-26-01"),
-    },
-    {
-        id: "2",
-        objective: "Objective 2",
-        Description: "Task 2",
-        PartialDescription: "Task 2 Partial",
-        FullDescription: "Task 2 Full",
-        progress: 0,
-        startDate: new Date("2024-01-01"),
-        endDate: new Date("2024-24-01"),
-    },
-    {
-        id: "3",
-        objective: "Objective 1",
-        Description: "Task 1",
-        PartialDescription: "Task 1 Partial",
-        FullDescription: "Task 1 Full",
-        progress: 0,
-        startDate: new Date("2024-01-01"),
-        endDate: new Date("2024-02-01"),
-    },
-    {
-        id: "4",
-        objective: "Objective 2",
-        Description: "Task 2",
-        PartialDescription: "Task 2 Partial",
-        FullDescription: "Task 2 Full",
-        progress: 0,
-        startDate: new Date("2024-01-01"),
-        endDate: new Date("2024-02-01"),
-    },
-];
+const GetActiveThemes = (data: undefined | ThemeType[]) => {
+    if (data === undefined) {
+        return null;
+    }
+    const today = new Date();
+    return data.filter(
+        (theme) => theme.startDate <= today && today < theme.endDate,
+    )[0];
+};
 
+// Add the new task button. Allows to add a new task.
 const Home = () => {
-    const progresses: Array<ProgressType> = [
-        {
-            id: "1",
-            taskId: "1",
-            completionDate: new Date("2024-01-01"),
-            progress: 0,
-        },
-        {
-            id: "1",
-            taskId: "1",
-            completionDate: new Date("2024-01-01"),
-            progress: 1,
-        },
-        {
-            id: "1",
-            taskId: "1",
-            completionDate: new Date("2024-01-01"),
-            progress: 2,
-        },
-    ];
+    const dates = GetDates();
+
+    const [animationRef, _animate] = useAutoAnimate<HTMLDivElement>();
+
+    const ThemesQuery = useQuery({
+        queryKey: ["currentThemes"],
+        queryFn: () => GetTheme(null, new Date()),
+    });
+
+    const TasksQuery = useQuery({
+        queryKey: ["currentTasks"],
+        queryFn: () => GetTask(dates[6], dates[0]),
+    });
+
+    const activeTheme = GetActiveThemes(ThemesQuery.data);
+
+    if (activeTheme === null) {
+        return <div></div>;
+    }
+
     return (
-        <main className="flex gap-2 p-2 flex-col justify-center">
-            <TaskList tasks={tasks} />
+        <main className="flex justify-center">
+            <div
+                ref={animationRef}
+                className="flex w-full max-w-[1054px] flex-auto flex-col gap-3 p-2"
+            >
+                {TasksQuery.data.map((task) => (
+                    <TaskView task={task} dates={dates} key={task.id} />
+                ))}
+                <CreateTask currentTheme={activeTheme.id} />
+            </div>
         </main>
     );
 };

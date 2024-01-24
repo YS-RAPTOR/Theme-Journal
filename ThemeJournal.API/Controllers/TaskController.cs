@@ -37,6 +37,7 @@ namespace ThemeJournal.Api.Controllers
             // Transform the Dates according to User Start time
             task.StartDate = _userService.TrasformDate(task.StartDate);
             task.EndDate = _userService.TrasformDate(task.EndDate);
+
             // Start Date must be today or in the future
             if (task.StartDate < _userService.TrasformDate(DateTime.UtcNow))
             {
@@ -54,10 +55,11 @@ namespace ThemeJournal.Api.Controllers
                 _userService.TrasformDate(DateTime.UtcNow)
             );
 
-            if (task.EndDate >= currentTheme[0].EndDate)
+
+            if (task.EndDate > currentTheme[0].EndDate)
             {
                 return BadRequest(
-                    "End Date of the task cannot be greater than or equal to the end date of the current theme"
+                    "End Date of the task cannot be greater than the end date of the current theme"
                 );
             }
 
