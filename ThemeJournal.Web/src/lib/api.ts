@@ -311,3 +311,9 @@ export const ExtendTask = async ({ id, endDate }: Types.TaskTypeGet) => {
             return res.data;
         });
 };
+
+export const EditTask = async ({ id, ...data }: Types.ThemeType) => {
+    return axiosInstance.put(`Task/${id}`, data).then((res) => {
+        return res.data;
+    });
+};
