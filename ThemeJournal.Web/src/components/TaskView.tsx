@@ -99,7 +99,10 @@ const TaskView = (props: {
                 (task) => progress.taskId == task.id,
             );
 
-            newTasks[index].progress?.set(progress.completionDate, progress);
+            newTasks[index].progress?.set(
+                progress.completionDate.getTime(),
+                progress,
+            );
 
             queryClient.setQueryData<TaskTypeGet[]>(["currentTasks"], newTasks);
 
@@ -162,7 +165,7 @@ const TaskView = (props: {
                     )}
                 </div>
             </CardHeader>
-            <ScrollArea about="center">
+            <ScrollArea about="center" className="min-w-0">
                 <CardContent className="flex gap-2 justify-center items-center">
                     {props.dates.map((date, index) => (
                         <TaskProgress

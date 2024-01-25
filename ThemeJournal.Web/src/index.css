@@ -6,3 +6,33 @@
     font-family: "Virgil";
     src: url("/Virgil.woff2");
 }
+/* Fixes Scroll Bar */
+::-webkit-scrollbar {
+    width: 0.5em;
+    height: 0.2em;
+    background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #e2e8f0;
+    border-radius: 0.5em;
+}
+
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 0px rgba(0, 0, 0, 0);
+    background-color: transparent;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+::-webkit-scrollbar-track-piece {
+    background-color: transparent;
+}
+
+::-webkit-scrollbar-corner {
+    background-color: transparent;
+}
+
+::-webkit-scrollbar-button {
+    display: none;
+}

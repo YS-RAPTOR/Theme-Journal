@@ -9,19 +9,17 @@ const MainLayout = () => {
     return (
         <>
             <AuthLayout>
-                <ScrollArea type="auto" className="h-screen">
-                    <header className="z-20">
-                        <div className="z-20 fixed top-0 h-16 w-full backdrop-blur-sm flex justify-between items-center">
-                            <NavBar className=" z-20 self-end" />
-                            <div className="z-20 p-3">
-                                <Profile />
-                            </div>
+                <header className="z-20">
+                    <div className="z-20 fixed top-0 h-16 w-full backdrop-blur-sm flex justify-between items-center">
+                        <NavBar className=" z-20 self-end" />
+                        <div className="z-20 p-3">
+                            <Profile />
                         </div>
-                        <Separator className="z-20 fixed top-16" />
-                    </header>
-                    <div className="h-16"></div>
-                    <Outlet />
-                </ScrollArea>
+                    </div>
+                    <Separator className="z-20 fixed top-16" />
+                </header>
+                <div className="h-16"></div>
+                <Outlet />
             </AuthLayout>
         </>
     );

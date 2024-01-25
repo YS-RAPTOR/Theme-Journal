@@ -24,7 +24,6 @@ export type TaskTypePost = {
     description: string;
     partialCompletion: string;
     fullCompletion: string;
-    progress?: Map<Date, ProgressType>;
     startDate: Date;
     endDate: Date;
 };
@@ -34,7 +33,7 @@ export type TaskTypeGet = {
     description: string;
     partialCompletion: string;
     fullCompletion: string;
-    progress?: Map<Date, ProgressType>;
+    progress?: Map<number, ProgressType>;
     startDate: Date;
     objectiveColor: number | null;
     objectiveDescription: string | null;

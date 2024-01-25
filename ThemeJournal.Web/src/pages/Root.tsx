@@ -38,7 +38,7 @@ const Root = () => {
     }, []);
 
     return (
-        <ScrollArea type="auto" className="h-screen">
+        <>
             <header className="h-16 relative">
                 <div className="absolute top-0 h-16 w-full flex justify-between items-center">
                     <div className="p-2 gap-2 flex items-center">
@@ -108,9 +108,10 @@ const Root = () => {
                     </Button>
                 </div>
             </main>
-        </ScrollArea>
+        </>
     );
 };
+// TODO: Better Date transforming algorithm
 // TODO: Add Skeletons for nicer loading
 // TODO: Convert Popover to Drawer for better mobile support
 // TODO: Add User Settings (Time)
