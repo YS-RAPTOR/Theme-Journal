@@ -22,13 +22,13 @@ const Profile = () => {
     const profileLetter = instance.getActiveAccount()?.name?.charAt(0);
 
     const HandleLogin = () => {
-        instance.loginRedirect(loginRequest).catch((error) => {
+        instance.loginPopup(loginRequest).catch((error) => {
             console.log(error);
         });
     };
 
     const HandleLogout = () => {
-        instance.logoutRedirect().catch((error) => {
+        instance.logoutPopup().catch((error) => {
             console.log(error);
         });
     };

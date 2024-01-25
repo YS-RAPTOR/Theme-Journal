@@ -9,7 +9,7 @@ const ScrollArea = React.forwardRef<
 >(({ className, children, about, ...props }, ref) => {
     const scrollAreaRef = React.useRef<HTMLDivElement | undefined>(undefined);
     React.useEffect(() => {
-        if ((about = "center" && scrollAreaRef)) {
+        if ((about = "center" && scrollAreaRef.current)) {
             scrollAreaRef.current.scrollLeft =
                 (scrollAreaRef.current.scrollWidth -
                     scrollAreaRef.current.clientWidth) /

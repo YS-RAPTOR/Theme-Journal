@@ -40,7 +40,7 @@ const Navigatons = [
     },
 ];
 
-const NavBar = (props: { className: string }) => {
+const NavBar = (props: { className?: string }) => {
     const location = useLocation();
 
     const InitialSelected = () => {

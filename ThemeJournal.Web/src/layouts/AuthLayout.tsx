@@ -22,7 +22,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
                         await instance.acquireTokenSilent(loginRequest);
                     config.headers.Authorization = `Bearer ${response.accessToken}`;
                 } catch (e) {
-                    instance.loginRedirect(loginRequest);
+                    instance.loginPopup(loginRequest);
                 }
                 return config;
             },

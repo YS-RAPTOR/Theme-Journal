@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import NavBar from "../components/NavBar";
+import { Button } from "@/components/ui/button";
 
 const NotFound = () => {
     return (
@@ -14,11 +15,8 @@ const NotFound = () => {
                 <div className="text-2xl font-black text-primaryLight">
                     Page Not Found
                 </div>
-                <Link
-                    className="rounded-md border-2 border-primaryDark px-2 py-1 text-xl text-primaryDark transition-all hover:border-primaryLight hover:bg-primaryDark hover:text-primaryLight hover:text-primaryWhite"
-                    to="/"
-                >
-                    Go Home
+                <Link to="/">
+                    <Button size="lg">Go Home</Button>
                 </Link>
             </main>
         </div>
