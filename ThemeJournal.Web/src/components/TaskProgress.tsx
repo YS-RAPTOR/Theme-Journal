@@ -24,7 +24,7 @@ const TaskProgress = (props: {
 
     return (
         <button
-            onClick={props.onClick}
+            onClick={props.disabled ? undefined : props.onClick}
             data-progress={
                 dataProgress[
                     props.progress != undefined ? props.progress.progress : 0
