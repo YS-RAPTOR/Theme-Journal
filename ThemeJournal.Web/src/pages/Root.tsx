@@ -111,7 +111,6 @@ const Root = () => {
         </>
     );
 };
-// TODO: Better Date transforming algorithm. Issue might be with progress where today of system time is used instead of utc.
 // TODO: Convert Popover to Drawer for better mobile support
 // TODO: Add User Settings (Time)
 // TODO: Sorting Tasks

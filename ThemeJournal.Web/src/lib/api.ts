@@ -16,10 +16,15 @@ export const FixDate = (date: Date) => {
     return date;
 };
 
-const FixTime = (date: Date) => {
-    const today = new Date();
-    date.setHours(today.getHours(), today.getMinutes(), 0, 0);
-    return date;
+export const TransformDateWithSubtraction = (date: Date) => {
+    const transform = new Date(date);
+    transform.setHours(4, 0, 0, 0);
+
+    if (transform.getTime() > date.getTime()) {
+        return new Date(transform.getTime() - 86400000);
+    }
+
+    return transform;
 };
 
 export const TransformDate = (date: Date) => {
@@ -31,7 +36,7 @@ export const GetDates = () => {
     // Get Dates from range -3 days to +3 days
     const dates = [];
     const DATERANGE = 3;
-    const today = TransformDate(new Date());
+    const today = TransformDateWithSubtraction(new Date());
 
     for (let i = -DATERANGE; i <= DATERANGE; i++) {
         dates.push(new Date(today.getTime() + i * 86400000));
@@ -106,8 +111,8 @@ export const CreateTheme = async ({
     const data = {
         id: id,
         title: title,
-        startDate: FixTime(startDate).toISOString(),
-        endDate: FixTime(endDate).toISOString(),
+        startDate: TransformDate(startDate).toISOString(),
+        endDate: TransformDate(endDate).toISOString(),
     };
 
     return axiosInstance.post("/theme", data).then((res) => {
@@ -123,8 +128,8 @@ export const EditTheme = async ({
 }: Types.ThemeType) => {
     const data = {
         title: title,
-        startDate: FixTime(startDate).toISOString(),
-        endDate: FixTime(endDate).toISOString(),
+        startDate: TransformDate(startDate).toISOString(),
+        endDate: TransformDate(endDate).toISOString(),
     };
     return axiosInstance.put(`theme/${id}`, data).then((res) => {
         return res.data;
@@ -133,7 +138,7 @@ export const EditTheme = async ({
 
 export const ExtendTheme = async ({ id, endDate }: Types.ThemeType) => {
     return axiosInstance
-        .put(`theme/${id}/extend`, FixTime(endDate).toISOString(), {
+        .put(`theme/${id}/extend`, TransformDate(endDate).toISOString(), {
             headers: { "Content-Type": "application/json" },
         })
         .then((res) => {
@@ -174,7 +179,6 @@ export const EditObjective = async (objective: Types.ObjectiveType) => {
 export const DeleteObjective = async ({
     id,
     themeId,
-    //@ts-ignore
     index,
 }: {
     id: string;
@@ -190,7 +194,6 @@ export const DeleteObjective = async ({
 
 export const GetGratitude = async (
     upperDate: date,
-
     lowerDate: date,
     time: Types.TimeOfDay | null,
     sentiment: number | null,
@@ -226,7 +229,7 @@ export const UpsertGratitude = async ({
 }: Types.GratitudesType) => {
     const data = {
         description: description,
-        createdAt: FixTime(createdAt).toISOString(),
+        createdAt: TransformDate(createdAt).toISOString(),
         sentiment: sentiment,
         time: time,
     };
@@ -259,10 +262,11 @@ export const UpsertThought = async ({
 }: Types.ThoughtsType) => {
     const data = {
         thought: thought,
-        createdAt: FixTime(createdAt).toISOString(),
+        createdAt: TransformDate(createdAt).toISOString(),
     };
 
     return axiosInstance.put(`/thoughts/${id}`, data).then((res) => {
+        console.log(res.data);
         return res.data;
     });
 };
@@ -312,8 +316,8 @@ export const CreateTask = async ({
         description: description,
         partialCompletion: partialCompletion,
         fullCompletion: fullCompletion,
-        startDate: FixTime(startDate).toISOString(),
-        endDate: FixTime(endDate).toISOString(),
+        startDate: TransformDate(startDate).toISOString(),
+        endDate: TransformDate(endDate).toISOString(),
     };
     return axiosInstance.post("/Task", data).then((res) => {
         return res.data;
@@ -322,7 +326,7 @@ export const CreateTask = async ({
 
 export const ExtendTask = async ({ id, endDate }: Types.TaskTypeGet) => {
     return axiosInstance
-        .put(`Task/${id}/extend`, FixTime(endDate).toISOString(), {
+        .put(`Task/${id}/extend`, TransformDate(endDate).toISOString(), {
             headers: { "Content-Type": "application/json" },
         })
         .then((res) => {
@@ -330,7 +334,23 @@ export const ExtendTask = async ({ id, endDate }: Types.TaskTypeGet) => {
         });
 };
 
-export const EditTask = async ({ id, ...data }: Types.ThemeType) => {
+export const EditTask = async ({
+    id,
+    objectiveId,
+    description,
+    partialCompletion,
+    fullCompletion,
+    startDate,
+    endDate,
+}: Types.ThemeType) => {
+    const data = {
+        objectiveId: objectiveId,
+        description: description,
+        partialCompletion: partialCompletion,
+        fullCompletion: fullCompletion,
+        startDate: TransformDate(startDate).toISOString(),
+        endDate: TransformDate(endDate).toISOString(),
+    };
     return axiosInstance.put(`Task/${id}`, data).then((res) => {
         return res.data;
     });

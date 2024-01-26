@@ -45,7 +45,6 @@ public class UserService : IUserService
 
         if (transformedDate > date)
         {
-            Console.WriteLine("-1");
             transformedDate = transformedDate.AddDays(-1);
         }
 

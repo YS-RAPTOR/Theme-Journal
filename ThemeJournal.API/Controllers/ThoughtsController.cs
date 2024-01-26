@@ -28,6 +28,7 @@ namespace ThemeJournal.Api.Controllers
         {
             // Transform the Dates according to User Start time
             thought.CreatedAt = _userService.TrasformDate(thought.CreatedAt);
+
             if (thought.CreatedAt != _userService.TrasformDate(DateTime.UtcNow))
             {
                 return BadRequest("Can only create/update thoughts for today");
@@ -40,9 +41,6 @@ namespace ThemeJournal.Api.Controllers
                 thought.CreatedAt.AddDays(1),
                 thought.CreatedAt
             );
-
-            Console.WriteLine("Thoughts");
-            Console.WriteLine(thoughts.Count);
 
             if (thoughts.Count == 1 && thoughts[0].Id != id)
             {
