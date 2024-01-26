@@ -1,4 +1,3 @@
-import TextArea from "../components/TextArea";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import {
@@ -47,12 +46,60 @@ const Journal = () => {
 
     if (gratitudeQuery.isLoading || thoughtsQuery.isLoading) {
         return (
-            <div className="flex h-screen">
-                <div className="h-16"></div>
-                <main className="flex w-full flex-auto flex-col">
-                    <Loading />
-                </main>
-            </div>
+            <main className="flex justify-center">
+                <div className="flex w-full max-w-[1054px] flex-auto flex-col gap-3 p-2 ">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>
+                                What are you feeling grateful for this morning?
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <Textarea
+                                rows={4}
+                                className="bg-yellow-200"
+                            ></Textarea>
+                        </CardContent>
+                    </Card>
+                    <Card className="p-2">
+                        <CardHeader>
+                            <CardTitle>
+                                What is something else you are grateful for?
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <Textarea
+                                rows={4}
+                                className="bg-amber-200"
+                            ></Textarea>
+                        </CardContent>
+                    </Card>
+                    <Card className="p-2">
+                        <CardHeader>
+                            <CardTitle>What is on your mind?</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <Textarea
+                                rows={8}
+                                className="bg-lime-200"
+                            ></Textarea>
+                        </CardContent>
+                    </Card>
+                    <Card className="p-2">
+                        <CardHeader>
+                            <CardTitle>
+                                What are you feeling grateful for this evening?
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <Textarea
+                                rows={4}
+                                className="bg-blue-300"
+                            ></Textarea>
+                        </CardContent>
+                    </Card>
+                </div>
+            </main>
         );
     }
 

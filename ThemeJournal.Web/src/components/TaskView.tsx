@@ -69,11 +69,12 @@ import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 import { Badge } from "./ui/badge";
 import { colors } from "@/lib/constants";
 import { uuidv7 } from "uuidv7";
+import { Skeleton } from "./ui/skeleton";
 
 const TaskView = (props: {
-    task: TaskTypeGet;
+    task?: TaskTypeGet;
+    currentTheme?: ThemeType;
     dates: Array<Date>;
-    currentTheme: ThemeType;
 }) => {
     const today = props.dates[3];
     const objectivesQuery = useQuery({
@@ -128,6 +129,39 @@ const TaskView = (props: {
                 obj.description == props.task.objectiveDescription &&
                 obj.colorId == props.task.objectiveColor,
         )?.id ?? null;
+
+    if (objectivesQuery.isLoading) {
+        return (
+            <Card>
+                <CardHeader className="relative">
+                    <CardTitle className="flex gap-2 max-w-[90%] flex-wrap items-center">
+                        <Skeleton className="w-[250px] h-6" />
+                        {props.task.objectiveDescription &&
+                            props.task.objectiveColor && (
+                                <Skeleton className="w-8 h-4" />
+                            )}
+                    </CardTitle>
+                    <CardDescription>
+                        <Indented>
+                            <Skeleton className="w-[250px] h-6" />
+                        </Indented>
+                        <Indented>
+                            <Skeleton className="w-[250px] h-6" />
+                        </Indented>
+                    </CardDescription>
+                    <Skeleton className="top-4 right-4 w-8 h-8 absolute"></Skeleton>
+                </CardHeader>
+                <ScrollArea about="center" className="min-w-0">
+                    <CardContent className="flex gap-2 justify-center items-center">
+                        {props.dates.map((date, index) => (
+                            <Skeleton className="h-20 w-20 rounded-full" />
+                        ))}
+                        <ScrollBar orientation="horizontal" />
+                    </CardContent>
+                </ScrollArea>
+            </Card>
+        );
+    }
 
     return (
         <Card>

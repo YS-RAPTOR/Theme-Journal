@@ -5,6 +5,16 @@ import { GetTheme } from "../lib/api";
 import { useQuery } from "react-query";
 import CreateTask from "@/components/CreateTask";
 import FetchError from "@/components/FetchError";
+import {
+    Card,
+    CardHeader,
+    CardContent,
+    CardDescription,
+    CardTitle,
+} from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import Indented from "@/components/IndentedText";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 // Add the new task button. Allows to add a new task.
 const Home = () => {
@@ -24,7 +34,42 @@ const Home = () => {
 
     if (ThemesQuery.isLoading || TasksQuery.isLoading) {
         // Show a loading screen if the themes are loading
-        return <div>loading...</div>;
+        return (
+            <main className="flex justify-center">
+                <div
+                    ref={animationRef}
+                    className="flex w-full max-w-[1054px] flex-auto flex-col gap-3 p-2"
+                >
+                    {[0, 1, 2, 3, 4].map((key) => (
+                        <Card key={key}>
+                            <CardHeader className="relative">
+                                <CardTitle className="flex gap-2 max-w-[90%] flex-wrap items-center">
+                                    <Skeleton className="w-[250px] h-6" />
+                                    <Skeleton className="w-8 h-4" />
+                                </CardTitle>
+                                <CardDescription>
+                                    <Indented>
+                                        <Skeleton className="w-[250px] h-6" />
+                                    </Indented>
+                                    <Indented>
+                                        <Skeleton className="w-[250px] h-6" />
+                                    </Indented>
+                                </CardDescription>
+                                <Skeleton className="top-4 right-4 w-8 h-8 absolute"></Skeleton>
+                            </CardHeader>
+                            <ScrollArea about="center" className="min-w-0">
+                                <CardContent className="flex gap-2 justify-center items-center">
+                                    {dates.map((date, index) => (
+                                        <Skeleton className="h-20 w-20 rounded-full" />
+                                    ))}
+                                    <ScrollBar orientation="horizontal" />
+                                </CardContent>
+                            </ScrollArea>
+                        </Card>
+                    ))}
+                </div>
+            </main>
+        );
     }
 
     if (

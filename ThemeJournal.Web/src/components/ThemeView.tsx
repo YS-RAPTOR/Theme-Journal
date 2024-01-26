@@ -54,6 +54,7 @@ import { format } from "date-fns";
 import { PiCalendarDuotone } from "react-icons/pi";
 import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
+import { Skeleton } from "./ui/skeleton";
 
 const ThemeView = (props: { theme: ThemeType }) => {
     const isThemeActive = () => {
@@ -68,7 +69,27 @@ const ThemeView = (props: { theme: ThemeType }) => {
     const [animationRef, _] = useAutoAnimate<HTMLDivElement>();
 
     if (objectivesQuery.isLoading) {
-        return <Loading />;
+        return (
+            <Card>
+                <CardHeader className="relative">
+                    <Skeleton className="w-[250px] h-10" />
+                    <CardDescription className="flex gap-2">
+                        <Skeleton className="w-[100px] h-4" /> -
+                        <Skeleton className="w-[100px] h-4" />
+                    </CardDescription>
+                    {/* If Active can only extend else can edit*/}
+                    <Skeleton className="top-4 right-4 w-8 h-8 absolute"></Skeleton>
+                </CardHeader>
+                <CardContent ref={animationRef} className="flex flex-col gap-2">
+                    {[0, 1, 2, 3, 4].map((objective) => (
+                        <Skeleton
+                            className="w-full h-12"
+                            key={objective}
+                        ></Skeleton>
+                    ))}
+                </CardContent>
+            </Card>
+        );
     }
 
     if (objectivesQuery.isError) {

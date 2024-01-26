@@ -130,9 +130,10 @@ const ObjectiveView = (props: {
                                     <AlertDialogAction
                                         onClick={() => {
                                             DeleteObjectiveMutation.mutate({
-                                                id: props.objectives[
-                                                    props.index
-                                                ].id,
+                                                id:
+                                                    props.objectives[
+                                                        props.index
+                                                    ].id ?? "",
                                                 themeId: props.themeId,
                                                 index: props.index,
                                             });
@@ -210,7 +211,7 @@ const EditObjectiveView = (props: {
     const form = useForm<z.infer<typeof ObjectiveSchema>>({
         resolver: zodResolver(ObjectiveSchema),
         values: {
-            id: props.objectives[props.index].id,
+            id: props.objectives[props.index].id ?? "",
             colorId: props.objectives[props.index].colorId,
         },
     });
