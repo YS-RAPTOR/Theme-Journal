@@ -3,11 +3,11 @@ import { useQuery, useMutation, useQueryClient } from "react-query";
 import {
     GetGratitude,
     GetThought,
+    HandleError,
     UpsertGratitude,
     UpsertThought,
 } from "../lib/api";
 import { GratitudesType, ThoughtsType, TimeOfDay } from "../lib/types";
-import Loading from "../components/Loading";
 import FetchError from "../components/FetchError";
 import { uuidv7obj } from "uuidv7";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
@@ -242,7 +242,11 @@ const JournalInner = ({
             description: value,
         };
         setValue(updated);
-        GratitudeMutation.mutate(updated);
+        try {
+            GratitudeMutation.mutate(updated);
+        } catch (err) {
+            HandleError(err);
+        }
     };
 
     return (
@@ -304,7 +308,11 @@ const JournalInner = ({
                                     thought: e.target.value,
                                 };
                                 setThoughts(updated);
-                                ThoughtMutation.mutate(updated);
+                                try {
+                                    ThoughtMutation.mutate(updated);
+                                } catch (err) {
+                                    HandleError(err);
+                                }
                             }}
                             className="bg-lime-200"
                         ></Textarea>

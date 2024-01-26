@@ -1,5 +1,10 @@
 import { useMutation, useQueryClient } from "react-query";
-import { CreateObjectives, CreateTheme, FixDate } from "../lib/api";
+import {
+    CreateObjectives,
+    CreateTheme,
+    FixDate,
+    HandleError,
+} from "../lib/api";
 import { ThemeType, ObjectiveType } from "../lib/types";
 import { uuidv7 } from "uuidv7";
 import { PiPlusBold } from "react-icons/pi";
@@ -185,14 +190,16 @@ const CreateThemeView = (props: { endDate: Date }) => {
     };
 
     const onSubmit = async (theme: z.infer<typeof ThemeSchema>) => {
-        // @ts-ignore
-        await CreateThemeMutation.mutateAsync(theme as ThemeType);
-        await CreateObjectivesMutation.mutateAsync({
-            themeId: theme.id,
-            objectives: theme.objectives as ObjectiveType[],
-        });
-
-        onModalOpenChange(false);
+        try {
+            await CreateThemeMutation.mutateAsync(theme as ThemeType);
+            await CreateObjectivesMutation.mutateAsync({
+                themeId: theme.id,
+                objectives: theme.objectives as ObjectiveType[],
+            });
+            onModalOpenChange(false);
+        } catch (err) {
+            HandleError(err);
+        }
     };
 
     return (

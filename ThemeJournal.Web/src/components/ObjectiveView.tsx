@@ -2,7 +2,7 @@ import { ObjectiveType } from "../lib/types";
 import { NumberOfColors, colors } from "../lib/constants";
 import { PiNotePencilDuotone, PiTrashDuotone } from "react-icons/pi";
 import { useMutation, useQueryClient } from "react-query";
-import { EditObjective, DeleteObjective } from "../lib/api";
+import { EditObjective, DeleteObjective, HandleError } from "../lib/api";
 import * as z from "zod";
 import {
     Dialog,
@@ -217,13 +217,16 @@ const EditObjectiveView = (props: {
     });
 
     const onSubmit = async (objective: z.infer<typeof ObjectiveSchema>) => {
-        // @ts-ignore
-        await EditObjectiveMutation.mutateAsync({
-            id: objective.id,
-            description: props.objectives[props.index].description,
-            colorId: objective.colorId,
-        });
-        onModalOpenChange(false);
+        try {
+            await EditObjectiveMutation.mutateAsync({
+                id: objective.id,
+                description: props.objectives[props.index].description,
+                colorId: objective.colorId,
+            });
+            onModalOpenChange(false);
+        } catch (err) {
+            HandleError(err);
+        }
     };
 
     return (

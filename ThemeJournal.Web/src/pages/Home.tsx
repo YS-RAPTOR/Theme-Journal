@@ -15,6 +15,8 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import Indented from "@/components/IndentedText";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { toast } from "sonner";
+import { redirect } from "react-router-dom";
 
 // Add the new task button. Allows to add a new task.
 const Home = () => {
@@ -59,8 +61,11 @@ const Home = () => {
                             </CardHeader>
                             <ScrollArea about="center" className="min-w-0">
                                 <CardContent className="flex gap-2 justify-center items-center">
-                                    {dates.map((date, index) => (
-                                        <Skeleton className="h-20 w-20 rounded-full" />
+                                    {dates.map((_, index) => (
+                                        <Skeleton
+                                            key={index}
+                                            className="h-20 w-20 rounded-full"
+                                        />
                                     ))}
                                     <ScrollBar orientation="horizontal" />
                                 </CardContent>
@@ -89,8 +94,9 @@ const Home = () => {
     const activeTheme = GetActiveTheme(ThemesQuery.data);
 
     if (activeTheme === null) {
-        // Redirect to the theme page if no theme is active
-        return <div>loading...</div>;
+        toast.error("No active theme found. Please Add a theme!");
+        redirect("/themes");
+        return <div></div>;
     }
 
     return (

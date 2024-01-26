@@ -41,6 +41,7 @@ import {
     GetActiveTheme,
     GetObjectives,
     GetTheme,
+    HandleError,
 } from "@/lib/api";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -166,8 +167,12 @@ const CreateTaskView = (props: { currentTheme: string }) => {
     };
 
     const onSubmit = async (task: z.infer<typeof TaskSchema>) => {
-        await CreateTaskMutation.mutateAsync(task as TaskTypePost);
-        onModalOpenChange(false);
+        try {
+            await CreateTaskMutation.mutateAsync(task as TaskTypePost);
+            onModalOpenChange(false);
+        } catch (err) {
+            HandleError(err);
+        }
     };
 
     return (

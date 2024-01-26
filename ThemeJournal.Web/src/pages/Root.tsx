@@ -4,7 +4,6 @@ import { Separator } from "@/components/ui/separator";
 import Profile from "@/components/Profile";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 const Root = () => {
     const { instance } = useMsal();
@@ -111,7 +110,6 @@ const Root = () => {
         </>
     );
 };
-// TODO:  Fix Error messages
 // TODO: Better Date transforming algorithm. Issue might be with progress where today of system time is used instead of utc.
 // TODO: Convert Popover to Drawer for better mobile support
 // TODO: Add User Settings (Time)

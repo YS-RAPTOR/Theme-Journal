@@ -1,6 +1,7 @@
 import axios from "axios";
 import { QueryClient } from "react-query";
 import * as Types from "./types";
+import { toast } from "sonner";
 
 // Create axios instance
 export const axiosInstance = axios.create({
@@ -36,6 +37,21 @@ export const GetDates = () => {
         dates.push(new Date(today.getTime() + i * 86400000));
     }
     return dates;
+};
+
+export const HandleError = (err: any) => {
+    if (err instanceof Error) {
+        if (err.message.length > 255) {
+            toast.error("Internal Server Error");
+            console.error(err);
+        } else {
+            toast.error(err.message);
+            console.error(err);
+        }
+    } else {
+        toast.error("Internal Server Error");
+        console.error(err);
+    }
 };
 
 export const GetActiveTheme = (data: undefined | Types.ThemeType[]) => {

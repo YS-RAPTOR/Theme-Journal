@@ -2,7 +2,7 @@ import { ThemeType } from "../lib/types";
 import { PiClockClockwiseBold } from "react-icons/pi";
 import { useState } from "react";
 import { useMutation, useQueryClient } from "react-query";
-import { ExtendTheme, FixDate } from "../lib/api";
+import { ExtendTheme, FixDate, HandleError } from "../lib/api";
 import * as z from "zod";
 import {
     Dialog,
@@ -116,15 +116,17 @@ const ExtendThemeView = (props: { theme: ThemeType; maxDate?: Date }) => {
     };
 
     const onSubmit = async (data: z.infer<typeof ExtendSchema>) => {
-        // @ts-ignore
-        await ExtendThemeMutation.mutateAsync({
-            id: props.theme.id,
-            title: props.theme.title,
-            startDate: props.theme.startDate,
-            endDate: data.endDate,
-        });
-
-        onModalOpenChange(false);
+        try {
+            await ExtendThemeMutation.mutateAsync({
+                id: props.theme.id,
+                title: props.theme.title,
+                startDate: props.theme.startDate,
+                endDate: data.endDate,
+            });
+            onModalOpenChange(false);
+        } catch (err) {
+            HandleError(err);
+        }
     };
 
     return (

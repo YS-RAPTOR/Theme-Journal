@@ -62,6 +62,7 @@ import {
     TransformDate,
     EditTask,
     UpsertProgress,
+    HandleError,
 } from "@/lib/api";
 import { useQuery } from "react-query";
 import TaskProgress from "./TaskProgress";
@@ -72,8 +73,8 @@ import { uuidv7 } from "uuidv7";
 import { Skeleton } from "./ui/skeleton";
 
 const TaskView = (props: {
-    task?: TaskTypeGet;
-    currentTheme?: ThemeType;
+    task: TaskTypeGet;
+    currentTheme: ThemeType;
     dates: Array<Date>;
 }) => {
     const today = props.dates[3];
@@ -136,10 +137,7 @@ const TaskView = (props: {
                 <CardHeader className="relative">
                     <CardTitle className="flex gap-2 max-w-[90%] flex-wrap items-center">
                         <Skeleton className="w-[250px] h-6" />
-                        {props.task.objectiveDescription &&
-                            props.task.objectiveColor && (
-                                <Skeleton className="w-8 h-4" />
-                            )}
+                        <Skeleton className="w-8 h-4" />
                     </CardTitle>
                     <CardDescription>
                         <Indented>
@@ -153,8 +151,11 @@ const TaskView = (props: {
                 </CardHeader>
                 <ScrollArea about="center" className="min-w-0">
                     <CardContent className="flex gap-2 justify-center items-center">
-                        {props.dates.map((date, index) => (
-                            <Skeleton className="h-20 w-20 rounded-full" />
+                        {props.dates.map((_, index) => (
+                            <Skeleton
+                                key={index}
+                                className="h-20 w-20 rounded-full"
+                            />
                         ))}
                         <ScrollBar orientation="horizontal" />
                     </CardContent>
@@ -209,20 +210,26 @@ const TaskView = (props: {
                                 const progress = props.task.progress?.get(
                                     date.getTime(),
                                 );
-                                if (progress) {
-                                    UpsertTaskProgress.mutate({
-                                        id: progress.id,
-                                        taskId: props.task.id,
-                                        progress: (progress.progress + 1) % 3,
-                                        completionDate: progress.completionDate,
-                                    });
-                                } else {
-                                    UpsertTaskProgress.mutate({
-                                        id: uuidv7(),
-                                        taskId: props.task.id,
-                                        progress: 1,
-                                        completionDate: date,
-                                    });
+                                try {
+                                    if (progress) {
+                                        UpsertTaskProgress.mutate({
+                                            id: progress.id,
+                                            taskId: props.task.id,
+                                            progress:
+                                                (progress.progress + 1) % 3,
+                                            completionDate:
+                                                progress.completionDate,
+                                        });
+                                    } else {
+                                        UpsertTaskProgress.mutate({
+                                            id: uuidv7(),
+                                            taskId: props.task.id,
+                                            progress: 1,
+                                            completionDate: date,
+                                        });
+                                    }
+                                } catch (err) {
+                                    HandleError(err);
                                 }
                             }}
                             progress={props.task.progress?.get(date.getTime())}
@@ -373,8 +380,12 @@ const EditTaskView = (props: {
     };
 
     const onSubmit = async (task: z.infer<typeof TaskSchema>) => {
-        await EditTaskMutation.mutateAsync(task as TaskTypePost);
-        onModalOpenChange(false);
+        try {
+            await EditTaskMutation.mutateAsync(task as TaskTypePost);
+            onModalOpenChange(false);
+        } catch (err) {
+            HandleError(err);
+        }
     };
 
     return (
@@ -704,11 +715,15 @@ const ExtendTaskView = (props: { task: TaskTypeGet; maxDate: Date }) => {
     };
 
     const onSubmit = async (data: z.infer<typeof ExtendSchema>) => {
-        await ExtendTaskMutation.mutateAsync({
-            ...props.task,
-            endDate: TransformDate(data.endDate),
-        });
-        onModalOpenChange(false);
+        try {
+            await ExtendTaskMutation.mutateAsync({
+                ...props.task,
+                endDate: TransformDate(data.endDate),
+            });
+            onModalOpenChange(false);
+        } catch (err) {
+            HandleError(err);
+        }
     };
 
     return (

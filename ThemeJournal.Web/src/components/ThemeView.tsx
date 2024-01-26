@@ -6,6 +6,7 @@ import {
     CreateObjectives,
     EditTheme,
     FixDate,
+    HandleError,
 } from "../lib/api";
 
 import { NumberOfColors, colors } from "../lib/constants";
@@ -15,7 +16,6 @@ import { uuidv7 } from "uuidv7";
 import { useState } from "react";
 import ExtendTheme from "./ExtendTheme";
 import FetchError from "./FetchError";
-import Loading from "./Loading";
 import {
     Card,
     CardHeader,
@@ -107,14 +107,11 @@ const ThemeView = (props: { theme: ThemeType }) => {
                 </CardDescription>
                 {/* If Active can only extend else can edit*/}
                 <div className="top-4 right-4 absolute">
-                    {
-                        // @ts-ignore
-                        isThemeActive() ? (
-                            <ExtendTheme theme={props.theme} />
-                        ) : (
-                            <EditThemeView theme={props.theme} />
-                        )
-                    }
+                    {isThemeActive() ? (
+                        <ExtendTheme theme={props.theme} />
+                    ) : (
+                        <EditThemeView theme={props.theme} />
+                    )}
                 </div>
             </CardHeader>
             <CardContent ref={animationRef} className="flex flex-col gap-2">
@@ -229,9 +226,12 @@ const EditThemeView = (props: { theme: ThemeType }) => {
     };
 
     const onSubmit = async (theme: z.infer<typeof ThemeSchema>) => {
-        // @ts-ignore
-        await EditThemeMutation.mutateAsync(theme);
-        onModalOpenChange(false);
+        try {
+            await EditThemeMutation.mutateAsync(theme);
+            onModalOpenChange(false);
+        } catch (err) {
+            HandleError(err);
+        }
     };
 
     return (
@@ -464,12 +464,15 @@ const AddObjectiveView = (props: { themeId: string }) => {
     });
 
     const onSubmit = async (objective: z.infer<typeof ObjectiveSchema>) => {
-        // @ts-ignore
-        await CreateObjectivesMutation.mutateAsync({
-            themeId: props.themeId,
-            objectives: [objective],
-        });
-        onModalOpenChange(false);
+        try {
+            await CreateObjectivesMutation.mutateAsync({
+                themeId: props.themeId,
+                objectives: [objective],
+            });
+            onModalOpenChange(false);
+        } catch (err) {
+            HandleError(err);
+        }
     };
 
     return (
