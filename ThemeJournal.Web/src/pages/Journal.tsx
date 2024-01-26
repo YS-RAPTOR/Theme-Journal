@@ -179,14 +179,30 @@ const JournalInner = ({
             return { previousGratitudes };
         },
         onError: (
-            _err,
-            _newGratitude: GratitudesType,
+            err,
+            newGratitude: GratitudesType,
             context: { previousGratitudes: GratitudesType[] },
         ) => {
             queryClient.setQueryData<GratitudesType[]>(
                 ["todaysGratitudes"],
                 context.previousGratitudes,
             );
+
+            const gratitude = context.previousGratitudes.find(
+                (grat) => grat.id === newGratitude.id,
+            );
+
+            if (gratitude) {
+                if (gratitude.time === TimeOfDay.Day1) {
+                    setDay1Gratitude(gratitude);
+                } else if (gratitude.time === TimeOfDay.Day2) {
+                    setDay2Gratitude(gratitude);
+                } else if (gratitude.time === TimeOfDay.Night) {
+                    setNightGratitude(gratitude);
+                }
+            }
+
+            HandleError(err);
         },
         onSettled: () => {
             queryClient.invalidateQueries(["todaysGratitudes"]);
@@ -218,14 +234,24 @@ const JournalInner = ({
             return { previousThoughts };
         },
         onError: (
-            _err: any,
-            _newThought: ThoughtsType,
+            err: any,
+            newThought: ThoughtsType,
             context: { previousThoughts: ThoughtsType[] },
         ) => {
             queryClient.setQueryData<ThoughtsType[]>(
                 ["todaysThoughts"],
                 context.previousThoughts,
             );
+
+            const thought = context.previousThoughts.find(
+                (th) => th.id === newThought.id,
+            );
+
+            if (thought) {
+                setThoughts(thought);
+            }
+
+            HandleError(err);
         },
         onSettled: () => {
             queryClient.invalidateQueries(["todaysThoughts"]);
@@ -242,11 +268,7 @@ const JournalInner = ({
             description: value,
         };
         setValue(updated);
-        try {
-            GratitudeMutation.mutate(updated);
-        } catch (err) {
-            HandleError(err);
-        }
+        GratitudeMutation.mutate(updated);
     };
 
     return (
@@ -308,11 +330,7 @@ const JournalInner = ({
                                     thought: e.target.value,
                                 };
                                 setThoughts(updated);
-                                try {
-                                    ThoughtMutation.mutate(updated);
-                                } catch (err) {
-                                    HandleError(err);
-                                }
+                                ThoughtMutation.mutate(updated);
                             }}
                             className="bg-lime-200"
                         ></Textarea>

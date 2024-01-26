@@ -187,7 +187,7 @@ const EditObjectiveView = (props: {
             return { previousObjectives: previousObjectives };
         },
         onError: (
-            _err: Error,
+            err: Error,
             _newObjective: ObjectiveType,
             context: { previousObjectives: ObjectiveType[] },
         ) => {
@@ -195,6 +195,7 @@ const EditObjectiveView = (props: {
                 ["objectives", props.themeId],
                 context!.previousObjectives,
             );
+            HandleError(err);
         },
         onSettled: () => {
             queryClient.invalidateQueries({
@@ -217,16 +218,12 @@ const EditObjectiveView = (props: {
     });
 
     const onSubmit = async (objective: z.infer<typeof ObjectiveSchema>) => {
-        try {
-            await EditObjectiveMutation.mutateAsync({
-                id: objective.id,
-                description: props.objectives[props.index].description,
-                colorId: objective.colorId,
-            });
-            onModalOpenChange(false);
-        } catch (err) {
-            HandleError(err);
-        }
+        await EditObjectiveMutation.mutateAsync({
+            id: objective.id,
+            description: props.objectives[props.index].description,
+            colorId: objective.colorId,
+        });
+        onModalOpenChange(false);
     };
 
     return (

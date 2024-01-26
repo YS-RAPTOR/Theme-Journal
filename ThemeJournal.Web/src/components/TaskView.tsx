@@ -71,6 +71,7 @@ import { Badge } from "./ui/badge";
 import { colors } from "@/lib/constants";
 import { uuidv7 } from "uuidv7";
 import { Skeleton } from "./ui/skeleton";
+import { toast } from "sonner";
 
 const TaskView = (props: {
     task: TaskTypeGet;
@@ -111,11 +112,12 @@ const TaskView = (props: {
             return { previousTasks };
         },
         onError: (
-            _err: Error,
+            err: Error,
             _progress: any,
             context: { previousTasks: TaskTypeGet[] },
         ) => {
             queryClient.setQueryData(["currentTasks"], context!.previousTasks);
+            HandleError(err);
         },
         onSettled: () => {
             queryClient.invalidateQueries({
@@ -210,26 +212,20 @@ const TaskView = (props: {
                                 const progress = props.task.progress?.get(
                                     date.getTime(),
                                 );
-                                try {
-                                    if (progress) {
-                                        UpsertTaskProgress.mutate({
-                                            id: progress.id,
-                                            taskId: props.task.id,
-                                            progress:
-                                                (progress.progress + 1) % 3,
-                                            completionDate:
-                                                progress.completionDate,
-                                        });
-                                    } else {
-                                        UpsertTaskProgress.mutate({
-                                            id: uuidv7(),
-                                            taskId: props.task.id,
-                                            progress: 1,
-                                            completionDate: date,
-                                        });
-                                    }
-                                } catch (err) {
-                                    HandleError(err);
+                                if (progress) {
+                                    UpsertTaskProgress.mutate({
+                                        id: progress.id,
+                                        taskId: props.task.id,
+                                        progress: (progress.progress + 1) % 3,
+                                        completionDate: progress.completionDate,
+                                    });
+                                } else {
+                                    UpsertTaskProgress.mutate({
+                                        id: uuidv7(),
+                                        taskId: props.task.id,
+                                        progress: 1,
+                                        completionDate: date,
+                                    });
                                 }
                             }}
                             progress={props.task.progress?.get(date.getTime())}
@@ -317,11 +313,12 @@ const EditTaskView = (props: {
             return { previousTasks };
         },
         onError: (
-            _err: Error,
+            err: Error,
             _newTask: TaskTypePost,
             context: { previousTasks: TaskTypeGet[] },
         ) => {
             queryClient.setQueryData(["currentTasks"], context!.previousTasks);
+            HandleError(err);
         },
         onSettled: () => {
             queryClient.invalidateQueries({
@@ -380,12 +377,8 @@ const EditTaskView = (props: {
     };
 
     const onSubmit = async (task: z.infer<typeof TaskSchema>) => {
-        try {
-            await EditTaskMutation.mutateAsync(task as TaskTypePost);
-            onModalOpenChange(false);
-        } catch (err) {
-            HandleError(err);
-        }
+        await EditTaskMutation.mutateAsync(task as TaskTypePost);
+        onModalOpenChange(false);
     };
 
     return (
@@ -670,11 +663,12 @@ const ExtendTaskView = (props: { task: TaskTypeGet; maxDate: Date }) => {
             return { previousTasks };
         },
         onError: (
-            _err: Error,
+            err: Error,
             _newTask: TaskTypeGet,
             context: { previousTasks: TaskTypeGet[] },
         ) => {
             queryClient.setQueryData(["currentTasks"], context!.previousTasks);
+            HandleError(err);
         },
         onSettled: () => {
             queryClient.invalidateQueries({
@@ -715,15 +709,11 @@ const ExtendTaskView = (props: { task: TaskTypeGet; maxDate: Date }) => {
     };
 
     const onSubmit = async (data: z.infer<typeof ExtendSchema>) => {
-        try {
-            await ExtendTaskMutation.mutateAsync({
-                ...props.task,
-                endDate: TransformDate(data.endDate),
-            });
-            onModalOpenChange(false);
-        } catch (err) {
-            HandleError(err);
-        }
+        await ExtendTaskMutation.mutateAsync({
+            ...props.task,
+            endDate: TransformDate(data.endDate),
+        });
+        onModalOpenChange(false);
     };
 
     return (

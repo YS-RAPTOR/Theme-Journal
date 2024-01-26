@@ -105,7 +105,7 @@ const CreateThemeView = (props: { endDate: Date }) => {
             return { previousObjectives };
         },
         onError: (
-            _err: Error,
+            err: Error,
             newObjectives: {
                 themeId: string;
                 objectives: Array<ObjectiveType>;
@@ -116,6 +116,7 @@ const CreateThemeView = (props: { endDate: Date }) => {
                 ["objectives", newObjectives.themeId],
                 context!.previousObjectives,
             );
+            HandleError(err);
         },
         onSettled: (
             _data: any,
@@ -190,16 +191,12 @@ const CreateThemeView = (props: { endDate: Date }) => {
     };
 
     const onSubmit = async (theme: z.infer<typeof ThemeSchema>) => {
-        try {
-            await CreateThemeMutation.mutateAsync(theme as ThemeType);
-            await CreateObjectivesMutation.mutateAsync({
-                themeId: theme.id,
-                objectives: theme.objectives as ObjectiveType[],
-            });
-            onModalOpenChange(false);
-        } catch (err) {
-            HandleError(err);
-        }
+        await CreateThemeMutation.mutateAsync(theme as ThemeType);
+        await CreateObjectivesMutation.mutateAsync({
+            themeId: theme.id,
+            objectives: theme.objectives as ObjectiveType[],
+        });
+        onModalOpenChange(false);
     };
 
     return (

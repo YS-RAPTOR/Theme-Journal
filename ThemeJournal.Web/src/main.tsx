@@ -29,7 +29,7 @@ import NotFound from "./pages/NotFound.tsx";
 
 // CSS
 import "./index.css";
-import { Toaster } from "./components/ui/sonner.tsx";
+import { Toaster } from "@/components/ui/sonner";
 
 // Create msal instance
 const msalInstance = new PublicClientApplication(msalConfig);
@@ -87,7 +87,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <MsalProvider instance={msalInstance}>
                 <QueryClientProvider client={queryClient}>
                     <RouterProvider router={router} />
-                    <Toaster className="font-virgil" />
+                    <Toaster />
                 </QueryClientProvider>
             </MsalProvider>
         </Provider>

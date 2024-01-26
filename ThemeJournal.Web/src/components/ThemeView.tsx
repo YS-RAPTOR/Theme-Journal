@@ -169,7 +169,7 @@ const EditThemeView = (props: { theme: ThemeType }) => {
             return { previousThemes };
         },
         onError: (
-            _err: Error,
+            err: Error,
             _newObjective: ThemeType,
             context: { previousThemes: ThemeType[] },
         ) => {
@@ -177,6 +177,7 @@ const EditThemeView = (props: { theme: ThemeType }) => {
                 ["currentThemes"],
                 context!.previousThemes,
             );
+            HandleError(err);
         },
         onSettled: () => {
             queryClient.invalidateQueries({
@@ -226,12 +227,8 @@ const EditThemeView = (props: { theme: ThemeType }) => {
     };
 
     const onSubmit = async (theme: z.infer<typeof ThemeSchema>) => {
-        try {
-            await EditThemeMutation.mutateAsync(theme);
-            onModalOpenChange(false);
-        } catch (err) {
-            HandleError(err);
-        }
+        await EditThemeMutation.mutateAsync(theme);
+        onModalOpenChange(false);
     };
 
     return (
@@ -417,7 +414,7 @@ const AddObjectiveView = (props: { themeId: string }) => {
             return { previousObjectives };
         },
         onError: (
-            _err: Error,
+            err: Error,
             newObjectives: {
                 themeId: string;
                 objectives: Array<ObjectiveType>;
@@ -428,6 +425,7 @@ const AddObjectiveView = (props: { themeId: string }) => {
                 ["objectives", newObjectives.themeId],
                 context!.previousObjectives,
             );
+            HandleError(err);
         },
         onSettled: (
             _data: any,
@@ -464,15 +462,11 @@ const AddObjectiveView = (props: { themeId: string }) => {
     });
 
     const onSubmit = async (objective: z.infer<typeof ObjectiveSchema>) => {
-        try {
-            await CreateObjectivesMutation.mutateAsync({
-                themeId: props.themeId,
-                objectives: [objective],
-            });
-            onModalOpenChange(false);
-        } catch (err) {
-            HandleError(err);
-        }
+        await CreateObjectivesMutation.mutateAsync({
+            themeId: props.themeId,
+            objectives: [objective],
+        });
+        onModalOpenChange(false);
     };
 
     return (

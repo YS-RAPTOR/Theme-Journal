@@ -54,7 +54,7 @@ const ExtendThemeView = (props: { theme: ThemeType; maxDate?: Date }) => {
             return { previousThemes };
         },
         onError: (
-            _err: Error,
+            err: Error,
             _newObjective: ThemeType,
             context: { previousThemes: ThemeType[] },
         ) => {
@@ -62,6 +62,7 @@ const ExtendThemeView = (props: { theme: ThemeType; maxDate?: Date }) => {
                 ["currentThemes"],
                 context!.previousThemes,
             );
+            HandleError(err);
         },
         onSettled: () => {
             queryClient.invalidateQueries({
@@ -116,17 +117,13 @@ const ExtendThemeView = (props: { theme: ThemeType; maxDate?: Date }) => {
     };
 
     const onSubmit = async (data: z.infer<typeof ExtendSchema>) => {
-        try {
-            await ExtendThemeMutation.mutateAsync({
-                id: props.theme.id,
-                title: props.theme.title,
-                startDate: props.theme.startDate,
-                endDate: data.endDate,
-            });
-            onModalOpenChange(false);
-        } catch (err) {
-            HandleError(err);
-        }
+        await ExtendThemeMutation.mutateAsync({
+            id: props.theme.id,
+            title: props.theme.title,
+            startDate: props.theme.startDate,
+            endDate: data.endDate,
+        });
+        onModalOpenChange(false);
     };
 
     return (

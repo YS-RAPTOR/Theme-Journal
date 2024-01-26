@@ -101,11 +101,12 @@ const CreateTaskView = (props: { currentTheme: string }) => {
             return { previousTasks };
         },
         onError: (
-            _err: Error,
+            err: Error,
             _newTask: TaskTypePost,
             context: { previousTasks: TaskTypePost[] },
         ) => {
             queryClient.setQueryData(["currentTasks"], context!.previousTasks);
+            HandleError(err);
         },
         onSettled: () => {
             queryClient.invalidateQueries({ queryKey: ["currentTasks"] });
@@ -167,12 +168,8 @@ const CreateTaskView = (props: { currentTheme: string }) => {
     };
 
     const onSubmit = async (task: z.infer<typeof TaskSchema>) => {
-        try {
-            await CreateTaskMutation.mutateAsync(task as TaskTypePost);
-            onModalOpenChange(false);
-        } catch (err) {
-            HandleError(err);
-        }
+        await CreateTaskMutation.mutateAsync(task as TaskTypePost);
+        onModalOpenChange(false);
     };
 
     return (

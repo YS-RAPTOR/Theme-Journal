@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { QueryClient } from "react-query";
 import * as Types from "./types";
 import { toast } from "sonner";
@@ -40,17 +40,20 @@ export const GetDates = () => {
 };
 
 export const HandleError = (err: any) => {
-    if (err instanceof Error) {
-        if (err.message.length > 255) {
-            toast.error("Internal Server Error");
-            console.error(err);
+    if (err instanceof AxiosError) {
+        if (err.response == undefined || err.response.data > 255) {
+            toast.error("Uh oh! Something went wrong.", {
+                description: "There was an internal server error",
+            });
         } else {
-            toast.error(err.message);
-            console.error(err);
+            toast.error("Uh oh! Something went wrong.", {
+                description: err.response.data,
+            });
         }
     } else {
-        toast.error("Internal Server Error");
-        console.error(err);
+        toast.error("Uh oh! Something went wrong.", {
+            description: "There was an internal server error",
+        });
     }
 };
 
@@ -312,7 +315,6 @@ export const CreateTask = async ({
         startDate: FixTime(startDate).toISOString(),
         endDate: FixTime(endDate).toISOString(),
     };
-    console.log(data);
     return axiosInstance.post("/Task", data).then((res) => {
         return res.data;
     });

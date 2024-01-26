@@ -4,6 +4,7 @@ import { Separator } from "@/components/ui/separator";
 import Profile from "@/components/Profile";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const Root = () => {
     const { instance } = useMsal();
