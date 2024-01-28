@@ -16,7 +16,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Indented from "@/components/IndentedText";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
-import { redirect } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 // Add the new task button. Allows to add a new task.
 const Home = () => {
@@ -33,6 +33,8 @@ const Home = () => {
         queryKey: ["currentTasks"],
         queryFn: () => GetTask(dates[6], dates[0]),
     });
+
+    const navigate = useNavigate();
 
     if (ThemesQuery.isLoading || TasksQuery.isLoading) {
         // Show a loading screen if the themes are loading
@@ -77,11 +79,7 @@ const Home = () => {
         );
     }
 
-    if (
-        ThemesQuery.isError ||
-        TasksQuery.isError ||
-        TasksQuery.data === undefined
-    ) {
+    if (ThemesQuery.isError || TasksQuery.isError) {
         return (
             <div className="flex h-screen">
                 <main className="flex w-full flex-auto flex-col ">
@@ -91,12 +89,12 @@ const Home = () => {
         );
     }
 
-    const activeTheme = GetActiveTheme(ThemesQuery.data);
+    const activeTheme = GetActiveTheme(ThemesQuery.data) ?? null;
 
     if (activeTheme === null) {
         toast.error("No active theme found. Please Add a theme!");
-        redirect("/themes");
-        return <div></div>;
+        navigate("/theme");
+        return <></>;
     }
 
     return (
@@ -105,7 +103,7 @@ const Home = () => {
                 ref={animationRef}
                 className="flex w-full max-w-[1054px] flex-auto flex-col gap-3 p-2"
             >
-                {TasksQuery.data.map((task) => (
+                {TasksQuery.data!.map((task) => (
                     <TaskView
                         task={task}
                         dates={dates}

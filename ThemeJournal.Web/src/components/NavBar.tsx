@@ -4,7 +4,7 @@ import {
     PiHouseDuotone,
     PiCompassDuotone,
 } from "react-icons/pi";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import {
     NavigationMenu,
@@ -53,6 +53,10 @@ const NavBar = (props: { className?: string }) => {
     };
 
     const [selected, setSelected] = useState(InitialSelected());
+
+    useEffect(() => {
+        setSelected(InitialSelected());
+    }, [location]);
 
     return (
         <NavigationMenu className={props.className}>
