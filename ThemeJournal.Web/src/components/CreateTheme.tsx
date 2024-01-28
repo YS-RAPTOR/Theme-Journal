@@ -69,7 +69,7 @@ const CreateThemeView = (props: { endDate: Date }) => {
             return { previousThemes };
         },
         onError: (
-            _err: Error,
+            err: Error,
             _newTheme: ThemeType,
             context: { previousThemes: ThemeType[] },
         ) => {
@@ -77,6 +77,7 @@ const CreateThemeView = (props: { endDate: Date }) => {
                 ["currentThemes"],
                 context!.previousThemes,
             );
+            HandleError(err);
         },
         onSettled: () => {
             queryClient.invalidateQueries({ queryKey: ["currentThemes"] });

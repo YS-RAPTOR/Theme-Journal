@@ -74,7 +74,7 @@ const ObjectiveView = (props: {
             return { previousObjectives: previousObjectives };
         },
         onError: (
-            _err: Error,
+            err: Error,
             _objectiveToDelete: { id: string; themeId: string; index: number },
             context: { previousObjectives: ObjectiveType[] },
         ) => {
@@ -82,6 +82,7 @@ const ObjectiveView = (props: {
                 ["objectives", props.themeId],
                 context!.previousObjectives,
             );
+            HandleError(err);
         },
         onSettled: () => {
             queryClient.invalidateQueries({
