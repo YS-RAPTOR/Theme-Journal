@@ -1,6 +1,6 @@
 import ThemeView from "../components/ThemeView";
 import { ThemeType } from "../lib/types";
-import { GetTheme } from "../lib/api";
+import { GetTheme, TransformDate } from "../lib/api";
 import { useQuery } from "react-query";
 import FetchError from "../components/FetchError";
 import CreateTheme from "../components/CreateTheme";
@@ -20,7 +20,7 @@ const Theme = () => {
 
     const ThemesQuery = useQuery({
         queryKey: ["currentThemes"],
-        queryFn: () => GetTheme(null, new Date()),
+        queryFn: () => GetTheme(null, TransformDate(new Date())),
     });
 
     if (ThemesQuery.isLoading) {
@@ -84,7 +84,7 @@ const Theme = () => {
                         endDate={
                             ThemesQuery.data!.length > 0
                                 ? ThemesQuery.data![0].endDate
-                                : new Date()
+                                : TransformDate(new Date())
                         }
                     />
                 )}

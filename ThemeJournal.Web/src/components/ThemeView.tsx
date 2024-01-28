@@ -7,6 +7,7 @@ import {
     EditTheme,
     FixDate,
     HandleError,
+    TransformDate,
 } from "../lib/api";
 
 import { NumberOfColors, colors } from "../lib/constants";
@@ -58,7 +59,7 @@ import { Skeleton } from "./ui/skeleton";
 
 const ThemeView = (props: { theme: ThemeType }) => {
     const isThemeActive = () => {
-        const today = new Date();
+        const today = TransformDate(new Date());
         return today >= props.theme.startDate && today < props.theme.endDate;
     };
     const objectivesQuery = useQuery({
@@ -189,7 +190,7 @@ const EditThemeView = (props: { theme: ThemeType }) => {
     // @ts-ignore
     const endDate = queryClient.getQueryData(["currentThemes"])[0].endDate;
 
-    const today = new Date();
+    const today = TransformDate(new Date());
     const minDate = FixDate(today < endDate ? endDate : today);
 
     const ThemeSchema = z

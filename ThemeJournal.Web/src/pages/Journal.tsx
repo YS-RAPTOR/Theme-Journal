@@ -4,6 +4,7 @@ import {
     GetGratitude,
     GetThought,
     HandleError,
+    TransformDate,
     UpsertGratitude,
     UpsertThought,
 } from "../lib/api";
@@ -26,13 +27,13 @@ const GetGratitudeByTime = (
         id: uuidv7obj(),
         time: time,
         description: "",
-        createdAt: new Date(),
+        createdAt: TransformDate(new Date()),
         sentiment: 0,
     };
 };
 
 const Journal = () => {
-    const today = new Date();
+    const today = TransformDate(new Date());
     const tomorrow = new Date(today.getTime() + 86400000);
     const gratitudeQuery = useQuery({
         queryKey: ["todaysGratitudes"],
@@ -147,7 +148,7 @@ const JournalInner = ({
             ? {
                   id: uuidv7obj(),
                   thought: "",
-                  createdAt: new Date(),
+                  createdAt: TransformDate(new Date()),
               }
             : thoughtQuery.data[0],
     );

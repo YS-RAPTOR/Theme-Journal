@@ -251,7 +251,7 @@ const EditTaskView = (props: {
 }) => {
     const queryClient = useQueryClient();
     const [modalOpen, setModalOpen] = useState(false);
-    const minDate = FixDate(new Date());
+    const minDate = FixDate(TransformDate(new Date()));
     const NoObjectiveMessage = "No Objective";
 
     const ObjectivesQuery = useQuery({
@@ -678,10 +678,12 @@ const ExtendTaskView = (props: { task: TaskTypeGet; maxDate: Date }) => {
     });
 
     const minDate = FixDate(
-        new Date(
-            props.task.endDate.getFullYear(),
-            props.task.endDate.getMonth(),
-            props.task.endDate.getDate() + 1,
+        TransformDate(
+            new Date(
+                props.task.endDate.getFullYear(),
+                props.task.endDate.getMonth(),
+                props.task.endDate.getDate() + 1,
+            ),
         ),
     );
 

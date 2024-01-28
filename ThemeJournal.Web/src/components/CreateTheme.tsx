@@ -4,6 +4,7 @@ import {
     CreateTheme,
     FixDate,
     HandleError,
+    TransformDate,
 } from "../lib/api";
 import { ThemeType, ObjectiveType } from "../lib/types";
 import { uuidv7 } from "uuidv7";
@@ -132,7 +133,7 @@ const CreateThemeView = (props: { endDate: Date }) => {
         },
     });
 
-    const today = new Date();
+    const today = TransformDate(new Date());
     let minDate = today < props.endDate ? props.endDate : today;
     minDate = FixDate(minDate);
 

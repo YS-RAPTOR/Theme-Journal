@@ -42,6 +42,7 @@ import {
     GetObjectives,
     GetTheme,
     HandleError,
+    TransformDate,
 } from "@/lib/api";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -52,7 +53,7 @@ import { TaskTypePost } from "@/lib/types";
 const CreateTaskView = (props: { currentTheme: string }) => {
     const queryClient = useQueryClient();
     const [modalOpen, setModalOpen] = useState(false);
-    const minDate = FixDate(new Date());
+    const minDate = FixDate(TransformDate(new Date()));
     const NoObjectiveMessage = "No Objective";
 
     const ObjectivesQuery = useQuery({
@@ -62,7 +63,7 @@ const CreateTaskView = (props: { currentTheme: string }) => {
 
     const ThemesQuery = useQuery({
         queryKey: ["currentThemes"],
-        queryFn: () => GetTheme(null, new Date()),
+        queryFn: () => GetTheme(null, TransformDate(new Date())),
     });
 
     const activeTheme = GetActiveTheme(ThemesQuery.data);

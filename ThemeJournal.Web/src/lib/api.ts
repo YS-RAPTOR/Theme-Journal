@@ -16,7 +16,7 @@ export const FixDate = (date: Date) => {
     return date;
 };
 
-export const TransformDateWithSubtraction = (date: Date) => {
+export const TransformDate = (date: Date) => {
     const transform = new Date(date);
     transform.setHours(4, 0, 0, 0);
 
@@ -27,16 +27,11 @@ export const TransformDateWithSubtraction = (date: Date) => {
     return transform;
 };
 
-export const TransformDate = (date: Date) => {
-    date.setHours(4, 0, 0, 0);
-    return date;
-};
-
 export const GetDates = () => {
     // Get Dates from range -3 days to +3 days
     const dates = [];
     const DATERANGE = 3;
-    const today = TransformDateWithSubtraction(new Date());
+    const today = TransformDate(new Date());
 
     for (let i = -DATERANGE; i <= DATERANGE; i++) {
         dates.push(new Date(today.getTime() + i * 86400000));
@@ -66,7 +61,7 @@ export const GetActiveTheme = (data: undefined | Types.ThemeType[]) => {
     if (data === undefined) {
         return null;
     }
-    const today = new Date();
+    const today = TransformDate(new Date());
     return data.filter(
         (theme) => theme.startDate <= today && today < theme.endDate,
     )[0];

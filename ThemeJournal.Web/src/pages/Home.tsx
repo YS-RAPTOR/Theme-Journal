@@ -1,5 +1,5 @@
 import TaskView from "@/components/TaskView";
-import { GetActiveTheme, GetDates, GetTask } from "@/lib/api";
+import { GetActiveTheme, GetDates, GetTask, TransformDate } from "@/lib/api";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { GetTheme } from "../lib/api";
 import { useQuery } from "react-query";
@@ -26,7 +26,7 @@ const Home = () => {
 
     const ThemesQuery = useQuery({
         queryKey: ["currentThemes"],
-        queryFn: () => GetTheme(null, new Date()),
+        queryFn: () => GetTheme(null, TransformDate(new Date())),
     });
 
     const TasksQuery = useQuery({
