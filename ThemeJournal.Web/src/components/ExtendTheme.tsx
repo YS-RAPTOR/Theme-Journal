@@ -2,7 +2,7 @@ import { ThemeType } from "../lib/types";
 import { PiClockClockwiseBold } from "react-icons/pi";
 import { useState } from "react";
 import { useMutation, useQueryClient } from "react-query";
-import { ExtendTheme, FixDate, HandleError, TransformDate } from "../lib/api";
+import { ExtendTheme, FixDate, HandleError } from "../lib/api";
 import * as z from "zod";
 import {
     Dialog,
@@ -72,12 +72,10 @@ const ExtendThemeView = (props: { theme: ThemeType; maxDate?: Date }) => {
     });
 
     const minDate = FixDate(
-        TransformDate(
-            new Date(
-                props.theme.endDate.getFullYear(),
-                props.theme.endDate.getMonth(),
-                props.theme.endDate.getDate() + 1,
-            ),
+        new Date(
+            props.theme.endDate.getFullYear(),
+            props.theme.endDate.getMonth(),
+            props.theme.endDate.getDate() + 1,
         ),
     );
 

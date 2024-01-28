@@ -71,7 +71,6 @@ import { Badge } from "./ui/badge";
 import { colors } from "@/lib/constants";
 import { uuidv7 } from "uuidv7";
 import { Skeleton } from "./ui/skeleton";
-import { toast } from "sonner";
 
 const TaskView = (props: {
     task: TaskTypeGet;
@@ -678,12 +677,10 @@ const ExtendTaskView = (props: { task: TaskTypeGet; maxDate: Date }) => {
     });
 
     const minDate = FixDate(
-        TransformDate(
-            new Date(
-                props.task.endDate.getFullYear(),
-                props.task.endDate.getMonth(),
-                props.task.endDate.getDate() + 1,
-            ),
+        new Date(
+            props.task.endDate.getFullYear(),
+            props.task.endDate.getMonth(),
+            props.task.endDate.getDate() + 1,
         ),
     );
 
@@ -713,7 +710,7 @@ const ExtendTaskView = (props: { task: TaskTypeGet; maxDate: Date }) => {
     const onSubmit = async (data: z.infer<typeof ExtendSchema>) => {
         await ExtendTaskMutation.mutateAsync({
             ...props.task,
-            endDate: TransformDate(data.endDate),
+            endDate: data.endDate,
         });
         onModalOpenChange(false);
     };

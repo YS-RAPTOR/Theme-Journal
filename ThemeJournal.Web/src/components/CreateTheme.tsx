@@ -193,12 +193,15 @@ const CreateThemeView = (props: { endDate: Date }) => {
     };
 
     const onSubmit = async (theme: z.infer<typeof ThemeSchema>) => {
-        await CreateThemeMutation.mutateAsync(theme as ThemeType);
-        await CreateObjectivesMutation.mutateAsync({
-            themeId: theme.id,
-            objectives: theme.objectives as ObjectiveType[],
-        });
-        onModalOpenChange(false);
+        try {
+            await CreateThemeMutation.mutateAsync(theme as ThemeType);
+            await CreateObjectivesMutation.mutateAsync({
+                themeId: theme.id,
+                objectives: theme.objectives as ObjectiveType[],
+            });
+            onModalOpenChange(false);
+        } finally {
+        }
     };
 
     return (
