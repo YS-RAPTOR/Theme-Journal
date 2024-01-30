@@ -143,6 +143,7 @@ const ExtendThemeView = (props: { theme: ThemeType; maxDate?: Date }) => {
                                         return date < minDate || date > maxDate;
                                     }
                                 }}
+                                defaultMonth={minDate}
                             />
                         </form>
                     </Form>

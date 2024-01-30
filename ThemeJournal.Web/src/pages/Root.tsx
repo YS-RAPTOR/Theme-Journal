@@ -111,7 +111,6 @@ const Root = () => {
     );
 };
 
-// TODO: Set Better Initial Focus for Calendar
 // TODO: Add User Settings (Time)
 // TODO: Sorting Tasks
 

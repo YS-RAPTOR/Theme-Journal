@@ -512,6 +512,7 @@ const EditTaskView = (props: {
                                 name="startDate"
                                 label="Start Date"
                                 disabled={(date) => date < minDate}
+                                defaultMonth={minDate}
                             />
                             <CalendarField
                                 control={form.control}
@@ -522,6 +523,7 @@ const EditTaskView = (props: {
                                     date < minDate ||
                                     date > props.currentTheme.endDate
                                 }
+                                defaultMonth={minDate}
                             />
                         </form>
                     </Form>
@@ -642,6 +644,7 @@ const ExtendTaskView = (props: { task: TaskTypeGet; maxDate: Date }) => {
                                 disabled={(date) =>
                                     date < minDate || date > maxDate
                                 }
+                                defaultMonth={minDate}
                             />
                         </form>
                     </Form>

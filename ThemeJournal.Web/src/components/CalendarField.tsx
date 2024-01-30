@@ -21,11 +21,13 @@ const CalendarField = ({
     name,
     disabled,
     control,
+    defaultMonth,
 }: {
     label: string;
     name: string;
     disabled: (date: Matcher | Matcher[]) => boolean;
     control: Control<any>;
+    defaultMonth: Matcher | Matcher[];
 }) => {
     const isDesktop = useMediaQuery("(min-width: 768px)");
 
@@ -67,6 +69,7 @@ const CalendarField = ({
                                     onSelect={field.onChange}
                                     disabled={disabled}
                                     today={TransformDate(new Date())}
+                                    defaultMonth={defaultMonth}
                                     initialFocus
                                 />
                             </PopoverContent>
@@ -99,6 +102,7 @@ const CalendarField = ({
                                     onSelect={field.onChange}
                                     disabled={disabled}
                                     today={TransformDate(new Date())}
+                                    defaultMonth={defaultMonth}
                                     initialFocus
                                 />
                             </DrawerContent>

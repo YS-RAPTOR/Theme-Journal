@@ -234,6 +234,7 @@ const CreateThemeView = (props: { endDate: Date }) => {
                                 name="startDate"
                                 label="Start Date"
                                 disabled={(date) => date < minDate}
+                                defaultMonth={minDate}
                             />
                             <CalendarField
                                 control={form.control}
@@ -243,6 +244,7 @@ const CreateThemeView = (props: { endDate: Date }) => {
                                     date <= form.getValues("startDate") ||
                                     date < minDate
                                 }
+                                defaultMonth={minDate}
                             />
                             <Separator />
                             <DialogTitle className="text-xl font-black">

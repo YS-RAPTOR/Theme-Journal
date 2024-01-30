@@ -308,6 +308,7 @@ const CreateTaskView = (props: { currentTheme: string }) => {
                                 label="Start Date"
                                 name="startDate"
                                 disabled={(date) => date < minDate}
+                                defaultMonth={minDate}
                             />
                             <CalendarField
                                 control={form.control}
@@ -318,6 +319,7 @@ const CreateTaskView = (props: { currentTheme: string }) => {
                                     date < minDate ||
                                     date > activeTheme!.endDate
                                 }
+                                defaultMonth={minDate}
                             />
                         </form>
                     </Form>
