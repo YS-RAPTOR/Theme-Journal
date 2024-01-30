@@ -54,6 +54,7 @@ specifiers:
   tailwindcss-animate: ^1.0.7
   typescript: ^5.2.2
   uuidv7: ^0.6.3
+  vaul: ^0.8.9
   vite: ^5.0.0
   zod: ^3.22.4
 
@@ -97,6 +98,7 @@ dependencies:
   tailwind-merge: 2.2.0
   tailwindcss-animate: 1.0.7_tailwindcss@3.3.5
   uuidv7: 0.6.3
+  vaul: 0.8.9_5krmoxrxcvdvec3mcfapbbpcqi
   zod: 3.22.4
 
 devDependencies:
@@ -3690,6 +3692,20 @@ packages:
   /uuidv7/0.6.3:
     resolution: {integrity: sha512-zV3eW2NlXTsun/aJ7AixxZjH/byQcH/r3J99MI0dDEkU2cJIBJxhEWUHDTpOaLPRNhebPZoeHuykYREkI9HafA==}
     hasBin: true
+    dev: false
+
+  /vaul/0.8.9_5krmoxrxcvdvec3mcfapbbpcqi:
+    resolution: {integrity: sha512-gpmtmZRWDPP6niQh14JfRIFUYZVyfvAWyA/7rUINOfNlO/2K7uEvI5rLXEXkxZIRFyUZj+TPHLFMirkegPHjrw==}
+    peerDependencies:
+      react: ^16.8 || ^17.0 || ^18.0
+      react-dom: ^16.8 || ^17.0 || ^18.0
+    dependencies:
+      '@radix-ui/react-dialog': 1.0.5_5krmoxrxcvdvec3mcfapbbpcqi
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    transitivePeerDependencies:
+      - '@types/react'
+      - '@types/react-dom'
     dev: false
 
   /vite/5.0.2_@types+node@20.11.0:

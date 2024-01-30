@@ -27,8 +27,6 @@ namespace ThemeJournal.Api.Controllers
         {
             // Transform the Dates according to User Start time
             theme.StartDate = _userService.TrasformDate(theme.StartDate);
-            Console.WriteLine(_userService.TrasformDate(DateTime.UtcNow));
-
             theme.EndDate = _userService.TrasformDate(theme.EndDate);
 
             // Start Date should be greater than or equal to today

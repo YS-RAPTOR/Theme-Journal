@@ -12,23 +12,12 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "./ui/dialog";
-import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "./ui/form";
+import { Form } from "./ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Popover, PopoverTrigger, PopoverContent } from "./ui/popover";
-import { cn } from "@/lib/utils";
-import { Calendar } from "./ui/calendar";
-import { format } from "date-fns";
-import { PiCalendarDuotone } from "react-icons/pi";
 import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
+import CalendarField from "./CalendarField";
 
 const ExtendThemeView = (props: { theme: ThemeType; maxDate?: Date }) => {
     const queryClient = useQueryClient();
@@ -142,65 +131,18 @@ const ExtendThemeView = (props: { theme: ThemeType; maxDate?: Date }) => {
                 <ScrollArea className="p-3 max-h-[50vh] ">
                     <Form {...form}>
                         <form className="px-1 flex flex-col gap-3">
-                            <FormField
+                            <CalendarField
                                 control={form.control}
+                                label="End Date"
                                 name="endDate"
-                                render={({ field }) => (
-                                    <FormItem className="flex flex-col gap-1 space-y-0">
-                                        <FormLabel>End Date</FormLabel>
-                                        <Popover>
-                                            <PopoverTrigger asChild>
-                                                <FormControl>
-                                                    <Button
-                                                        variant={"outline"}
-                                                        className={cn(
-                                                            "w-[240px] pl-3 text-left font-normal",
-                                                            !field.value &&
-                                                                "text-muted-foreground",
-                                                        )}
-                                                    >
-                                                        {field.value ? (
-                                                            format(
-                                                                field.value,
-                                                                "P",
-                                                            )
-                                                        ) : (
-                                                            <span>
-                                                                Pick a date
-                                                            </span>
-                                                        )}
-                                                        <PiCalendarDuotone className="ml-auto h-4 w-4 opacity-50" />
-                                                    </Button>
-                                                </FormControl>
-                                            </PopoverTrigger>
-                                            <PopoverContent
-                                                className="w-auto p-0"
-                                                align="start"
-                                            >
-                                                <Calendar
-                                                    mode="single"
-                                                    selected={field.value}
-                                                    onSelect={field.onChange}
-                                                    disabled={(date) => {
-                                                        if (!maxDate) {
-                                                            return (
-                                                                date < minDate
-                                                            );
-                                                        } else {
-                                                            return (
-                                                                date <
-                                                                    minDate ||
-                                                                date > maxDate
-                                                            );
-                                                        }
-                                                    }}
-                                                    initialFocus
-                                                />
-                                            </PopoverContent>
-                                        </Popover>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
+                                // @ts-ignore
+                                disabledDays={(date) => {
+                                    if (!maxDate) {
+                                        return date < minDate;
+                                    } else {
+                                        return date < minDate || date > maxDate;
+                                    }
+                                }}
                             />
                         </form>
                     </Form>

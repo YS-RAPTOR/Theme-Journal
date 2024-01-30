@@ -26,11 +26,8 @@ import {
     CommandItem,
 } from "./ui/command";
 
-import { PiCalendarDuotone } from "react-icons/pi";
 import { Popover, PopoverTrigger, PopoverContent } from "./ui/popover";
 import { cn } from "@/lib/utils";
-import { Calendar } from "./ui/calendar";
-import { format } from "date-fns";
 import { Input } from "./ui/input";
 import { ScrollArea } from "./ui/scroll-area";
 import * as z from "zod";
@@ -49,6 +46,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useState } from "react";
 import { TaskTypePost } from "@/lib/types";
+import CalendarField from "./CalendarField";
 
 const CreateTaskView = (props: { currentTheme: string }) => {
     const queryClient = useQueryClient();
@@ -305,111 +303,21 @@ const CreateTaskView = (props: { currentTheme: string }) => {
                                     </FormItem>
                                 )}
                             ></FormField>
-                            <FormField
+                            <CalendarField
                                 control={form.control}
+                                label="Start Date"
                                 name="startDate"
-                                render={({ field }) => (
-                                    <FormItem className="flex flex-col gap-1 space-y-0">
-                                        <FormLabel>Start Date</FormLabel>
-                                        <Popover>
-                                            <PopoverTrigger asChild>
-                                                <FormControl>
-                                                    <Button
-                                                        variant={"outline"}
-                                                        className={cn(
-                                                            "w-[240px] pl-3 text-left font-normal",
-                                                            !field.value &&
-                                                                "text-muted-foreground",
-                                                        )}
-                                                    >
-                                                        {field.value ? (
-                                                            format(
-                                                                field.value,
-                                                                "P",
-                                                            )
-                                                        ) : (
-                                                            <span>
-                                                                Pick a date
-                                                            </span>
-                                                        )}
-                                                        <PiCalendarDuotone className="ml-auto h-4 w-4 opacity-50" />
-                                                    </Button>
-                                                </FormControl>
-                                            </PopoverTrigger>
-                                            <PopoverContent
-                                                className="w-auto p-0"
-                                                align="start"
-                                            >
-                                                <Calendar
-                                                    mode="single"
-                                                    selected={field.value}
-                                                    onSelect={field.onChange}
-                                                    disabled={(date) =>
-                                                        date < minDate
-                                                    }
-                                                    initialFocus
-                                                />
-                                            </PopoverContent>
-                                        </Popover>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
+                                disabled={(date) => date < minDate}
                             />
-                            <FormField
+                            <CalendarField
                                 control={form.control}
+                                label="End Date"
                                 name="endDate"
-                                render={({ field }) => (
-                                    <FormItem className="flex flex-col gap-1 space-y-0">
-                                        <FormLabel>End Date</FormLabel>
-                                        <Popover>
-                                            <PopoverTrigger asChild>
-                                                <FormControl>
-                                                    <Button
-                                                        variant={"outline"}
-                                                        className={cn(
-                                                            "w-[240px] pl-3 text-left font-normal",
-                                                            !field.value &&
-                                                                "text-muted-foreground",
-                                                        )}
-                                                    >
-                                                        {field.value ? (
-                                                            format(
-                                                                field.value,
-                                                                "P",
-                                                            )
-                                                        ) : (
-                                                            <span>
-                                                                Pick a date
-                                                            </span>
-                                                        )}
-                                                        <PiCalendarDuotone className="ml-auto h-4 w-4 opacity-50" />
-                                                    </Button>
-                                                </FormControl>
-                                            </PopoverTrigger>
-                                            <PopoverContent
-                                                className="w-auto p-0"
-                                                align="start"
-                                            >
-                                                <Calendar
-                                                    mode="single"
-                                                    selected={field.value}
-                                                    onSelect={field.onChange}
-                                                    disabled={(date) =>
-                                                        date <=
-                                                            form.getValues(
-                                                                "startDate",
-                                                            ) ||
-                                                        date < minDate ||
-                                                        date >
-                                                            activeTheme!.endDate
-                                                    }
-                                                    initialFocus
-                                                />
-                                            </PopoverContent>
-                                        </Popover>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
+                                disabled={(date) =>
+                                    date <= form.getValues("startDate") ||
+                                    date < minDate ||
+                                    date > activeTheme!.endDate
+                                }
                             />
                         </form>
                     </Form>

@@ -4,7 +4,6 @@ import { Separator } from "@/components/ui/separator";
 import Profile from "@/components/Profile";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 
 const Root = () => {
     const { instance } = useMsal();
@@ -111,7 +110,8 @@ const Root = () => {
         </>
     );
 };
-// TODO: Convert Popover to Drawer for better mobile support
+
+// TODO: Set Better Initial Focus for Calendar
 // TODO: Add User Settings (Time)
 // TODO: Sorting Tasks
 
