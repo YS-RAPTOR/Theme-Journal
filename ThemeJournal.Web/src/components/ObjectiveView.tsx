@@ -109,7 +109,7 @@ const ObjectiveView = (props: {
                     )}
                     {props.canDelete && (
                         <AlertDialog>
-                            <AlertDialogTrigger>
+                            <AlertDialogTrigger asChild>
                                 <Button size="icon" variant="ghost">
                                     <PiTrashDuotone className="text-2xl" />
                                 </Button>
@@ -229,7 +229,7 @@ const EditObjectiveView = (props: {
 
     return (
         <Dialog onOpenChange={onModalOpenChange} open={modalOpen}>
-            <DialogTrigger>
+            <DialogTrigger asChild>
                 <Button size="icon" variant="ghost">
                     <PiNotePencilDuotone className="text-2xl" />
                 </Button>

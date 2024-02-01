@@ -202,7 +202,7 @@ const CreateThemeView = (props: { endDate: Date }) => {
 
     return (
         <Dialog onOpenChange={onModalOpenChange} open={modalOpen}>
-            <DialogTrigger>
+            <DialogTrigger asChild>
                 <Button variant="default" size="wide">
                     <PiPlusBold className="text-5xl" />
                 </Button>

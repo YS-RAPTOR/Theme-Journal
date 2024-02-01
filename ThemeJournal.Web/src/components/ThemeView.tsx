@@ -23,6 +23,7 @@ import {
     CardContent,
     CardDescription,
     CardTitle,
+    CardDescriptionDiv,
 } from "./ui/card";
 
 import * as z from "zod";
@@ -70,10 +71,10 @@ const ThemeView = (props: { theme: ThemeType }) => {
             <Card>
                 <CardHeader className="relative">
                     <Skeleton className="w-[250px] h-10" />
-                    <CardDescription className="flex gap-2">
+                    <CardDescriptionDiv className="flex gap-2">
                         <Skeleton className="w-[100px] h-4" /> -
                         <Skeleton className="w-[100px] h-4" />
-                    </CardDescription>
+                    </CardDescriptionDiv>
                     {/* If Active can only extend else can edit*/}
                     <Skeleton className="top-4 right-4 w-8 h-8 absolute"></Skeleton>
                 </CardHeader>
@@ -230,7 +231,7 @@ const EditThemeView = (props: { theme: ThemeType }) => {
 
     return (
         <Dialog onOpenChange={onModalOpenChange} open={modalOpen}>
-            <DialogTrigger>
+            <DialogTrigger asChild>
                 <Button size="icon" variant="ghost">
                     <PiNotePencilDuotone className="text-2xl" />
                 </Button>
@@ -382,7 +383,7 @@ const AddObjectiveView = (props: { themeId: string }) => {
 
     return (
         <Dialog onOpenChange={onModalOpenChange} open={modalOpen}>
-            <DialogTrigger>
+            <DialogTrigger asChild>
                 <Button variant="default" size="wide">
                     <PiPlusBold className="text-2xl" />
                 </Button>

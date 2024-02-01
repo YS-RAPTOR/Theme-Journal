@@ -15,6 +15,7 @@ import { PiCalendarDuotone } from "react-icons/pi";
 import { Button } from "./ui/button";
 import { TransformDate } from "@/lib/api";
 import { Control } from "react-hook-form";
+import { useState } from "react";
 
 const CalendarField = ({
     label,
@@ -27,9 +28,10 @@ const CalendarField = ({
     name: string;
     disabled: (date: Matcher | Matcher[]) => boolean;
     control: Control<any>;
-    defaultMonth: Matcher | Matcher[];
+    defaultMonth: Date;
 }) => {
-    const isDesktop = useMediaQuery("(min-width: 768px)");
+    const isDesktop = useMediaQuery("(min-height: 700px)");
+    const [state, setState] = useState(false);
 
     return (
         <FormField
@@ -39,7 +41,7 @@ const CalendarField = ({
                 <FormItem className="flex flex-col gap-1 space-y-0">
                     <FormLabel>{label}</FormLabel>
                     {isDesktop ? (
-                        <Popover>
+                        <Popover open={state} onOpenChange={setState}>
                             <PopoverTrigger asChild>
                                 <FormControl>
                                     <Button
@@ -75,7 +77,7 @@ const CalendarField = ({
                             </PopoverContent>
                         </Popover>
                     ) : (
-                        <Drawer>
+                        <Drawer open={state} onOpenChange={setState}>
                             <DrawerTrigger asChild>
                                 <FormControl>
                                     <Button

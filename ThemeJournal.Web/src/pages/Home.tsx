@@ -9,11 +9,11 @@ import {
     Card,
     CardHeader,
     CardContent,
-    CardDescription,
     CardTitle,
+    CardDescriptionDiv,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import Indented from "@/components/IndentedText";
+import { IndentedDiv } from "@/components/IndentedText";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -51,14 +51,14 @@ const Home = () => {
                                     <Skeleton className="w-[250px] h-6" />
                                     <Skeleton className="w-8 h-4" />
                                 </CardTitle>
-                                <CardDescription>
-                                    <Indented>
+                                <CardDescriptionDiv>
+                                    <IndentedDiv>
                                         <Skeleton className="w-[250px] h-6" />
-                                    </Indented>
-                                    <Indented>
+                                    </IndentedDiv>
+                                    <IndentedDiv>
                                         <Skeleton className="w-[250px] h-6" />
-                                    </Indented>
-                                </CardDescription>
+                                    </IndentedDiv>
+                                </CardDescriptionDiv>
                                 <Skeleton className="top-4 right-4 w-8 h-8 absolute"></Skeleton>
                             </CardHeader>
                             <ScrollArea about="center" className="min-w-0">

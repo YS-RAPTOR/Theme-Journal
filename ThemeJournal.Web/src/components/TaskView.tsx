@@ -7,6 +7,7 @@ import {
     CardContent,
     CardDescription,
     CardTitle,
+    CardDescriptionDiv,
 } from "./ui/card";
 import { Input } from "./ui/input";
 import {
@@ -47,7 +48,7 @@ import {
     ThemeType,
     ProgressType,
 } from "@/lib/types";
-import Indented from "./IndentedText";
+import { Indented, IndentedDiv } from "./IndentedText";
 import { cn } from "@/lib/utils";
 import {
     FixDate,
@@ -135,14 +136,14 @@ const TaskView = (props: {
                         <Skeleton className="w-[250px] h-6" />
                         <Skeleton className="w-8 h-4" />
                     </CardTitle>
-                    <CardDescription>
-                        <Indented>
+                    <CardDescriptionDiv>
+                        <IndentedDiv>
                             <Skeleton className="w-[250px] h-6" />
-                        </Indented>
-                        <Indented>
+                        </IndentedDiv>
+                        <IndentedDiv>
                             <Skeleton className="w-[250px] h-6" />
-                        </Indented>
-                    </CardDescription>
+                        </IndentedDiv>
+                    </CardDescriptionDiv>
                     <Skeleton className="top-4 right-4 w-8 h-8 absolute"></Skeleton>
                 </CardHeader>
                 <ScrollArea about="center" className="min-w-0">
@@ -178,10 +179,10 @@ const TaskView = (props: {
                             </Badge>
                         )}
                 </CardTitle>
-                <CardDescription>
+                <CardDescriptionDiv>
                     <Indented>Partial: {props.task.partialCompletion}</Indented>
                     <Indented>Full: {props.task.fullCompletion}</Indented>
-                </CardDescription>
+                </CardDescriptionDiv>
                 <div className="top-4 right-4 absolute">
                     {props.task.startDate > today ? (
                         <EditTaskView
@@ -377,7 +378,7 @@ const EditTaskView = (props: {
 
     return (
         <Dialog onOpenChange={onModalOpenChange} open={modalOpen}>
-            <DialogTrigger>
+            <DialogTrigger asChild>
                 <Button size="icon" variant="ghost">
                     <PiNotePencilDuotone className="text-2xl" />
                 </Button>
@@ -623,7 +624,7 @@ const ExtendTaskView = (props: { task: TaskTypeGet; maxDate: Date }) => {
 
     return (
         <Dialog onOpenChange={onModalOpenChange} open={modalOpen}>
-            <DialogTrigger>
+            <DialogTrigger asChild>
                 <Button size="icon" variant="ghost">
                     <PiClockClockwiseBold className="text-2xl" />
                 </Button>

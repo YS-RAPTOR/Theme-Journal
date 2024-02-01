@@ -117,7 +117,7 @@ const ExtendThemeView = (props: { theme: ThemeType; maxDate?: Date }) => {
 
     return (
         <Dialog onOpenChange={onModalOpenChange} open={modalOpen}>
-            <DialogTrigger>
+            <DialogTrigger asChild>
                 <Button size="icon" variant="ghost">
                     <PiClockClockwiseBold className="text-2xl" />
                 </Button>

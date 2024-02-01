@@ -30,6 +30,8 @@ import NotFound from "./pages/NotFound.tsx";
 // CSS
 import "./index.css";
 import { Toaster } from "@/components/ui/sonner";
+import Settings from "./pages/Settings.tsx";
+import IgnoreThis from "./components/IgnoreThis.tsx";
 
 // Create msal instance
 const msalInstance = new PublicClientApplication(msalConfig);
@@ -77,6 +79,10 @@ const router = createBrowserRouter([
                 path: "/theme",
                 element: <Theme />,
             },
+            {
+                path: "/settings",
+                element: <Settings />,
+            },
         ],
     },
 ]);
@@ -88,6 +94,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                 <QueryClientProvider client={queryClient}>
                     <RouterProvider router={router} />
                     <Toaster />
+                    <IgnoreThis />
                 </QueryClientProvider>
             </MsalProvider>
         </Provider>

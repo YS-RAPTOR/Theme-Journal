@@ -10,7 +10,7 @@ import {
     Card,
     CardHeader,
     CardContent,
-    CardDescription,
+    CardDescriptionDiv,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PiPlusBold } from "react-icons/pi";
@@ -33,10 +33,10 @@ const Theme = () => {
                     <Card>
                         <CardHeader className="relative">
                             <Skeleton className="w-[250px] h-10" />
-                            <CardDescription className="flex gap-2">
+                            <CardDescriptionDiv className="flex gap-2">
                                 <Skeleton className="w-[100px] h-4" /> -
                                 <Skeleton className="w-[100px] h-4" />
-                            </CardDescription>
+                            </CardDescriptionDiv>
                             {/* If Active can only extend else can edit*/}
                             <Skeleton className="top-4 right-4 w-8 h-8 absolute"></Skeleton>
                         </CardHeader>
