@@ -35,7 +35,6 @@ specifiers:
   eslint: ^8.53.0
   eslint-plugin-react-hooks: ^4.6.0
   eslint-plugin-react-refresh: ^0.4.4
-  jotai: ^2.6.0
   localforage: ^1.10.0
   match-sorter: ^6.3.1
   next-themes: ^0.2.1
@@ -57,6 +56,7 @@ specifiers:
   vaul: ^0.8.9
   vite: ^5.0.0
   zod: ^3.22.4
+  zustand: ^4.5.0
 
 dependencies:
   '@azure/msal-browser': 3.5.0
@@ -82,7 +82,6 @@ dependencies:
   clsx: 2.1.0
   cmdk: 0.2.0_p5xgpqf7wiayqxc6j6o5zt2pdy
   date-fns: 3.2.0
-  jotai: 2.6.0_vefaa57jiikjg7ztnhkaom6nr4
   localforage: 1.10.0
   match-sorter: 6.3.1
   next-themes: 0.2.1_hipqgvz32dfk24avoqah5l7veq
@@ -100,6 +99,7 @@ dependencies:
   uuidv7: 0.6.3
   vaul: 0.8.9_5krmoxrxcvdvec3mcfapbbpcqi
   zod: 3.22.4
+  zustand: 4.5.0_vefaa57jiikjg7ztnhkaom6nr4
 
 devDependencies:
   '@tailwindcss/forms': 0.5.7_tailwindcss@3.3.5
@@ -2777,22 +2777,6 @@ packages:
     resolution: {integrity: sha512-gFqAIbuKyyso/3G2qhiO2OM6shY6EPP/R0+mkDbyspxKazh8BXDC5FiFsUjlczgdNz/vfra0da2y+aHrusLG/Q==}
     hasBin: true
 
-  /jotai/2.6.0_vefaa57jiikjg7ztnhkaom6nr4:
-    resolution: {integrity: sha512-Vt6hsc04Km4j03l+Ax+Sc+FVft5cRJhqgxt6GTz6GM2eM3DyX3CdBdzcG0z2FrlZToL1/0OAkqDghIyARWnSuQ==}
-    engines: {node: '>=12.20.0'}
-    peerDependencies:
-      '@types/react': '>=17.0.0'
-      react: '>=17.0.0'
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-      react:
-        optional: true
-    dependencies:
-      '@types/react': 18.2.38
-      react: 18.2.0
-    dev: false
-
   /js-sha3/0.8.0:
     resolution: {integrity: sha512-gF1cRrHhIzNfToc802P800N8PpXS+evLLXfsVpowqmAFR9uwbi89WvXg2QspOmXL8QL86J4T1EpFu+yUkwJY3Q==}
     dev: false
@@ -3686,6 +3670,14 @@ packages:
       tslib: 2.6.2
     dev: false
 
+  /use-sync-external-store/1.2.0_react@18.2.0:
+    resolution: {integrity: sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 18.2.0
+    dev: false
+
   /util-deprecate/1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
@@ -3770,4 +3762,24 @@ packages:
 
   /zod/3.22.4:
     resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
+    dev: false
+
+  /zustand/4.5.0_vefaa57jiikjg7ztnhkaom6nr4:
+    resolution: {integrity: sha512-zlVFqS5TQ21nwijjhJlx4f9iGrXSL0o/+Dpy4txAP22miJ8Ti6c1Ol1RLNN98BMib83lmDH/2KmLwaNXpjrO1A==}
+    engines: {node: '>=12.7.0'}
+    peerDependencies:
+      '@types/react': '>=16.8'
+      immer: '>=9.0.6'
+      react: '>=16.8'
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      immer:
+        optional: true
+      react:
+        optional: true
+    dependencies:
+      '@types/react': 18.2.38
+      react: 18.2.0
+      use-sync-external-store: 1.2.0_react@18.2.0
     dev: false

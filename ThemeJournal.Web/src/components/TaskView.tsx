@@ -5,7 +5,6 @@ import {
     Card,
     CardHeader,
     CardContent,
-    CardDescription,
     CardTitle,
     CardDescriptionDiv,
 } from "./ui/card";
@@ -512,7 +511,11 @@ const EditTaskView = (props: {
                                 control={form.control}
                                 name="startDate"
                                 label="Start Date"
-                                disabled={(date) => date < minDate}
+                                disabled={(date) =>
+                                    date < minDate ||
+                                    date > props.currentTheme.endDate ||
+                                    date >= form.getValues("endDate")
+                                }
                                 defaultMonth={minDate}
                             />
                             <CalendarField

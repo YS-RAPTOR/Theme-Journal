@@ -262,7 +262,10 @@ const EditThemeView = (props: { theme: ThemeType }) => {
                                 control={form.control}
                                 name="startDate"
                                 label="Start Date"
-                                disabled={(date) => date < minDate}
+                                disabled={(date) =>
+                                    date < minDate ||
+                                    date >= form.getValues("endDate")
+                                }
                                 defaultMonth={minDate}
                             />
                             <CalendarField

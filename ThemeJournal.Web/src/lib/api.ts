@@ -2,6 +2,7 @@ import axios, { AxiosError } from "axios";
 import { QueryClient } from "react-query";
 import * as Types from "./types";
 import { toast } from "sonner";
+import { create } from "zustand";
 
 // Create axios instance
 export const axiosInstance = axios.create({
@@ -18,7 +19,9 @@ export const FixDate = (date: Date) => {
 
 export const TransformDate = (date: Date, subtract: boolean = true) => {
     const transform = new Date(date);
-    transform.setHours(4, 0, 0, 0);
+
+    const time = timeStore.getState().time;
+    transform.setHours(time.hours, time.minutes, 0, 0);
 
     if (transform.getTime() > date.getTime() && subtract) {
         return new Date(transform.getTime() - 86400000);
@@ -178,7 +181,6 @@ export const EditObjective = async (objective: Types.ObjectiveType) => {
 export const DeleteObjective = async ({
     id,
     themeId,
-    index,
 }: {
     id: string;
     themeId: string;
@@ -296,6 +298,17 @@ export const GetTask = async (upperDate: date, lowerDate: date) => {
                 }
                 res.data[i].progress = map;
             }
+
+            res.data.sort((a: Types.TaskTypeGet, b: Types.TaskTypeGet) => {
+                if (a.id < b.id) {
+                    return -1;
+                }
+                if (a.id > b.id) {
+                    return 1;
+                }
+                return 0;
+            });
+
             return res.data as Array<Types.TaskTypeGet>;
         });
 };
@@ -360,3 +373,61 @@ export const UpsertProgress = async ({ id, ...data }: Types.ProgressType) => {
         return res.data;
     });
 };
+
+export const EditTime = async ({ hours, minutes }: Types.TimeType) => {
+    const date = new Date(2000, 1, 1, hours, minutes);
+    date.get;
+
+    return axiosInstance
+        .put(`user/time`, {
+            hours: date.getUTCHours(),
+            minutes: date.getUTCMinutes(),
+        })
+        .then((res) => {
+            return res.data;
+        });
+};
+
+export const GetTime = async () => {
+    return axiosInstance.get(`user/time`).then((res) => {
+        if (res.data.hours === null || res.data.minutes === null) {
+            return { hours: 0, minutes: 0 };
+        }
+
+        const date = new Date(
+            Date.UTC(2000, 1, 1, res.data.hours, res.data.minutes),
+        );
+        res.data = { hours: date.getHours(), minutes: date.getMinutes() };
+        return res.data;
+    });
+};
+
+type timeStoreType = {
+    time: Types.TimeType;
+    setTime: (time: Types.TimeType) => void;
+    timeString: string;
+};
+
+export const timeStore = create<timeStoreType>((set, get) => ({
+    time: { hours: 0, minutes: 0 },
+    SetTime: (time: Types.TimeType) => {
+        set(() => ({ time: time }));
+    },
+    get timeString() {
+        const time = get().time;
+        let timeString = "";
+
+        if (time.hours < 10) {
+            timeString += "0";
+        }
+
+        timeString += time.hours.toString() + ":";
+
+        if (time.minutes < 10) {
+            timeString += "0";
+        }
+
+        timeString += time.minutes.toString();
+        return timeString;
+    },
+}));

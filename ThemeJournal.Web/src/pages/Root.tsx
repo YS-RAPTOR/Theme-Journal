@@ -111,7 +111,4 @@ const Root = () => {
     );
 };
 
-// TODO: Add User Settings (Time)
-// TODO: Sorting Tasks
-
 export default Root;

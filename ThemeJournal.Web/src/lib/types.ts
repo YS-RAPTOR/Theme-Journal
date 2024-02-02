@@ -60,3 +60,8 @@ export type ProgressType = {
     completionDate: Date;
     progress: number;
 };
+
+export type TimeType = {
+    hours: number;
+    minutes: number;
+};

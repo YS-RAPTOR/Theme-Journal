@@ -17,9 +17,6 @@ import { msalConfig } from "./lib/authConfig.ts";
 import { QueryClientProvider } from "react-query";
 import { queryClient } from "./lib/api.ts";
 
-// State
-import { Provider } from "jotai";
-
 // Pages
 import Home from "./pages/Home.tsx";
 import MainLayout from "./layouts/MainLayout.tsx";
@@ -89,14 +86,12 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
-        <Provider>
-            <MsalProvider instance={msalInstance}>
-                <QueryClientProvider client={queryClient}>
-                    <RouterProvider router={router} />
-                    <Toaster />
-                    <IgnoreThis />
-                </QueryClientProvider>
-            </MsalProvider>
-        </Provider>
+        <MsalProvider instance={msalInstance}>
+            <QueryClientProvider client={queryClient}>
+                <RouterProvider router={router} />
+                <Toaster />
+                <IgnoreThis />
+            </QueryClientProvider>
+        </MsalProvider>
     </React.StrictMode>,
 );
