@@ -2,31 +2,49 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { EditTime, HandleError, timeStore } from "@/lib/api";
+import { editRequest } from "@/lib/authConfig";
 import { TimeType } from "@/lib/types";
+import { InteractionStatus } from "@azure/msal-browser";
 import { useMsal } from "@azure/msal-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation } from "react-query";
 
 const Settings = () => {
-    // TODO: Edit Profile Button
-    const EditProfile = () => {};
-    const { instance } = useMsal();
+    const { instance, inProgress } = useMsal();
+    const EditProfile = () => {
+        if (inProgress === InteractionStatus.None) {
+            instance.acquireTokenPopup(editRequest);
+        }
+    };
     const account = instance.getActiveAccount();
 
     const timeString = timeStore((state) => state.timeString);
+    const time = timeStore((state) => state.time);
     const setTime = timeStore((state) => state.setTime);
 
-    const [newTime, setNewTime] = useState(timeString);
+    const [newTime, setNewTime] = useState(timeString());
+
+    useEffect(() => {
+        setNewTime(timeString());
+    }, [time]);
 
     const EditTimeMutation = useMutation({
         mutationFn: EditTime,
         onError(error) {
             HandleError(error);
         },
-        onSuccess: (data: TimeType) => {
+        onSuccess: (_old: any, data: TimeType) => {
             setTime(data);
         },
     });
+
+    const submitTime = async () => {
+        const [hours, minutes] = newTime.split(":");
+        await EditTimeMutation.mutateAsync({
+            hours: parseInt(hours),
+            minutes: parseInt(minutes),
+        });
+    };
 
     return (
         <main className="flex justify-center">
@@ -60,6 +78,11 @@ const Settings = () => {
                         onChange={(e) => {
                             setNewTime(e.target.value);
                         }}
+                        onKeyPress={(e) => {
+                            if (e.key === "Enter") {
+                                submitTime();
+                            }
+                        }}
                     />
                 </div>
                 <div className="self-end flex gap-2">
@@ -69,21 +92,15 @@ const Settings = () => {
                         onClick={() => {
                             setNewTime(timeString);
                         }}
-                        disabled={newTime === timeString}
+                        disabled={newTime === timeString()}
                         className="disabled:bg-transparent disabled:text-transparent disabled:shadow-none"
                     >
                         Cancel Changes
                     </Button>
                     <Button
                         size="sm"
-                        onClick={async () => {
-                            const [hours, minutes] = newTime.split(":");
-                            await EditTimeMutation.mutateAsync({
-                                hours: parseInt(hours),
-                                minutes: parseInt(minutes),
-                            });
-                        }}
-                        disabled={newTime === timeString}
+                        onClick={submitTime}
+                        disabled={newTime === timeString()}
                     >
                         Save Changes
                     </Button>

@@ -32,11 +32,12 @@ builder
 // Register services
 
 // User service
+builder.Services.AddTransient<IDataAccess, SqlDataAccess>();
+builder.Services.AddTransient<IUserData, UserData>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddHttpContextAccessor();
 
 // Data Services
-builder.Services.AddTransient<IDataAccess, SqlDataAccess>();
 builder.Services.AddTransient<IObjectiveData, ObjectiveData>();
 builder.Services.AddTransient<IProgressData, ProgressData>();
 builder.Services.AddTransient<ITaskData, TaskData>();

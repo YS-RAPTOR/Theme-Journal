@@ -185,6 +185,9 @@ const CreateThemeView = (props: { endDate: Date }) => {
 
     const onModalOpenChange = (open: boolean) => {
         form.reset();
+        form.setValue("objectives", [
+            { id: uuidv7(), description: "Critical", colorId: 0 },
+        ]);
         setModalOpen(open);
     };
 

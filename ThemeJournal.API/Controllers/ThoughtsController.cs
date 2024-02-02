@@ -27,9 +27,9 @@ namespace ThemeJournal.Api.Controllers
         public async Task<IActionResult> UpsertThought(Guid id, ThoughtModel thought)
         {
             // Transform the Dates according to User Start time
-            thought.CreatedAt = _userService.TrasformDate(thought.CreatedAt);
+            thought.CreatedAt = await _userService.TrasformDate(thought.CreatedAt);
 
-            if (thought.CreatedAt != _userService.TrasformDate(DateTime.UtcNow))
+            if (thought.CreatedAt != await _userService.TrasformDate(DateTime.UtcNow))
             {
                 return BadRequest("Can only create/update thoughts for today");
             }
@@ -64,11 +64,11 @@ namespace ThemeJournal.Api.Controllers
         {
             DateTime? upperDateCorrect = !upperDate.HasValue
                 ? null
-                : _userService.TrasformDate(upperDate.Value);
+                : await _userService.TrasformDate(upperDate.Value);
 
             DateTime? lowerDateCorrect = !lowerDate.HasValue
                 ? null
-                : _userService.TrasformDate(lowerDate.Value);
+                : await _userService.TrasformDate(lowerDate.Value);
 
             var userId = _userService.GetUserId();
             var output = await _thoughtData.GetThoughts(userId, upperDateCorrect, lowerDateCorrect);

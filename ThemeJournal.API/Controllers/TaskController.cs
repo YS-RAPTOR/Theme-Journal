@@ -35,11 +35,11 @@ namespace ThemeJournal.Api.Controllers
         public async Task<IActionResult> CreateTask(PostTaskModel task)
         {
             // Transform the Dates according to User Start time
-            task.StartDate = _userService.TrasformDate(task.StartDate);
-            task.EndDate = _userService.TrasformDate(task.EndDate);
+            task.StartDate = await _userService.TrasformDate(task.StartDate);
+            task.EndDate = await _userService.TrasformDate(task.EndDate);
 
             // Start Date must be today or in the future
-            if (task.StartDate < _userService.TrasformDate(DateTime.UtcNow))
+            if (task.StartDate < await _userService.TrasformDate(DateTime.UtcNow))
             {
                 return BadRequest("Start Date should be greater than or equal to today");
             }
@@ -49,7 +49,7 @@ namespace ThemeJournal.Api.Controllers
                 return BadRequest("End Date should be greater than Start Date");
             }
             // Maximum End Date is the end date of the current theme
-            var today = _userService.TrasformDate(DateTime.UtcNow);
+            var today = await _userService.TrasformDate(DateTime.UtcNow);
             var currentTheme = await _themeData.GetThemes(
                 _userService.GetUserId(),
                 today,
@@ -80,17 +80,17 @@ namespace ThemeJournal.Api.Controllers
                 return NotFound();
             }
 
-            if (taskToUpdate[0].StartDate < _userService.TrasformDate(DateTime.UtcNow))
+            if (taskToUpdate[0].StartDate < await _userService.TrasformDate(DateTime.UtcNow))
             {
                 return BadRequest("Cannot update a task that has already started");
             }
 
             // Transform the Dates according to User Start time
-            task.StartDate = _userService.TrasformDate(task.StartDate);
-            task.EndDate = _userService.TrasformDate(task.EndDate);
+            task.StartDate = await _userService.TrasformDate(task.StartDate);
+            task.EndDate = await _userService.TrasformDate(task.EndDate);
 
             // Start Date should be greater than or equal to today
-            if (task.StartDate < _userService.TrasformDate(DateTime.UtcNow))
+            if (task.StartDate < await _userService.TrasformDate(DateTime.UtcNow))
             {
                 return BadRequest("Start Date should be greater than or equal to today");
             }
@@ -116,12 +116,12 @@ namespace ThemeJournal.Api.Controllers
                 return NotFound();
             }
 
-            if (taskToExtend[0].StartDate > _userService.TrasformDate(DateTime.UtcNow))
+            if (taskToExtend[0].StartDate > await _userService.TrasformDate(DateTime.UtcNow))
             {
                 return BadRequest("Cannot extend a task that hasn't started");
             }
 
-            if (taskToExtend[0].EndDate <= _userService.TrasformDate(DateTime.UtcNow))
+            if (taskToExtend[0].EndDate <= await _userService.TrasformDate(DateTime.UtcNow))
             {
                 return BadRequest("Cannot extend a task that has completed");
             }
@@ -134,7 +134,7 @@ namespace ThemeJournal.Api.Controllers
             }
 
             // Transform the Dates according to User Start time
-            endDate = _userService.TrasformDate(endDate);
+            endDate = await _userService.TrasformDate(endDate);
             await _taskData.ExtendTask(userId, id, endDate);
             return Ok();
         }
@@ -148,11 +148,11 @@ namespace ThemeJournal.Api.Controllers
         {
             DateTime? upperDateCorrect = !upperDate.HasValue
                 ? null
-                : _userService.TrasformDate(upperDate.Value);
+                :await  _userService.TrasformDate(upperDate.Value);
 
             DateTime? lowerDateCorrect = !lowerDate.HasValue
                 ? null
-                : _userService.TrasformDate(lowerDate.Value);
+                :await  _userService.TrasformDate(lowerDate.Value);
 
             var userId = _userService.GetUserId();
             List<TaskModel> tasks = await _taskData.GetTasks(

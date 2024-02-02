@@ -3,6 +3,6 @@ namespace ThemeJournal.Api.Services;
 public interface IUserService
 {
     Guid GetUserId();
-    TimeOnly GetUserDayStartTime();
-    DateTime TrasformDate(DateTime date);
+    Task<TimeOnly> GetUserDayStartTime();
+    Task<DateTime> TrasformDate(DateTime date, bool subtract = true);
 }

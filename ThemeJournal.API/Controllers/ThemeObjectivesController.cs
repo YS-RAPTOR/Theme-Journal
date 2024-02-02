@@ -49,7 +49,7 @@ namespace ThemeJournal.Api.Controllers
                 return NotFound();
             }
 
-            if (theme[0].EndDate <= _userService.TrasformDate(DateTime.UtcNow))
+            if (theme[0].EndDate <= await _userService.TrasformDate(DateTime.UtcNow))
             {
                 return BadRequest("Theme has already been completed.");
             }
@@ -79,7 +79,7 @@ namespace ThemeJournal.Api.Controllers
                 return NotFound();
             }
 
-            if (theme[0].StartDate <= _userService.TrasformDate(DateTime.UtcNow))
+            if (theme[0].StartDate <= await _userService.TrasformDate(DateTime.UtcNow))
             {
                 return BadRequest(
                     "Cannot update an objective of a theme that has/had already started"

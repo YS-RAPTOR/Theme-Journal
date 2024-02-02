@@ -1,4 +1,4 @@
-import { LogLevel } from "@azure/msal-browser";
+import { LogLevel, RedirectRequest } from "@azure/msal-browser";
 
 const ua = window.navigator.userAgent;
 const msie = ua.indexOf("MSIE ");
@@ -73,5 +73,10 @@ export const msalConfig = {
 };
 
 export const loginRequest = {
+    scopes: [import.meta.env.VITE_AUTH_SCOPE as string],
+};
+
+export const editRequest: RedirectRequest = {
+    authority: b2cPolicies.authorities.editProfile.authority,
     scopes: [import.meta.env.VITE_AUTH_SCOPE as string],
 };

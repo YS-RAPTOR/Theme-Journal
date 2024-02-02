@@ -26,11 +26,11 @@ namespace ThemeJournal.Api.Controllers
         public async Task<IActionResult> CreateTheme(PostThemeModel theme)
         {
             // Transform the Dates according to User Start time
-            theme.StartDate = _userService.TrasformDate(theme.StartDate);
-            theme.EndDate = _userService.TrasformDate(theme.EndDate);
+            theme.StartDate = await _userService.TrasformDate(theme.StartDate);
+            theme.EndDate = await _userService.TrasformDate(theme.EndDate);
 
             // Start Date should be greater than or equal to today
-            if (theme.StartDate < _userService.TrasformDate(DateTime.UtcNow))
+            if (theme.StartDate < await _userService.TrasformDate(DateTime.UtcNow))
             {
                 return BadRequest("Start Date should be greater than or equal to today");
             }
@@ -63,17 +63,17 @@ namespace ThemeJournal.Api.Controllers
                 return NotFound();
             }
 
-            if (themeToUpdate[0].StartDate <= _userService.TrasformDate(DateTime.UtcNow))
+            if (themeToUpdate[0].StartDate <= await _userService.TrasformDate(DateTime.UtcNow))
             {
                 return BadRequest("Cannot update a theme that has/had already started");
             }
 
             // Transform the Dates according to User Start time
-            theme.StartDate = _userService.TrasformDate(theme.StartDate);
-            theme.EndDate = _userService.TrasformDate(theme.EndDate);
+            theme.StartDate = await _userService.TrasformDate(theme.StartDate);
+            theme.EndDate = await _userService.TrasformDate(theme.EndDate);
 
             // Start Date should be greater than or equal to today
-            if (theme.StartDate < _userService.TrasformDate(DateTime.UtcNow))
+            if (theme.StartDate < await _userService.TrasformDate(DateTime.UtcNow))
             {
                 return BadRequest("Start Date should be greater than or equal to today");
             }
@@ -114,12 +114,12 @@ namespace ThemeJournal.Api.Controllers
                 return NotFound();
             }
 
-            if (themeToUpdate[0].StartDate > _userService.TrasformDate(DateTime.UtcNow))
+            if (themeToUpdate[0].StartDate > await _userService.TrasformDate(DateTime.UtcNow))
             {
                 return BadRequest("Cannot extend a theme that hasn't started");
             }
 
-            if (themeToUpdate[0].EndDate <= _userService.TrasformDate(DateTime.UtcNow))
+            if (themeToUpdate[0].EndDate <= await _userService.TrasformDate(DateTime.UtcNow))
             {
                 return BadRequest("Cannot extend a theme that has completed");
             }
@@ -132,8 +132,8 @@ namespace ThemeJournal.Api.Controllers
             }
 
             // Transform the Dates according to User Start time
-            endDate = _userService.TrasformDate(endDate);
-            themeToUpdate[0].StartDate = _userService.TrasformDate(themeToUpdate[0].StartDate);
+            endDate = await _userService.TrasformDate(endDate);
+            themeToUpdate[0].StartDate = await _userService.TrasformDate(themeToUpdate[0].StartDate);
 
             // Check Intersection with other themes
             var themesWithIntersection = await _themeData.GetThemes(
@@ -176,11 +176,11 @@ namespace ThemeJournal.Api.Controllers
         {
             DateTime? upperDateCorrect = !upperDate.HasValue
                 ? null
-                : _userService.TrasformDate(upperDate.Value);
+                : await _userService.TrasformDate(upperDate.Value);
 
             DateTime? lowerDateCorrect = !lowerDate.HasValue
                 ? null
-                : _userService.TrasformDate(lowerDate.Value);
+                : await _userService.TrasformDate(lowerDate.Value);
 
             if (upperDateCorrect.HasValue && lowerDateCorrect.HasValue)
             {

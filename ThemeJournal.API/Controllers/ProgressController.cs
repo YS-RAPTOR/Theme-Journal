@@ -27,11 +27,11 @@ namespace ThemeJournal.Api.Controllers
         public async Task<IActionResult> UpsertProgress(Guid id, PostProgressModel progress)
         {
             // Transform the Dates according to User Start time
-            progress.CompletionDate = _userService.TrasformDate(progress.CompletionDate);
+            progress.CompletionDate = await _userService.TrasformDate(progress.CompletionDate);
 
             var userId = _userService.GetUserId();
 
-            if (progress.CompletionDate != _userService.TrasformDate(DateTime.UtcNow))
+            if (progress.CompletionDate != await _userService.TrasformDate(DateTime.UtcNow))
             {
                 return BadRequest("Can only update/insert today's progress.");
             }

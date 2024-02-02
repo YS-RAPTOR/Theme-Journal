@@ -1,12 +1,15 @@
+using ThemeJournal.ServiceLibrary.Data;
 namespace ThemeJournal.Api.Services;
 
 public class UserService : IUserService
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IUserData _userData;
 
-    public UserService(IHttpContextAccessor httpContextAccessor)
+    public UserService(IHttpContextAccessor httpContextAccessor, IUserData userData)
     {
         _httpContextAccessor = httpContextAccessor;
+        _userData = userData;
     }
 
     public Guid GetUserId()
@@ -24,14 +27,22 @@ public class UserService : IUserService
         return Guid.Parse(userId);
     }
 
-    public TimeOnly GetUserDayStartTime()
+    public async Task<TimeOnly> GetUserDayStartTime()
     {
-        return new TimeOnly(17, 0, 0);
+        var userId = GetUserId();
+        var time = await _userData.GetTime(userId);
+
+        if (time.Count == 0)
+        {
+            return new TimeOnly(0, 0, 0);
+        }
+
+        return new TimeOnly(time[0].Hours, time[0].Minutes, 0);
     }
 
-    public DateTime TrasformDate(DateTime date)
+    public async Task<DateTime> TrasformDate(DateTime date, bool subtract = true)
     {
-        var userDayStartTime = GetUserDayStartTime();
+        var userDayStartTime = await GetUserDayStartTime();
 
         var transformedDate = new DateTime(
             date.Year,
@@ -43,7 +54,7 @@ public class UserService : IUserService
             DateTimeKind.Utc
         );
 
-        if (transformedDate > date)
+        if (transformedDate > date && subtract)
         {
             transformedDate = transformedDate.AddDays(-1);
         }

@@ -30,15 +30,15 @@ const Layout = ({ children }: { children: ReactNode }) => {
             },
         );
 
-        const interval = setInterval(async () => {
+        const func = async () => {
             try {
                 const time = await GetTime();
                 setTime(time);
-                console.log("Time refreshed");
-            } catch (e) {
-                console.error(e);
-            }
-        }, 600000);
+            } catch (e) {}
+        };
+        func();
+
+        const interval = setInterval(func, 600000);
 
         return () => {
             axiosInstance.interceptors.request.eject(inceptor);

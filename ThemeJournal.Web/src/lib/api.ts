@@ -44,7 +44,7 @@ export const GetDates = () => {
 
 export const HandleError = (err: any) => {
     if (err instanceof AxiosError) {
-        if (err.response == undefined || err.response.data > 255) {
+        if (err.response == undefined || err.response.data > 100) {
             toast.error("Uh oh! Something went wrong.", {
                 description: "There was an internal server error",
             });
@@ -376,7 +376,6 @@ export const UpsertProgress = async ({ id, ...data }: Types.ProgressType) => {
 
 export const EditTime = async ({ hours, minutes }: Types.TimeType) => {
     const date = new Date(2000, 1, 1, hours, minutes);
-    date.get;
 
     return axiosInstance
         .put(`user/time`, {
@@ -405,15 +404,15 @@ export const GetTime = async () => {
 type timeStoreType = {
     time: Types.TimeType;
     setTime: (time: Types.TimeType) => void;
-    timeString: string;
+    timeString: () => string;
 };
 
 export const timeStore = create<timeStoreType>((set, get) => ({
     time: { hours: 0, minutes: 0 },
-    SetTime: (time: Types.TimeType) => {
+    setTime: (time: Types.TimeType) => {
         set(() => ({ time: time }));
     },
-    get timeString() {
+    timeString() {
         const time = get().time;
         let timeString = "";
 

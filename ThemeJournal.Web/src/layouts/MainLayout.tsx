@@ -3,7 +3,6 @@ import Profile from "../components/Profile";
 import NavBar from "../components/NavBar";
 import AuthLayout from "./AuthLayout";
 import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 const MainLayout = () => {
     return (
