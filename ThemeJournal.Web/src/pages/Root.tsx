@@ -94,6 +94,7 @@ const Root = () => {
                         height={embedWidth * 0.5625}
                         src="https://www.youtube.com/embed/fSwpe8r50_o?si=DNdtjTcW949crJSq"
                         title="YouTube video player"
+                        //@ts-ignore
                         allow="accelerometer; allowfullscreen; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     ></embed>
                 </div>

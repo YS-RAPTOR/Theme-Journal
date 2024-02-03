@@ -34,64 +34,65 @@ import IgnoreThis from "./components/IgnoreThis.tsx";
 const msalInstance = new PublicClientApplication(msalConfig);
 
 // Check if there is no active account, and there are multiple accounts, then set active account to first account
-await msalInstance.initialize();
-if (
-    !msalInstance.getActiveAccount() &&
-    msalInstance.getAllAccounts().length > 0
-) {
-    msalInstance.setActiveAccount(msalInstance.getAllAccounts()[0]);
-}
-
-msalInstance.enableAccountStorageEvents();
-
-msalInstance.addEventCallback((event: EventMessage) => {
+msalInstance.initialize().then(() => {
     if (
-        (event.eventType === EventType.LOGIN_SUCCESS ||
-            event.eventType === EventType.ACQUIRE_TOKEN_SUCCESS ||
-            event.eventType === EventType.SSO_SILENT_SUCCESS) &&
-        // @ts-ignore
-        event.payload.account
+        !msalInstance.getActiveAccount() &&
+        msalInstance.getAllAccounts().length > 0
     ) {
-        // @ts-ignore
-        msalInstance.setActiveAccount(event.payload.account);
+        msalInstance.setActiveAccount(msalInstance.getAllAccounts()[0]);
     }
+
+    msalInstance.enableAccountStorageEvents();
+
+    msalInstance.addEventCallback((event: EventMessage) => {
+        if (
+            (event.eventType === EventType.LOGIN_SUCCESS ||
+                event.eventType === EventType.ACQUIRE_TOKEN_SUCCESS ||
+                event.eventType === EventType.SSO_SILENT_SUCCESS) &&
+            // @ts-ignore
+            event.payload.account
+        ) {
+            // @ts-ignore
+            msalInstance.setActiveAccount(event.payload.account);
+        }
+    });
+
+    // Create Router
+    const router = createBrowserRouter([
+        {
+            path: "/",
+            element: <MainLayout />,
+            errorElement: <NotFound />,
+            children: [
+                {
+                    index: true,
+                    element: <Home />,
+                },
+                {
+                    path: "/journal",
+                    element: <Journal />,
+                },
+                {
+                    path: "/theme",
+                    element: <Theme />,
+                },
+                {
+                    path: "/settings",
+                    element: <Settings />,
+                },
+            ],
+        },
+    ]);
+
+    ReactDOM.createRoot(document.getElementById("root")!).render(
+        <React.StrictMode>
+            <MsalProvider instance={msalInstance}>
+                <QueryClientProvider client={queryClient}>
+                    <RouterProvider router={router} />
+                    <Toaster />
+                    <IgnoreThis />
+                </QueryClientProvider>
+            </MsalProvider>
+        </React.StrictMode>,
+    );
 });
-
-// Create Router
-const router = createBrowserRouter([
-    {
-        path: "/",
-        element: <MainLayout />,
-        errorElement: <NotFound />,
-        children: [
-            {
-                index: true,
-                element: <Home />,
-            },
-            {
-                path: "/journal",
-                element: <Journal />,
-            },
-            {
-                path: "/theme",
-                element: <Theme />,
-            },
-            {
-                path: "/settings",
-                element: <Settings />,
-            },
-        ],
-    },
-]);
-
-ReactDOM.createRoot(document.getElementById("root")!).render(
-    <React.StrictMode>
-        <MsalProvider instance={msalInstance}>
-            <QueryClientProvider client={queryClient}>
-                <RouterProvider router={router} />
-                <Toaster />
-                <IgnoreThis />
-            </QueryClientProvider>
-        </MsalProvider>
-    </React.StrictMode>,
-);

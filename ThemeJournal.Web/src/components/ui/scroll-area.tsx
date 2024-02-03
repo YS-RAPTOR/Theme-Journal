@@ -9,7 +9,7 @@ const ScrollArea = React.forwardRef<
 >(({ className, children, about, ...props }, ref) => {
     const scrollAreaRef = React.useRef<HTMLDivElement | undefined>(undefined);
     React.useEffect(() => {
-        if ((about = "center" && scrollAreaRef.current)) {
+        if (about === "center" && scrollAreaRef.current) {
             scrollAreaRef.current.scrollLeft =
                 (scrollAreaRef.current.scrollWidth -
                     scrollAreaRef.current.clientWidth) /
@@ -24,6 +24,7 @@ const ScrollArea = React.forwardRef<
             {...props}
         >
             <ScrollAreaPrimitive.Viewport
+                // @ts-ignore
                 ref={scrollAreaRef}
                 className="h-full w-full rounded-[inherit]"
             >
