@@ -12,7 +12,6 @@ import Root from "../pages/Root";
 
 const Layout = ({ children }: { children: ReactNode }) => {
     const { instance }: IMsalContext = useMsal();
-    const setTime = timeStore((state) => state.setTime);
 
     useEffect(() => {
         // Sets up interceptor to add bearer token to requests
@@ -30,6 +29,27 @@ const Layout = ({ children }: { children: ReactNode }) => {
             },
         );
 
+        return () => {
+            axiosInstance.interceptors.request.eject(inceptor);
+        };
+    }, []);
+
+    return (
+        <>
+            <AuthenticatedTemplate>
+                <AutomaticallyGetTime>{children}</AutomaticallyGetTime>
+            </AuthenticatedTemplate>
+            <UnauthenticatedTemplate>
+                <Root />
+            </UnauthenticatedTemplate>
+        </>
+    );
+};
+
+const AutomaticallyGetTime = (props: { children: React.ReactNode }) => {
+    const setTime = timeStore((state) => state.setTime);
+
+    useEffect(() => {
         const func = async () => {
             try {
                 const time = await GetTime();
@@ -41,18 +61,10 @@ const Layout = ({ children }: { children: ReactNode }) => {
         const interval = setInterval(func, 600000);
 
         return () => {
-            axiosInstance.interceptors.request.eject(inceptor);
             clearInterval(interval);
         };
     }, []);
-
-    return (
-        <>
-            <AuthenticatedTemplate>{children}</AuthenticatedTemplate>
-            <UnauthenticatedTemplate>
-                <Root />
-            </UnauthenticatedTemplate>
-        </>
-    );
+    return <>{props.children}</>;
 };
+
 export default Layout;
