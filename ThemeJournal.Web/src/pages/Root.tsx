@@ -74,7 +74,7 @@ const Root = () => {
                         width={width}
                         height={height}
                         alt="Hero Image"
-                        src="/HeroImage.png"
+                        src="/HeroImage.webp"
                     ></img>
                 </div>
                 <div className="bg-slate-800 gap-4 flex p-5 py-10 flex-col text-center items-center">

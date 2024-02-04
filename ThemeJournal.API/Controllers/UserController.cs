@@ -72,7 +72,6 @@ namespace ThemeJournal.Api.Controllers
             var time = await _userData.GetTime(userId);
             if (time.Count == 0)
             {
-                await _userData.UpsertTime(userId, new TimeModel());
                 return Ok(new GetTimeModel());
             }
 

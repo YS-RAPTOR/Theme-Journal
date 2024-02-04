@@ -7,7 +7,9 @@ import { TimeType } from "@/lib/types";
 import { InteractionStatus } from "@azure/msal-browser";
 import { useMsal } from "@azure/msal-react";
 import { useEffect, useState } from "react";
+import { PiArrowArcLeftDuotone } from "react-icons/pi";
 import { useMutation } from "react-query";
+import { useNavigate } from "react-router-dom";
 
 const Settings = () => {
     const { instance, inProgress } = useMsal();
@@ -46,9 +48,19 @@ const Settings = () => {
         });
     };
 
+    const navigate = useNavigate();
+
     return (
         <main className="flex justify-center">
             <div className="flex w-full max-w-[750px] flex-auto flex-col gap-3 p-2">
+                <Button
+                    onClick={() => navigate(-1)}
+                    size="icon"
+                    variant="outline"
+                >
+                    <PiArrowArcLeftDuotone className="text-2xl" />
+                </Button>
+                <div></div>
                 <div>
                     <h1>Profile Settings</h1>
                     <Separator />

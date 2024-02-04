@@ -398,6 +398,7 @@ export const EditTime = async ({ hours, minutes }: Types.TimeType) => {
 export const GetTime = async () => {
     return axiosInstance.get(`user/time`).then((res) => {
         if (res.data.hours === null || res.data.minutes === null) {
+            EditTime({ hours: 0, minutes: 0 });
             return { hours: 0, minutes: 0 };
         }
 

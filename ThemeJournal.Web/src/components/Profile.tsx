@@ -16,10 +16,12 @@ import {
     DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "./ui/avatar";
+import { useState } from "react";
 
 const Profile = () => {
     const { instance } = useMsal();
     const profileLetter = instance.getActiveAccount()?.name?.charAt(0);
+    const [state, setState] = useState(false);
 
     const HandleLogin = () => {
         instance.loginPopup(loginRequest).catch((error) => {
@@ -28,6 +30,7 @@ const Profile = () => {
     };
 
     const HandleLogout = () => {
+        setState(false);
         instance.logoutPopup().catch((error) => {
             console.log(error);
         });
@@ -36,14 +39,14 @@ const Profile = () => {
     return (
         <>
             <AuthenticatedTemplate>
-                <DropdownMenu>
+                <DropdownMenu open={state} onOpenChange={setState}>
                     <DropdownMenuTrigger>
                         <Avatar>
                             <AvatarFallback>{profileLetter}</AvatarFallback>
                         </Avatar>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setState(false)}>
                             <Link
                                 to="/settings"
                                 className="gap-2 flex items-center"
