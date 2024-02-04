@@ -333,16 +333,16 @@ const EditTaskView = (props: {
                 }),
             partialCompletion: z
                 .string()
-                .min(1, { message: "Partial description cannot be empty" })
+                .min(1, { message: "Partial Completion cannot be empty" })
                 .max(255, {
                     message:
-                        "Partial description cannot be longer than 255 chars",
+                        "Partial Completion cannot be longer than 255 chars",
                 }),
             fullCompletion: z
                 .string()
-                .min(1, { message: "Full description cannot be empty" })
+                .min(1, { message: "Full Completion cannot be empty" })
                 .max(255, {
-                    message: "Full description cannot be longer than 255 chars",
+                    message: "Full Completion cannot be longer than 255 chars",
                 }),
             startDate: z.coerce
                 .date({ required_error: "Start date is required" })
@@ -410,7 +410,7 @@ const EditTaskView = (props: {
                                 render={({ field }) => (
                                     <FormItem className="flex flex-col gap-1 space-y-0">
                                         <FormLabel>
-                                            Partial Description
+                                            Partial Completion
                                         </FormLabel>
                                         <FormControl>
                                             <Input {...field} />
@@ -424,7 +424,7 @@ const EditTaskView = (props: {
                                 name="fullCompletion"
                                 render={({ field }) => (
                                     <FormItem className="flex flex-col gap-1 space-y-0">
-                                        <FormLabel>Full Description</FormLabel>
+                                        <FormLabel>Full Completion</FormLabel>
                                         <FormControl>
                                             <Input {...field} />
                                         </FormControl>

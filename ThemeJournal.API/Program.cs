@@ -53,6 +53,10 @@ UTCDateTimeHandler.Register(DateTimeConverter);
 var GUIDConverter = new GUIDHandler();
 GUIDHandler.Register(GUIDConverter);
 
+// Add BitArray converter
+var BitArrayConverter = new BitHandler();
+BitHandler.Register(BitArrayConverter);
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder

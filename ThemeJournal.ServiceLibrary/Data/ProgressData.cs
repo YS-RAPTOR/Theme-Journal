@@ -32,8 +32,8 @@ public class ProgressData : IProgressData
         var sql =
             @"
                 insert into daily_progress (id, userid, taskid, completiondate, progress)
-                values (@id, @userid, @taskid, @completiondate, @progress)
-                on duplicate key update progress = @progress;
+                values (@id, @userid, @taskid, @completiondate, b@progress)
+                on duplicate key update progress = b@progress;
             ";
 
         await _sql.SaveData(sql, parameters);
