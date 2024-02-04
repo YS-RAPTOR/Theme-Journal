@@ -6,7 +6,7 @@ import { create } from "zustand";
 
 // Create axios instance
 export const axiosInstance = axios.create({
-    baseURL: "https://localhost:7181/api",
+    baseURL: import.meta.env.VITE_API as string,
 });
 
 // Create query client
