@@ -1,6 +1,6 @@
 import ThemeView from "../components/ThemeView";
 import { ThemeType } from "../lib/types";
-import { GetTheme, TransformDate } from "../lib/api";
+import { GetTheme, TransformDate, timeStore } from "../lib/api";
 import { useQuery } from "react-query";
 import FetchError from "../components/FetchError";
 import CreateTheme from "../components/CreateTheme";
@@ -23,7 +23,9 @@ const Theme = () => {
         queryFn: () => GetTheme(null, TransformDate(new Date())),
     });
 
-    if (ThemesQuery.isLoading) {
+    const time = timeStore((state) => state.time);
+
+    if (ThemesQuery.isLoading || time === undefined) {
         return (
             <main className="flex justify-center">
                 <div

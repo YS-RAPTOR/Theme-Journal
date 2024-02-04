@@ -1,5 +1,11 @@
 import TaskView from "@/components/TaskView";
-import { GetActiveTheme, GetDates, GetTask, TransformDate } from "@/lib/api";
+import {
+    GetActiveTheme,
+    GetDates,
+    GetTask,
+    TransformDate,
+    timeStore,
+} from "@/lib/api";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { GetTheme } from "../lib/api";
 import { useQuery } from "react-query";
@@ -35,8 +41,9 @@ const Home = () => {
     });
 
     const navigate = useNavigate();
+    const time = timeStore((state) => state.time);
 
-    if (ThemesQuery.isLoading || TasksQuery.isLoading) {
+    if (ThemesQuery.isLoading || TasksQuery.isLoading || time === undefined) {
         // Show a loading screen if the themes are loading
         return (
             <main className="flex justify-center">

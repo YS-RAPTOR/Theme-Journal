@@ -7,6 +7,7 @@ import {
     TransformDate,
     UpsertGratitude,
     UpsertThought,
+    timeStore,
 } from "../lib/api";
 import { GratitudesType, ThoughtsType, TimeOfDay } from "../lib/types";
 import FetchError from "../components/FetchError";
@@ -45,7 +46,13 @@ const Journal = () => {
         queryFn: () => GetThought(tomorrow, today),
     });
 
-    if (gratitudeQuery.isLoading || thoughtsQuery.isLoading) {
+    const time = timeStore((state) => state.time);
+
+    if (
+        gratitudeQuery.isLoading ||
+        thoughtsQuery.isLoading ||
+        time === undefined
+    ) {
         return (
             <main className="flex justify-center">
                 <div className="flex w-full max-w-[1054px] flex-auto flex-col gap-3 p-2 ">
@@ -143,7 +150,7 @@ const JournalInner = ({
         GetGratitudeByTime(gratitudeQuery.data, TimeOfDay.Night),
     );
 
-    const [thoughts, setThoughts] = useState(
+    const [thoughts, setThoughts] = useState<ThoughtsType>(
         thoughtQuery.data.length === 0
             ? {
                   id: uuidv7obj(),

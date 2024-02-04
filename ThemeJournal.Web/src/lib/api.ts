@@ -21,11 +21,21 @@ export const TransformDate = (date: Date, subtract: boolean = true) => {
     const transform = new Date(date);
 
     const time = timeStore.getState().time;
-    transform.setHours(time.hours, time.minutes, 0, 0);
 
-    if (transform.getTime() > date.getTime() && subtract) {
-        return new Date(transform.getTime() - 86400000);
+    if (time !== undefined) {
+        transform.setHours(time.hours, time.minutes, 0, 0);
+
+        if (transform.getTime() > date.getTime() && subtract) {
+            return new Date(transform.getTime() - 86400000);
+        }
+
+        return transform;
     }
+
+    GetTime().then((e) => {
+        timeStore.setState({ time: e });
+        return TransformDate(date, subtract);
+    });
 
     return transform;
 };
@@ -400,18 +410,23 @@ export const GetTime = async () => {
 };
 
 type timeStoreType = {
-    time: Types.TimeType;
+    time?: Types.TimeType;
     setTime: (time: Types.TimeType) => void;
     timeString: () => string;
 };
 
 export const timeStore = create<timeStoreType>((set, get) => ({
-    time: { hours: 0, minutes: 0 },
+    time: undefined,
     setTime: (time: Types.TimeType) => {
         set(() => ({ time: time }));
     },
     timeString() {
         const time = get().time;
+
+        if (time === undefined) {
+            return "00:00";
+        }
+
         let timeString = "";
 
         if (time.hours < 10) {
