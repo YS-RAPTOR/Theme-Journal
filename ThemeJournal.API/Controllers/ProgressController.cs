@@ -59,7 +59,7 @@ namespace ThemeJournal.Api.Controllers
             //Make sure the user has not already submitted progress for today under different Id for same task
             var progresses = await _progressData.GetProgress(
                 userId,
-                [progress.TaskId],
+                progress.TaskId,
                 progress.CompletionDate.AddDays(1),
                 progress.CompletionDate
             );

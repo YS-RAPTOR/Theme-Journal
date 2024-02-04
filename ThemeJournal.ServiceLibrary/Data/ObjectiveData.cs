@@ -15,31 +15,25 @@ public class ObjectiveData : IObjectiveData
 
     public async Task CreateObjective(Guid userId, Guid themeId, List<ObjectiveModel> objectives)
     {
-        List<Guid> ids = new(objectives.Count);
-        List<string> descriptions = new(objectives.Count);
-        List<int> colorIds = new(objectives.Count);
-
+        List<Task> tasks = new();
         foreach (var objective in objectives)
         {
-            ids.Add(objective.Id);
-            descriptions.Add(objective.Description);
-            colorIds.Add(objective.ColorId);
+            DynamicParameters parameters = new();
+            parameters.Add("@userid", userId);
+            parameters.Add("@themeid", themeId);
+            parameters.Add("@id", objective.Id);
+            parameters.Add("@description", objective.Description);
+            parameters.Add("@colorid", objective.ColorId);
+            var sql =
+                @"
+                    insert into theme_objectives (id, userid, themeid, description, colorid)
+                    values(@id, @userid, @themeid, @description, @colorid);
+                ";
+
+            tasks.Add(_sql.SaveData(sql, parameters));
         }
 
-        DynamicParameters parameters = new();
-        parameters.Add("@userid", userId);
-        parameters.Add("@themeid", themeId);
-        parameters.Add("@id", ids);
-        parameters.Add("@description", descriptions);
-        parameters.Add("@colorid", colorIds);
-
-        var sql =
-            @"
-                insert into theme_objectives (id, userid, themeid, description, colorid)
-                select unnest(@id), @userid, @themeid, unnest(@description), unnest(@colorid)
-            ";
-
-        await _sql.SaveData(sql, parameters);
+        await Task.WhenAll(tasks);
     }
 
     public async Task<List<ObjectiveModel>> GetObjectiveByThemeId(Guid userId, Guid themeId)

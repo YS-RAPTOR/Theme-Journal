@@ -8,7 +8,7 @@ public interface IProgressData
     Task UpsertProgress(Guid userId, Guid id, PostProgressModel progress, BitArray bits);
     Task<List<ProgressModel>> GetProgress(
         Guid userId,
-        List<Guid> taskIds,
+        Guid taskId,
         DateTime? upperDate,
         DateTime? lowerDate
     );

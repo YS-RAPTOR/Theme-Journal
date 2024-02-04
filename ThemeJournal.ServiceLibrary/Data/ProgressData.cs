@@ -33,8 +33,7 @@ public class ProgressData : IProgressData
             @"
                 insert into daily_progress (id, userid, taskid, completiondate, progress)
                 values (@id, @userid, @taskid, @completiondate, @progress)
-                on conflict (id) do update
-                set progress = @progress;
+                on duplicate key update progress = @progress;
             ";
 
         await _sql.SaveData(sql, parameters);
@@ -59,14 +58,14 @@ public class ProgressData : IProgressData
 
     public async Task<List<ProgressModel>> GetProgress(
         Guid userId,
-        List<Guid> taskIds,
+        Guid taskId,
         DateTime? upperDate,
         DateTime? lowerDate
     )
     {
         DynamicParameters parameters = new();
         parameters.Add("@userid", userId);
-        parameters.Add("@taskids", taskIds);
+        parameters.Add("@taskids", taskId);
         parameters.Add("@lowerdate", lowerDate, DbType.Date);
         parameters.Add("@upperdate", upperDate, DbType.Date);
 
@@ -77,9 +76,8 @@ public class ProgressData : IProgressData
                 where userid = @userid and
                 (@lowerdate is null or completiondate >= @lowerdate) and
                 (@upperdate is null or completiondate < @upperdate) and
-                taskid = any(@taskids);
+                taskid = @taskids;
             ";
-
         return await _sql.LoadData<ProgressModel, dynamic>(sql, parameters);
     }
 

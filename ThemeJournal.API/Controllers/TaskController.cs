@@ -148,11 +148,11 @@ namespace ThemeJournal.Api.Controllers
         {
             DateTime? upperDateCorrect = !upperDate.HasValue
                 ? null
-                :await  _userService.TrasformDate(upperDate.Value);
+                : await _userService.TrasformDate(upperDate.Value);
 
             DateTime? lowerDateCorrect = !lowerDate.HasValue
                 ? null
-                :await  _userService.TrasformDate(lowerDate.Value);
+                : await _userService.TrasformDate(lowerDate.Value);
 
             var userId = _userService.GetUserId();
             List<TaskModel> tasks = await _taskData.GetTasks(
@@ -169,34 +169,18 @@ namespace ThemeJournal.Api.Controllers
                 }
             }
 
-            var TaskMap = new Dictionary<Guid, TaskModel>(tasks.Count);
-            var listOfTaskIds = new List<Guid>(tasks.Count);
-
             foreach (var task in tasks)
             {
-                TaskMap.Add(task.Id, task);
-                listOfTaskIds.Add(task.Id);
-            }
+                var progresses = await _progressData.GetProgress(userId, task.Id, upperDateCorrect, lowerDateCorrect);
+                task.Progress = [];
 
-            var progresses = await _progressData.GetProgress(
-                userId,
-                listOfTaskIds,
-                upperDateCorrect,
-                lowerDateCorrect
-            );
-
-            foreach (var progress in progresses)
-            {
-                if (TaskMap[progress.TaskId].Progress == null)
+                foreach (var progress in progresses)
                 {
-                    TaskMap[progress.TaskId].Progress = [];
+                    task.Progress.Add(new TaskProgress(progress.Id, progress.CompletionDate, progress.Progress));
                 }
-                TaskMap[progress.TaskId]
-                    .Progress
-                    .Add(new TaskProgress(progress.Id, progress.CompletionDate, progress.Progress));
             }
 
-            return Ok(TaskMap.Values.ToList());
+            return Ok(tasks);
         }
     }
 }

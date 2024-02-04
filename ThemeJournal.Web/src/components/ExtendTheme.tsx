@@ -136,7 +136,7 @@ const ExtendThemeView = (props: { theme: ThemeType; maxDate?: Date }) => {
                                 label="End Date"
                                 name="endDate"
                                 // @ts-ignore
-                                disabledDays={(date) => {
+                                disabled={(date) => {
                                     if (!maxDate) {
                                         return date < minDate;
                                     } else {

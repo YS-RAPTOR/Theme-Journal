@@ -1,7 +1,6 @@
-﻿using System.Data;
-using Dapper;
+﻿using Dapper;
 using Microsoft.Extensions.Configuration;
-using Npgsql;
+using MySqlConnector;
 
 namespace ThemeJournal.ServiceLibrary.DataAccess;
 
@@ -20,12 +19,11 @@ public class SqlDataAccess : IDataAccess
         string connectionStringName = "DatabaseConnection"
     )
     {
-        using (NpgsqlConnection connection = new(_config.GetConnectionString(connectionStringName)))
+        using (MySqlConnection connection = new(_config.GetConnectionString(connectionStringName)))
         {
             connection.Open();
             await connection.ExecuteAsync(sql, data);
-        }
-        ;
+        };
     }
 
     public async Task<List<T>> LoadData<T, U>(
@@ -34,12 +32,11 @@ public class SqlDataAccess : IDataAccess
         string connectionStringName = "DatabaseConnection"
     )
     {
-        using (NpgsqlConnection connection = new(_config.GetConnectionString(connectionStringName)))
+        using (MySqlConnection connection = new(_config.GetConnectionString(connectionStringName)))
         {
             connection.Open();
             var output = await connection.QueryAsync<T>(sql, parameters);
             return output.ToList();
-        }
-        ;
+        };
     }
 }

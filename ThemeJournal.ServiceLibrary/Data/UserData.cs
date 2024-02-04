@@ -26,8 +26,7 @@ public class UserData : IUserData
             @"
                 insert into users (id, hours, minutes)
                 values (@id, @hours, @minutes)
-                on conflict (id) do update
-                set hours = @hours, minutes = @minutes;
+                on duplicate key update hours = @hours, minutes = @minutes;
             ";
 
         await _sql.SaveData(sql, parameters);

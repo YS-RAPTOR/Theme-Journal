@@ -1,7 +1,9 @@
-CREATE TABLE Theme_Objectives (
-    Id UUID PRIMARY KEY,
-    UserId UUID REFERENCES Users(Id) ON DELETE CASCADE NOT NULL,
-    ThemeId UUID REFERENCES Themes(Id) ON DELETE CASCADE NOT NULL,
-    Description VARCHAR(255) NOT NULL
-    ColorId INTEGER NOT NULL DEFAULT 0,
+create table theme_objectives (
+    id binary(16) primary key,
+    userid binary(16) not null,
+    themeid binary(16) not null,
+    description varchar(255) not null,
+    colorid integer not null default 0,
+    foreign key(userid) references users(id) on delete cascade,
+    foreign key(themeid) references themes(id) on delete cascade
 );

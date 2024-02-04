@@ -1,10 +1,9 @@
-CREATE TYPE TimeOfDay AS ENUM ('Day1', 'Day2', 'Night');
-
-CREATE TABLE Daily_Gratitudes (
-    Id UUID PRIMARY KEY,
-    UserId UUID REFERENCES Users(Id) ON DELETE CASCADE NOT NULL,
-    Time TimeOfDay NOT NULL,
-    CreatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    Description VARCHAR(1024) NOT NULL,
-    Sentiment NUMERIC(3, 2) CHECK (Sentiment >= -1 AND Sentiment <= 1) DEFAULT NULL
+create table daily_gratitudes (
+    id binary(16) primary key,
+    userid binary(16) not null,
+    time enum ('day1', 'day2', 'night') not null,
+    createdat datetime not null default current_timestamp,
+    description varchar(1024) not null,
+    sentiment numeric(3, 2) check (sentiment >= -1 and sentiment <= 1) default null,
+    foreign key (userid) references users(id) on delete cascade
 );

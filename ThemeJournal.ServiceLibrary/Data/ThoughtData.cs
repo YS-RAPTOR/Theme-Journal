@@ -26,8 +26,7 @@ public class ThoughtData : IThoughtData
             @"
                 insert into daily_thoughts (id, userid, thought, createdat)
                 values (@id, @userid, @thought, @createdat)
-                on conflict (id) do update
-                set thought = @thought;
+                on duplicate key update thought=@thought;
             ";
 
         await _sql.SaveData(sql, parameters);

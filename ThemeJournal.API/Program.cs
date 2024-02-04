@@ -49,6 +49,10 @@ builder.Services.AddTransient<IThoughtData, ThoughtData>();
 var DateTimeConverter = new UTCDateTimeHandler();
 UTCDateTimeHandler.Register(DateTimeConverter);
 
+// Add GUID converter
+var GUIDConverter = new GUIDHandler();
+GUIDHandler.Register(GUIDConverter);
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder

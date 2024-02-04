@@ -95,7 +95,6 @@ export const GetTheme = async (upperDate: date, lowerDate: date) => {
             res.data.sort((a: Types.ThemeType, b: Types.ThemeType) => {
                 return a.startDate.getTime() - b.startDate.getTime();
             });
-
             return res.data as Array<Types.ThemeType>;
         });
 };
@@ -267,7 +266,6 @@ export const UpsertThought = async ({
     };
 
     return axiosInstance.put(`/thoughts/${id}`, data).then((res) => {
-        console.log(res.data);
         return res.data;
     });
 };

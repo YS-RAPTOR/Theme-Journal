@@ -262,7 +262,7 @@ const CreateThemeView = (props: { endDate: Date }) => {
                             >
                                 {objectiveFields.map((field, index) => (
                                     <ObjectiveView
-                                        key={field.id}
+                                        key={index}
                                         canEdit={0 !== index}
                                         index={index}
                                         control={form.control}

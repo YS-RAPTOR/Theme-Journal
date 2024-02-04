@@ -1,5 +1,5 @@
-CREATE TABLE Users(
-    Id UUID PRIMARY KEY,
-    Hours SMALLINT NOT NULL DEFAULT 0, 
-    Minutes SMALLINT NOT NULL DEFAULT 0,
-)
+create table users(
+    id binary(16) primary key,
+    hours smallint not null default 0, 
+    minutes smallint not null default 0
+);
