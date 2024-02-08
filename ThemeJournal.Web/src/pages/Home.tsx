@@ -23,6 +23,7 @@ import { IndentedDiv } from "@/components/IndentedText";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { ThemeType } from "@/lib/types";
 
 // Add the new task button. Allows to add a new task.
 const Home = () => {
@@ -33,6 +34,12 @@ const Home = () => {
     const ThemesQuery = useQuery({
         queryKey: ["currentThemes"],
         queryFn: () => GetTheme(null, TransformDate(new Date())),
+        onSuccess: (data: ThemeType[]) => {
+            const activeTheme = GetActiveTheme(data) ?? null;
+            if (activeTheme === null) {
+                toast.error("No active theme found. Please Add a theme!");
+            }
+        },
     });
 
     const TasksQuery = useQuery({
@@ -99,7 +106,6 @@ const Home = () => {
     const activeTheme = GetActiveTheme(ThemesQuery.data) ?? null;
 
     if (activeTheme === null) {
-        toast.error("No active theme found. Please Add a theme!");
         navigate("/theme");
         return <></>;
     }
