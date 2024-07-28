@@ -40,7 +40,7 @@ public class UserService : IUserService
         return new TimeOnly(time[0].Hours, time[0].Minutes, 0);
     }
 
-    public async Task<DateTime> TrasfarmDate(DateTime date, bool subtract = true)
+    public async Task<DateTime> TrasformDate(DateTime date, bool subtract = true)
     {
         var userDayStartTime = await GetUserDayStartTime();
 
