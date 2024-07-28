@@ -133,7 +133,9 @@ namespace ThemeJournal.Api.Controllers
 
             // Transform the Dates according to User Start time
             endDate = await _userService.TrasformDate(endDate);
-            themeToUpdate[0].StartDate = await _userService.TrasformDate(themeToUpdate[0].StartDate);
+            themeToUpdate[0].StartDate = await _userService.TrasformDate(
+                themeToUpdate[0].StartDate
+            );
 
             // Check Intersection with other themes
             var themesWithIntersection = await _themeData.GetThemes(

@@ -5,7 +5,6 @@ using ThemeJournal.ServiceLibrary.Models;
 
 namespace ThemeJournal.ServiceLibrary.Data;
 
-
 public class UserData : IUserData
 {
     private readonly IDataAccess _sql;
@@ -26,7 +25,8 @@ public class UserData : IUserData
             @"
                 insert into users (id, hours, minutes)
                 values (@id, @hours, @minutes)
-                on duplicate key update hours = @hours, minutes = @minutes;
+                on conflict (id) do update
+                set hours = @hours, minutes = @minutes;
             ";
 
         await _sql.SaveData(sql, parameters);
@@ -46,5 +46,4 @@ public class UserData : IUserData
 
         return await _sql.LoadData<TimeModel, dynamic>(sql, parameters);
     }
-
 }

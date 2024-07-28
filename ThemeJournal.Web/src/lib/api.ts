@@ -383,7 +383,9 @@ export const UpsertProgress = async ({ id, ...data }: Types.ProgressType) => {
 };
 
 export const EditTime = async ({ hours, minutes }: Types.TimeType) => {
-    const date = new Date(2000, 1, 1, hours, minutes);
+    const date = new Date();
+    date.setHours(hours);
+    date.setMinutes(minutes);
 
     return axiosInstance
         .put(`user/time`, {
@@ -402,9 +404,9 @@ export const GetTime = async () => {
             return { hours: 0, minutes: 0 };
         }
 
-        const date = new Date(
-            Date.UTC(2000, 1, 1, res.data.hours, res.data.minutes),
-        );
+        const date = new Date();
+        date.setUTCHours(res.data.hours);
+        date.setUTCMinutes(res.data.minutes);
         res.data = { hours: date.getHours(), minutes: date.getMinutes() };
         return res.data;
     });

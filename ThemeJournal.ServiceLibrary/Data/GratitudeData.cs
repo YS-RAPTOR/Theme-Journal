@@ -26,8 +26,9 @@ public class GratitudeData : IGratitudeData
         var sql =
             @"
                 insert into daily_gratitudes (id, userid, description, sentiment, createdat, time)
-                values (@id, @userid, @description, @sentiment, @createdat, @time)
-                on duplicate key update description = @description, sentiment = @sentiment;
+                values (@id, @userid, @description, @sentiment, @createdat, @time::timeofday)
+                on conflict (id)
+                do update set description = @description, sentiment = @sentiment;
             ";
 
         await _sql.SaveData(sql, parameters);
@@ -56,7 +57,7 @@ public class GratitudeData : IGratitudeData
                 (createdat >= @lowerdate or @lowerdate is null) and
                 (createdat < @upperdate or @upperdate is null) and
                 (sentiment >= @sentiment or @sentiment is null) and
-                (time = @time or @time is null);
+                (time = @time::timeofday or @time is null);
             ";
 
         return await _sql.LoadData<GetGratitudeModel, dynamic>(sql, parameters);

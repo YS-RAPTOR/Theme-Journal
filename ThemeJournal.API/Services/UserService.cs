@@ -1,4 +1,5 @@
 using ThemeJournal.ServiceLibrary.Data;
+
 namespace ThemeJournal.Api.Services;
 
 public class UserService : IUserService
@@ -19,10 +20,9 @@ public class UserService : IUserService
             return Guid.Empty;
         }
         var userId = _httpContextAccessor
-            .HttpContext
-            .User
-            .Claims
-            .First(c => c.Type == "http://schemas.microsoft.com/identity/claims/objectidentifier")
+            .HttpContext.User.Claims.First(c =>
+                c.Type == "http://schemas.microsoft.com/identity/claims/objectidentifier"
+            )
             .Value;
         return Guid.Parse(userId);
     }
@@ -40,7 +40,7 @@ public class UserService : IUserService
         return new TimeOnly(time[0].Hours, time[0].Minutes, 0);
     }
 
-    public async Task<DateTime> TrasformDate(DateTime date, bool subtract = true)
+    public async Task<DateTime> TrasfarmDate(DateTime date, bool subtract = true)
     {
         var userDayStartTime = await GetUserDayStartTime();
 
